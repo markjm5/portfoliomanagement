@@ -26,7 +26,7 @@ def get_oecd_data(dataset, dimensions, params):
   dim_str = '.'.join(dim_args)
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
-
+  
   try:
 
     #resp = requests.get(url=url,params=params)
@@ -61,7 +61,7 @@ def get_oecd_data(dataset, dimensions, params):
           df.insert(index,value.get('value'),[],True)
       index+=1
 
-    #Add Dates  
+    #Add Dates  TODO: This needs to account for monthly data as well. Can't just be for Quarters.
     quarter_list = []
     date_list = []
     year_start, qtr_start =  params['startTime'].split('-Q')
@@ -105,13 +105,14 @@ def get_oecd_data(dataset, dimensions, params):
 
             #match based on quarter and country, then add the observation value
             df.loc[obs_row, current_country] = round(float(obs_value),9)        
+    return df
 
   except Exception as e:
+    
     exc_type, exc_obj, exc_tb = sys.exc_info()
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)
 
-  return df
 
 def write_to_directory(df,filename):
     #Write to a csv file in the correct directory
