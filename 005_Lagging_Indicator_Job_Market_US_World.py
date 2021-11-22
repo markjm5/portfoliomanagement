@@ -40,7 +40,7 @@ todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
 #TODO: CHANGE THIS FUNCTION SO THAT IT SHOWS MONTHS INSTEAD OF QUARTERS
-df_unemployed_world = get_oecd_data('STLABOUR', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '005_World.xml'})
+df_unemployed_world = get_oecd_data('STLABOUR', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '005_Job_Market_World.xml'})
 import pdb; pdb.set_trace()
 #Write to a csv file in the correct directory
 write_to_directory(df_unemployed_world,'005_Lagging_Indicator_Job_Market_World.csv')
