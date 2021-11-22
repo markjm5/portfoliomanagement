@@ -1,7 +1,9 @@
 import requests
+import sys
 import os.path
 import csv
 import pandas as pd
+import xml.etree.ElementTree as ET
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
@@ -15,6 +17,99 @@ def get_stlouisfed_data(series_code):
     df = df.append({"DATE": json["observations"][i]["date"], series_code: json["observations"][i]["value"]}, ignore_index=True)
 
   print("Retrieved Data for Series %s" % (series_code,))
+
+  return df
+
+def get_oecd_data(dataset, dimensions, params):
+
+  dim_args = ['+'.join(d) for d in dimensions]
+  dim_str = '.'.join(dim_args)
+
+  url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
+
+  try:
+
+    #resp = requests.get(url=url,params=params)
+    resp = requests.get(url=url)
+
+    resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
+
+    # Write response to an XML File
+    with open(params['filename'], 'w') as f:
+      f.write(resp_formatted)
+
+    # Load in the XML file into ElementTree
+    tree = ET.parse(params['filename'])
+
+    #TODO: Load into a dataframe and return the data frame
+    root = tree.getroot()
+
+    ns = {'sdmx': 'http://www.SDMX.org/resources/SDMXML/schemas/v2_0/generic'}
+
+    df = pd.DataFrame()
+
+    #Add column headers
+    df.insert(0,"QTR",[],True)
+    df.insert(1,"DATE",[],True)
+    index = 2
+    for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
+      current_country = ""
+      for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
+        if(value.get('concept')) == 'LOCATION':
+          current_country = value.get('value')
+          
+          df.insert(index,value.get('value'),[],True)
+      index+=1
+
+    #Add Dates  
+    quarter_list = []
+    date_list = []
+    year_start, qtr_start =  params['startTime'].split('-Q')
+    year_end, qtr_end =  params['endTime'].split('-Q')
+
+    for x in range(int(year_start), int(year_end)+1):
+      for y in range(1,5):
+
+        qtr_string = "%s-Q%s" % (x, y)
+        quarter_list.append(qtr_string)
+        match y:
+          case 1:
+            full_date = "1/4/" + str(x)
+          case 2:
+            full_date = "1/7/" + str(x)
+
+          case 3:
+            full_date = "1/10/" + str(x)
+          case 4:
+            full_date = "1/1/" + str(x)
+
+        date_list.append(full_date)
+
+    df['QTR'] = quarter_list
+    df['DATE'] = date_list
+
+    #Add observations for all countries
+    for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
+      for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
+        if(value.get('concept')) == 'LOCATION':
+          current_country = value.get('value')
+
+          observations = series.findall('sdmx:Obs',ns)
+
+          for observation in observations:
+            #TODO: Get qtr, date and observation. Add to column in chronological order for all countries
+
+            obs_qtr = observation.findall('sdmx:Time',ns)[0].text
+            obs_row = df.index[df['QTR'] == obs_qtr].tolist()
+            obs_value = observation.findall('sdmx:ObsValue',ns)[0].get('value')
+
+            #match based on quarter and country, then add the observation value
+            df.loc[obs_row, current_country] = round(float(obs_value),9)        
+
+  except Exception as e:
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print(exc_type, fname, exc_tb.tb_lineno)
 
   return df
 
