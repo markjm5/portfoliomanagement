@@ -10,6 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
+from common import write_to_directory
 
 
 #TODO: Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
@@ -171,9 +172,7 @@ endDate = '%s-Q4' % (todays_date.year)
 df_QoQ = get_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '003_QoQ.xml'})
 
 #Write to a csv file in the correct directory
-userhome = os.path.expanduser('~')
-file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database','003_Lagging_Indicator_World_GDP_QoQ.csv')
-df_QoQ.to_csv(file_name, index=False)
+write_to_directory(df_QoQ,'003_Lagging_Indicator_World_GDP_QoQ.csv')
 
 #Get YoY Data from OECD
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
@@ -191,16 +190,12 @@ endDate = '%s-Q4' % (todays_date.year)
 df_YoY = get_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '003_YoY.xml'})
 
 #Write to a csv file in the correct directory
-userhome = os.path.expanduser('~')
-file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database','003_Lagging_Indicator_World_GDP_YoY.csv')
-df_YoY.to_csv(file_name, index=False)
+write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
 
 
 df_World_GDP = scrape_table("https://tradingeconomics.com/matrix")
 
 #Write to a csv file in the correct directory
-userhome = os.path.expanduser('~')
-file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database','003_Lagging_Indicator_World_GDP.csv')
-df_World_GDP.to_csv(file_name, index=False)
+write_to_directory(df_World_GDP,'003_Lagging_Indicator_World_GDP.csv')
 
 print("Done!")
