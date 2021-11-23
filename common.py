@@ -24,6 +24,12 @@ def get_oecd_data(dataset, dimensions, params):
 
   dim_args = ['+'.join(d) for d in dimensions]
   dim_str = '.'.join(dim_args)
+  
+  date_range = dimensions[3][0]
+  if(date_range == 'Q'):
+    date_range = 'QTR'
+  elif(date_range == 'M'):
+    date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
   
@@ -49,7 +55,7 @@ def get_oecd_data(dataset, dimensions, params):
     df = pd.DataFrame()
 
     #Add column headers
-    df.insert(0,"QTR",[],True)
+    df.insert(0,date_range,[],True)
     df.insert(1,"DATE",[],True)
     index = 2
     for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
@@ -61,31 +67,37 @@ def get_oecd_data(dataset, dimensions, params):
           df.insert(index,value.get('value'),[],True)
       index+=1
 
-    #Add Dates  TODO: This needs to account for monthly data as well. Can't just be for Quarters.
-    quarter_list = []
+    #Add Dates  TODO: This needs to account for both Quarterly and Monthly data.
+    date_range_list = []
     date_list = []
     year_start, qtr_start =  params['startTime'].split('-Q')
     year_end, qtr_end =  params['endTime'].split('-Q')
 
-    for x in range(int(year_start), int(year_end)+1):
-      for y in range(1,5):
+    if(date_range == 'QTR'):
 
-        qtr_string = "%s-Q%s" % (x, y)
-        quarter_list.append(qtr_string)
-        match y:
-          case 1:
-            full_date = "1/4/" + str(x)
-          case 2:
-            full_date = "1/7/" + str(x)
+      for x in range(int(year_start), int(year_end)+1):
+        for y in range(1,5):
 
-          case 3:
-            full_date = "1/10/" + str(x)
-          case 4:
-            full_date = "1/1/" + str(x)
+          qtr_string = "%s-Q%s" % (x, y)
+          date_range_list.append(qtr_string)
+          match y:
+            case 1:
+              full_date = "1/4/" + str(x)
+            case 2:
+              full_date = "1/7/" + str(x)
 
-        date_list.append(full_date)
+            case 3:
+              full_date = "1/10/" + str(x)
+            case 4:
+              full_date = "1/1/" + str(x)
 
-    df['QTR'] = quarter_list
+          date_list.append(full_date)
+
+    else:
+      #TODO: From year_start to year_end, calculate all the months. Populate date_range_list and date_list
+      pass
+
+    df[date_range] = date_range_list
     df['DATE'] = date_list
 
     #Add observations for all countries
