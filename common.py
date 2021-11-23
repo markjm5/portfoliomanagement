@@ -94,13 +94,16 @@ def get_oecd_data(dataset, dimensions, params):
           date_list.append(full_date)
 
     else:
-      #TODO: From year_start to year_end, calculate all the months. Populate date_range_list and date_list
-      pass
+      #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
+      date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (year_end), freq='MS').strftime("%Y-%m").tolist()
+      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (year_end), freq='MS').strftime("1/%-m/%Y").tolist()
 
     df[date_range] = date_range_list
     df['DATE'] = date_list
 
     #Add observations for all countries
+    #TODO: Does not work for monthly jobless data
+    import pdb; pdb.set_trace()
     for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
       for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
         if(value.get('concept')) == 'LOCATION':
@@ -112,7 +115,7 @@ def get_oecd_data(dataset, dimensions, params):
             #TODO: Get qtr, date and observation. Add to column in chronological order for all countries
 
             obs_qtr = observation.findall('sdmx:Time',ns)[0].text
-            obs_row = df.index[df['QTR'] == obs_qtr].tolist()
+            obs_row = df.index[df[date_range] == obs_qtr].tolist()
             obs_value = observation.findall('sdmx:ObsValue',ns)[0].get('value')
 
             #match based on quarter and country, then add the observation value
