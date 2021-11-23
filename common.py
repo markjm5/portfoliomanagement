@@ -49,7 +49,7 @@ def get_oecd_data(dataset, dimensions, params):
     # Load in the XML file into ElementTree
     tree = ET.parse(params['filename'])
 
-    #TODO: Load into a dataframe and return the data frame
+    #Load into a dataframe and return the data frame
     root = tree.getroot()
 
     ns = {'sdmx': 'http://www.SDMX.org/resources/SDMXML/schemas/v2_0/generic'}
@@ -98,7 +98,7 @@ def get_oecd_data(dataset, dimensions, params):
           observations = series.findall('sdmx:Obs',ns)
 
           for observation in observations:
-            #TODO: Get qtr, date and observation. Add to column in chronological order for all countries
+            #Get qtr, date and observation. Add to column in chronological order for all countries
 
             obs_qtr = observation.findall('sdmx:Time',ns)[0].text
             obs_row = df.index[df[date_range] == obs_qtr].tolist()
