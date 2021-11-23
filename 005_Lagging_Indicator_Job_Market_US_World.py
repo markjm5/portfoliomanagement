@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 from datetime import date
 from common import get_stlouisfed_data, get_oecd_data, write_to_directory
-"""
+
 df_CIVPART = get_stlouisfed_data('CIVPART')
 df_PAYEMS = get_stlouisfed_data('PAYEMS')
 df_UNRATE = get_stlouisfed_data('UNRATE')
@@ -23,7 +23,7 @@ df_unemployed_US = pd.concat([df_1,df_2],axis=1)
 
 #Write to a csv file in the correct directory
 write_to_directory(df_unemployed_US,'005_Lagging_Indicator_Job_Market_US.csv')
-"""
+
 
 #TODO: Get Correct Data from OECD
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI_ARCHIVE/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+NMEC+BRA+RUS.501.202102.Q+M/all?startTime=2020-Q4&endTime=2021-Q4
