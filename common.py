@@ -27,10 +27,11 @@ def get_oecd_data(dataset, dimensions, params):
   dim_str = '.'.join(dim_args)
   
   date_range = dimensions[3][0]
-  if(date_range == 'Q'):
-    date_range = 'QTR'
-  elif(date_range == 'M'):
-    date_range = 'MTH'
+  match date_range:
+    case 'Q':
+      date_range = 'QTR'
+    case 'M':
+      date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
   
@@ -74,15 +75,16 @@ def get_oecd_data(dataset, dimensions, params):
     year_start, qtr_start =  params['startTime'].split('-Q')
     year_end, qtr_end =  params['endTime'].split('-Q')
 
-    if(date_range == 'QTR'):
-      #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
-      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
-      date_range_list = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q')
+    match date_range:
+      case 'QTR':
+        #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
+        date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
+        date_range_list = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
 
-    else:
-      #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
-      date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("%Y-%m").tolist()
-      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("1/%-m/%Y").tolist()
+      case 'MTH':
+        #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
+        date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("%Y-%m").tolist()
+        date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("1/%-m/%Y").tolist()
 
     df[date_range] = date_range_list
     df['DATE'] = date_list
