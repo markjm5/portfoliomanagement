@@ -195,7 +195,7 @@ write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
 
 
 df_World_GDP = scrape_table("https://tradingeconomics.com/matrix")
-
+import pdb; pdb.set_trace()
 #Write to a csv file in the correct directory
 write_to_directory(df_World_GDP,'003_Lagging_Indicator_World_GDP.csv')
 

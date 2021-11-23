@@ -4,6 +4,7 @@ import os.path
 import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
+from datetime import datetime
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
@@ -74,36 +75,19 @@ def get_oecd_data(dataset, dimensions, params):
     year_end, qtr_end =  params['endTime'].split('-Q')
 
     if(date_range == 'QTR'):
-
-      for x in range(int(year_start), int(year_end)+1):
-        for y in range(1,5):
-
-          qtr_string = "%s-Q%s" % (x, y)
-          date_range_list.append(qtr_string)
-          match y:
-            case 1:
-              full_date = "1/4/" + str(x)
-            case 2:
-              full_date = "1/7/" + str(x)
-
-            case 3:
-              full_date = "1/10/" + str(x)
-            case 4:
-              full_date = "1/1/" + str(x)
-
-          date_list.append(full_date)
+      #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
+      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
+      date_range_list = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q')
 
     else:
       #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
-      date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (year_end), freq='MS').strftime("%Y-%m").tolist()
-      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (year_end), freq='MS').strftime("1/%-m/%Y").tolist()
+      date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("%Y-%m").tolist()
+      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("1/%-m/%Y").tolist()
 
     df[date_range] = date_range_list
     df['DATE'] = date_list
 
     #Add observations for all countries
-    #TODO: Does not work for monthly jobless data
-
     for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
       for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
         if(value.get('concept')) == 'LOCATION':
