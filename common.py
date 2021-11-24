@@ -115,6 +115,17 @@ def get_oecd_data(dataset, dimensions, params):
     print(exc_type, fname, exc_tb.tb_lineno)
 
 
+def get_newyorkfed_data(dataset, dimensions, params):
+  base_url = "https://markets.newyorkfed.org/api/"
+
+  #TODO: Use Dataset, Dimensions and Params to construct the below URL and make GET request
+  #https://markets.newyorkfed.org/api/rates/unsecured/effr/search.json?startDate=01/01/1971&endDate=01/11/2021
+
+  #TODO: Process returned JSON by getting list of Fed Funds Targets for 1st of each month for date range
+
+  #TODO: Add columns and observations to dataframe, and return data frame
+  
+
 def write_to_directory(df,filename):
     #Write to a csv file in the correct directory
     userhome = os.path.expanduser('~')
