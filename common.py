@@ -128,19 +128,20 @@ def get_newyorkfed_data(type, dimensions):
   df = pd.DataFrame(columns=["DATE",dimensions[0].upper()])
 
   for i in range(len(json["refRates"])):
-    #import pdb; pdb.set_trace()
-    #TODO: Check if current date is the first of the month. Only if it is, add the row to the dataframe.    
-    try:
-      df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): json["refRates"][i]['targetRateTo']}, ignore_index=True)
-    except KeyError as e:
-      df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): json["refRates"][i]['targetRateFrom']}, ignore_index=True)
+
+    datetime_object = datetime.strptime(json["refRates"][i]['effectiveDate'], '%Y-%m-%d')
+
+    #Check if current date is the first of the month. Only if it is, add the row to the dataframe. 
+    if datetime_object.day == 1:
+      # TODO: format datetime so that it matches excel file.   
+      try:
+        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): json["refRates"][i]['targetRateTo']}, ignore_index=True)
+      except KeyError as e:
+        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): json["refRates"][i]['targetRateFrom']}, ignore_index=True)
 
   #import pdb; pdb.set_trace()
 
-  #TODO: Process returned JSON by getting list of Fed Funds Targets for 1st of each month for date range
-
-  #TODO: Add columns and observations to dataframe, and return data frame
-  
+  return df  
 
 def write_to_directory(df,filename):
     #Write to a csv file in the correct directory
