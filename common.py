@@ -106,8 +106,8 @@ def get_oecd_data(dataset, dimensions, params):
 
           #match based on quarter and country, then add the observation value
           df.loc[obs_row, current_country] = round(float(obs_value),9)        
-    return df
 
+  return df
 
   #except Exception as e:
     
