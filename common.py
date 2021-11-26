@@ -34,85 +34,86 @@ def get_oecd_data(dataset, dimensions, params):
       date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
-  
+  #import pdb; pdb.set_trace()
   try:
-
     #resp = requests.get(url=url,params=params)
     resp = requests.get(url=url)
-
     resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
-
     # Write response to an XML File
     with open(params['filename'], 'w') as f:
       f.write(resp_formatted)
 
-    # Load in the XML file into ElementTree
-    tree = ET.parse(params['filename'])
+  except requests.exceptions.ConnectionError:
+    print("Connection refused, Opening from File...")
 
-    #Load into a dataframe and return the data frame
-    root = tree.getroot()
+  # Load in the XML file into ElementTree
+  tree = ET.parse(params['filename'])
 
-    ns = {'sdmx': 'http://www.SDMX.org/resources/SDMXML/schemas/v2_0/generic'}
+  #Load into a dataframe and return the data frame
+  root = tree.getroot()
 
-    df = pd.DataFrame()
+  ns = {'sdmx': 'http://www.SDMX.org/resources/SDMXML/schemas/v2_0/generic'}
 
-    #Add column headers
-    df.insert(0,date_range,[],True)
-    df.insert(1,"DATE",[],True)
-    index = 2
-    for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
-      current_country = ""
-      for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
-        if(value.get('concept')) == 'LOCATION':
-          current_country = value.get('value')
-          
-          df.insert(index,value.get('value'),[],True)
-      index+=1
+  df = pd.DataFrame()
 
-    #Add Dates  TODO: This needs to account for both Quarterly and Monthly data.
-    date_range_list = []
-    date_list = []
-    year_start, qtr_start =  params['startTime'].split('-Q')
-    year_end, qtr_end =  params['endTime'].split('-Q')
+  #Add column headers
+  df.insert(0,date_range,[],True)
+  df.insert(1,"DATE",[],True)
+  index = 2
+  for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
+    current_country = ""
+    for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
+      if(value.get('concept')) == 'LOCATION':
+        current_country = value.get('value')
+        
+        df.insert(index,value.get('value'),[],True)
+    index+=1
 
-    match date_range:
-      case 'QTR':
-        #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
-        date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
-        date_range_list = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
+  #Add Dates  TODO: This needs to account for both Quarterly and Monthly data.
+  date_range_list = []
+  date_list = []
+  year_start, qtr_start =  params['startTime'].split('-Q')
+  year_end, qtr_end =  params['endTime'].split('-Q')
 
-      case 'MTH':
-        #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
-        date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("%Y-%m").tolist()
-        date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("1/%-m/%Y").tolist()
+  match date_range:
+    case 'QTR':
+      #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
+      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
+      date_range_list = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
 
-    df[date_range] = date_range_list
-    df['DATE'] = date_list
+    case 'MTH':
+      #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
+      date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("%Y-%m").tolist()
+      date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("1/%-m/%Y").tolist()
 
-    #Add observations for all countries
-    for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
-      for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
-        if(value.get('concept')) == 'LOCATION':
-          current_country = value.get('value')
+  df[date_range] = date_range_list
+  df['DATE'] = date_list
 
-          observations = series.findall('sdmx:Obs',ns)
+  #Add observations for all countries
+  for series in root.findall('./sdmx:DataSet/sdmx:Series',ns):
+    for value in series.findall('./sdmx:SeriesKey/sdmx:Value',ns): 
+      if(value.get('concept')) == 'LOCATION':
+        current_country = value.get('value')
 
-          for observation in observations:
-            #Get qtr, date and observation. Add to column in chronological order for all countries
+        observations = series.findall('sdmx:Obs',ns)
 
-            obs_qtr = observation.findall('sdmx:Time',ns)[0].text
-            obs_row = df.index[df[date_range] == obs_qtr].tolist()
-            obs_value = observation.findall('sdmx:ObsValue',ns)[0].get('value')
+        for observation in observations:
+          #Get qtr, date and observation. Add to column in chronological order for all countries
 
-            #match based on quarter and country, then add the observation value
-            df.loc[obs_row, current_country] = round(float(obs_value),9)        
+          obs_qtr = observation.findall('sdmx:Time',ns)[0].text
+          obs_row = df.index[df[date_range] == obs_qtr].tolist()
+          obs_value = observation.findall('sdmx:ObsValue',ns)[0].get('value')
+
+          #match based on quarter and country, then add the observation value
+          df.loc[obs_row, current_country] = round(float(obs_value),9)        
     return df
 
-  except Exception as e:
+
+  #except Exception as e:
     
-    exc_type, exc_obj, exc_tb = sys.exc_info()
-    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    print(exc_type, fname, exc_tb.tb_lineno)
+  #  exc_type, exc_obj, exc_tb = sys.exc_info()
+  #  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+  #  print(exc_type, fname, exc_tb.tb_lineno)
 
 
 def get_newyorkfed_data(type, dimensions):
