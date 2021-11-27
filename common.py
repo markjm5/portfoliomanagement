@@ -4,7 +4,6 @@ import os.path
 import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
-from datetime import datetime
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
@@ -115,35 +114,6 @@ def get_oecd_data(dataset, dimensions, params):
   #  exc_type, exc_obj, exc_tb = sys.exc_info()
   #  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   #  print(exc_type, fname, exc_tb.tb_lineno)
-
-
-def get_newyorkfed_data(type, dimensions):
-
-  #Use Dataset, Dimensions to construct the below URL and make GET request
-  #https://markets.newyorkfed.org/api/rates/unsecured/effr/search.json?startDate=01/01/1971&endDate=01/11/2021
-
-  url = "https://markets.newyorkfed.org/api/rates/%s/%s/search.json?startDate=%s&endDate=%s" % (type,dimensions[0], dimensions[1], dimensions[2])
-
-  resp = requests.get(url=url)
-  json = resp.json() 
-
-  df = pd.DataFrame(columns=["DATE",dimensions[0].upper()])
-
-  for i in range(len(json["refRates"])):
-
-    datetime_object = datetime.strptime(json["refRates"][i]['effectiveDate'], '%Y-%m-%d')
-
-    #Check if current date is the first of the month. Only if it is, add the row to the dataframe. 
-    if datetime_object.day == 1:
-      # TODO: format datetime so that it matches excel file.   
-      try:
-        df = df.append({"DATE": datetime_object.strftime("%Y-%m-%d"), dimensions[0].upper(): json["refRates"][i]['targetRateTo']}, ignore_index=True)
-      except KeyError as e:
-        df = df.append({"DATE": datetime_object.strftime("%Y-%m-%d"), dimensions[0].upper(): json["refRates"][i]['targetRateFrom']}, ignore_index=True)
-
-  #import pdb; pdb.set_trace()
-
-  return df  
 
 def write_to_directory(df,filename):
     #Write to a csv file in the correct directory
