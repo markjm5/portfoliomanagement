@@ -17,12 +17,13 @@ dataset = 'effr'
 startDate = '01/01/1971'
 endDate = '11/01/2021'
 df_get_ff_target_rate = get_newyorkfed_data('unsecured', [dataset,startDate,endDate])
-
+#import pdb; pdb.set_trace()
 #Combine all these data frames into a single data frame based on the DATE field
 df = pd.merge(df_CPIAUCSL,df_CPIENGSL,"left")
 df = pd.merge(df,df_CPIFABSL,"left")
 df = pd.merge(df,df_CPILFESL,"left")
 df = pd.merge(df,df_FEDFUNDS,"left")
+df = pd.merge(df,df_get_ff_target_rate,"left")
 
 #Write to a csv file in the correct directory
 write_to_directory(df,'007_Lagging_Indicator_US_Inflation.csv')

@@ -38,7 +38,7 @@ def get_oecd_data(dataset, dimensions, params):
   try:
     #resp = requests.get(url=url,params=params)
     resp = requests.get(url=url,verify=False)
-    
+
     resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
     # Write response to an XML File
     with open(params['filename'], 'w') as f:
@@ -137,9 +137,9 @@ def get_newyorkfed_data(type, dimensions):
     if datetime_object.day == 1:
       # TODO: format datetime so that it matches excel file.   
       try:
-        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): json["refRates"][i]['targetRateTo']}, ignore_index=True)
+        df = df.append({"DATE": datetime_object.strftime("%Y-%m-%d"), dimensions[0].upper(): json["refRates"][i]['targetRateTo']}, ignore_index=True)
       except KeyError as e:
-        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): json["refRates"][i]['targetRateFrom']}, ignore_index=True)
+        df = df.append({"DATE": datetime_object.strftime("%Y-%m-%d"), dimensions[0].upper(): json["refRates"][i]['targetRateFrom']}, ignore_index=True)
 
   #import pdb; pdb.set_trace()
 
