@@ -37,7 +37,8 @@ def get_oecd_data(dataset, dimensions, params):
   #import pdb; pdb.set_trace()
   try:
     #resp = requests.get(url=url,params=params)
-    resp = requests.get(url=url)
+    resp = requests.get(url=url,verify=False)
+    
     resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
     # Write response to an XML File
     with open(params['filename'], 'w') as f:
