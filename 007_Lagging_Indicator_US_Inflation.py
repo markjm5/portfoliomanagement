@@ -18,30 +18,12 @@ def get_newyorkfed_target_rate(type, dimensions):
   df = pd.DataFrame(columns=["DATE",dimensions[0].upper()])
 
   for i in range(len(json["refRates"])):
-
-    datetime_object = datetime.strptime(json["refRates"][i]['effectiveDate'], '%Y-%m-%d')
-
-    #Check if current date is the first of the month. Only if it is, add the row to the dataframe. 
-    #TODO: In cases where there is no first day of month, get the first day of the month where a FF target was released
-    #TODO: format datetime so that it matches excel file (ie. 1st day of every month).   
-    #if datetime_object.day == 1:
     try:
-        df = df.append({"DATE": datetime_object.strftime("%Y-%m-1"), dimensions[0].upper(): str(json["refRates"][i]['targetRateTo'])}, ignore_index=True)
+        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): str(json["refRates"][i]['targetRateTo'])}, ignore_index=True)
     except KeyError as e:
-        df = df.append({"DATE": datetime_object.strftime("%Y-%m-1"), dimensions[0].upper(): str(json["refRates"][i]['targetRateFrom'])}, ignore_index=True)
+        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): str(json["refRates"][i]['targetRateFrom'])}, ignore_index=True)
 
-
-    df = df.drop_duplicates(subset=['DATE'],keep='first')
-
-    #else:
-    #    if datetime_object.year != year_set and datetime_object.month != month_set:
-    #        try:
-    #            df = df.append({"DATE": datetime_object.strftime("%Y-%m-1"), dimensions[0].upper(): json["refRates"][i]['targetRateTo']}, ignore_index=True)
-    #        except KeyError as e:
-    #            df = df.append({"DATE": datetime_object.strftime("%Y-%m-1"), dimensions[0].upper(): json["refRates"][i]['targetRateFrom']}, ignore_index=True)
-
-    #        year_set = datetime_object.year
-    #        month_set = datetime_object.month
+  df = df.sort_values(by='DATE')
 
   return df  
 
@@ -51,7 +33,6 @@ df_CPIFABSL = get_stlouisfed_data('CPIFABSL')
 df_CPILFESL = get_stlouisfed_data('CPILFESL')
 
 df_FEDFUNDS = get_stlouisfed_data('FEDFUNDS')
-
 #Get Fed Funds Target from markets.newyorkfed.org
 #unsecured/effr/search.json?startDate=01/01/1971&endDate=11/01/2021
 dataset = 'effr'
@@ -63,13 +44,12 @@ df_ff_target_rate = get_newyorkfed_target_rate('unsecured', [dataset,startDate,e
 df = pd.merge(df_CPIAUCSL,df_CPIENGSL,"left")
 df = pd.merge(df,df_CPIFABSL,"left")
 df = pd.merge(df,df_CPILFESL,"left")
-df = pd.merge(df,df_FEDFUNDS,"left")
+#df = pd.merge(df,df_FEDFUNDS,"left")
 
-#TODO: Merge Not Working
-df = pd.merge(df,df_ff_target_rate,"left")
+df_FEDFUNDS = df_FEDFUNDS.merge(df_ff_target_rate, how="left")
 
 #Write to a csv file in the correct directory
 write_to_directory(df,'007_Lagging_Indicator_US_Inflation.csv')
-
+write_to_directory(df_FEDFUNDS,'007_Lagging_Indicator_US_Fed_Fund_Rate_Target.csv')
 
 print("Done!")
