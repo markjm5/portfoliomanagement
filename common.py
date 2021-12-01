@@ -4,6 +4,7 @@ import os.path
 import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
+import openpyxl
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
