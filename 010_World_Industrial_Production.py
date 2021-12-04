@@ -1,5 +1,33 @@
+import pandas as pd
+import requests
+import re
 from datetime import date
+from bs4 import BeautifulSoup
+from requests.models import parse_header_links
 from common import get_oecd_data, write_to_directory
+
+
+def scrape_div_capital_investment(url):
+  #Scrape GDP Table from https://www.theglobaleconomy.com/rankings/Capital_investment/
+
+  page = requests.get(url=url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  #TODO: Need to scrape div for capital investment list countries and numbers.
+  value = soup.find('input', {'id': 'export_data'}).get('value')
+  countries = value.split('=')[4].split('&')[0]
+  numbers = value.split('=')[3].split('&')[0]
+
+  #Need to put countries and numbers into a pandas dataframe.
+  dataframe_values = {'COUNTRY': countries.split('|'), 'CAPITAL_INVESTMENT': numbers.split('|')}
+  df = pd.DataFrame(data=dataframe_values)
+
+  return df
+
+
+df_capital_investment = scrape_div_capital_investment("https://www.theglobaleconomy.com/rankings/Capital_investment/")
+#Write to a csv file in the correct directory
+write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
 # Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
 
