@@ -34,10 +34,15 @@ def get_oecd_data(dataset, dimensions, params):
       date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
-  #import pdb; pdb.set_trace()
+
   try:
     #resp = requests.get(url=url,params=params)
     resp = requests.get(url=url,verify=False)
+
+    if(resp.status_code == 400):
+      url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s.%s.%s.%s/all?startTime=%s&endTime=%s" % (dataset, dim_args[1],dim_args[0],dim_args[2],dim_args[3],params['startTime'],params['endTime'])
+
+      resp = requests.get(url=url,verify=False)
 
     resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
     # Write response to an XML File
