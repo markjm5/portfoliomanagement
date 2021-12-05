@@ -146,9 +146,10 @@ def scrape_table_china_production():
   df_selections = df_combined[["Actual", "Last"]]
   df_final = df_selections.rename(columns={"Actual": "YoY", "Last": "HSBC China PMI"})
 
+  #TODO: Add date_str to df_final
   import pdb; pdb.set_trace()
 
-  return df_ip_yoy
+  return df_final
 
 
 #Get Capital Investment Data
