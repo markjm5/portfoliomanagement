@@ -74,7 +74,7 @@ def scrape_table_china_production(url):
   page = requests.get(url=url)
   soup = BeautifulSoup(page.content, 'html.parser')
 
-  #TODO: Need to scrape table for china production and numbers.
+  #Need to scrape table for china production and numbers.
   table = soup.find('table')
   table_rows = table.find_all('tr', recursive=False)
   table_rows_header = table.find_all('tr')[0].find_all('th')
