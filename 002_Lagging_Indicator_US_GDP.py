@@ -2,7 +2,14 @@ import requests
 import os.path
 import csv
 import pandas as pd
+import xlwings as xw
 from common import get_stlouisfed_data, write_to_directory
+
+filepath = os.path.realpath(__file__)
+
+import pdb; pdb.set_trace()
+
+wk = xw.books.open(filepath[:filepath.rfind('/')] + '/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm')
 
 df_DPCCRV1Q225SBEA = get_stlouisfed_data('DPCCRV1Q225SBEA')
 df_EXPGSC1 = get_stlouisfed_data('EXPGSC1')
