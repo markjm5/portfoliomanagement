@@ -110,7 +110,7 @@ def get_data(dataset, dimensions, params):
   return df
 """
 
-def scrape_table(url):
+def scrape_world_gdp_table(url):
   #Scrape GDP Table from Trading Economics
   #url = "https://tradingeconomics.com/matrix"
 
@@ -193,7 +193,7 @@ df_YoY = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 #Write to a csv file in the correct directory
 write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
 
-df_World_GDP = scrape_table("https://tradingeconomics.com/matrix")
+df_World_GDP = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
 #Write to a csv file in the correct directory
 write_to_directory(df_World_GDP,'003_Lagging_Indicator_World_GDP.csv')
