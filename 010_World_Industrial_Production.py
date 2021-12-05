@@ -68,24 +68,28 @@ def scrape_table_world_production(url):
 
   return df
 
-def scrape_table_china_production(url):
+def scrape_table_china_production():
   #Scrape GDP Table from https://www.investing.com/economic-calendar/chinese-industrial-production-462
+  #Scrape China PMI Index From https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753
 
-  page = requests.get(url=url)
+  url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
+  url_caixin_pmi = 'https://tradingeconomics.com/china/manufacturing-pmi'
+
+  page = requests.get(url=url_ip_yoy)
   soup = BeautifulSoup(page.content, 'html.parser')
 
   #Need to scrape table for china production and numbers.
   table = soup.find('table')
   table_rows = table.find_all('tr', recursive=False)
   table_rows_header = table.find_all('tr')[0].find_all('th')
-  df = pd.DataFrame()
+  df_ip_yoy = pd.DataFrame()
 
   index = 0
   for header in table_rows_header:
     if(index == 0):
-      df.insert(0,"Calendar",[],True)
+      df_ip_yoy.insert(0,"Calendar",[],True)
     else:
-      df.insert(index,str(header.text).strip(),[],True)
+      df_ip_yoy.insert(index,str(header.text).strip(),[],True)
     index+=1
 
   #Get rows of data.
@@ -100,11 +104,24 @@ def scrape_table_china_production(url):
         text = str(obs.text).strip()
         temp_row.append(text)        
         index += 1
-    df.loc[len(df.index)] = temp_row
+    df_ip_yoy.loc[len(df_ip_yoy.index)] = temp_row
 
-  #TODO: Add additional column to df with HSBC China PMI Index
+  #TODO: Add additional column to df with China PMI Index
+  page = requests.get(url=url_caixin_pmi)
+  soup = BeautifulSoup(page.content, 'html.parser')
 
-  return df
+  table = soup.find('table')
+  table_rows = table.find_all('tr', recursive=False)
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df_caixin_pmi = pd.DataFrame()
+
+  index = 0
+  for header in table_rows_header:
+    df_caixin_pmi.insert(index,str(header.text).strip(),[],True)
+    index += 1
+
+
+  return df_ip_yoy
 
 
 #Get Capital Investment Data
@@ -118,7 +135,7 @@ df_world_production = scrape_table_world_production("https://tradingeconomics.co
 write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
 
 #Get China Production Data
-df_china_production = scrape_table_china_production("https://tradingeconomics.com/china/industrial-production")
+df_china_production = scrape_table_china_production()
 #Write to a csv file in the correct directory
 write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
 
