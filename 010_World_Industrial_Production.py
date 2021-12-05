@@ -120,6 +120,17 @@ def scrape_table_china_production():
     df_caixin_pmi.insert(index,str(header.text).strip(),[],True)
     index += 1
 
+  for tr in table_rows:
+    temp_row = []
+    index = 0
+    td = tr.find_all('td')
+    for obs in td:
+      text = str(obs.text).strip()
+      temp_row.append(text)        
+      index += 1
+    df_caixin_pmi.loc[len(df_caixin_pmi.index)] = temp_row
+
+  #TODO: Combine IP YoY df with Caixin PMI df
 
   return df_ip_yoy
 
