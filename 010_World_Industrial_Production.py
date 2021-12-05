@@ -11,16 +11,20 @@ def scrape_div_capital_investment(url):
   #Scrape GDP Table from https://www.theglobaleconomy.com/rankings/Capital_investment/
 
   page = requests.get(url=url)
-  soup = BeautifulSoup(page.content, 'html.parser')
 
-  #Need to scrape div for capital investment list countries and numbers.
-  value = soup.find('input', {'id': 'export_data'}).get('value')
-  countries = value.split('=')[4].split('&')[0]
-  numbers = value.split('=')[3].split('&')[0]
+  if(page.status_code == 200):
+    soup = BeautifulSoup(page.content, 'html.parser')
 
-  #Need to put countries and numbers into a pandas dataframe.
-  dataframe_values = {'COUNTRY': countries.split('|'), 'CAPITAL_INVESTMENT': numbers.split('|')}
-  df = pd.DataFrame(data=dataframe_values)
+    #Need to scrape div for capital investment list countries and numbers.
+    value = soup.find('input', {'id': 'export_data'}).get('value')
+    countries = value.split('=')[4].split('&')[0]
+    numbers = value.split('=')[3].split('&')[0]
+
+    #Need to put countries and numbers into a pandas dataframe.
+    dataframe_values = {'COUNTRY': countries.split('|'), 'CAPITAL_INVESTMENT': numbers.split('|')}
+    df = pd.DataFrame(data=dataframe_values)
+  else:
+    print(page.status_code)
 
   return df
 
@@ -41,6 +45,7 @@ def scrape_table_world_production(url):
     df.insert(index,str(header.text).strip(),[],True)
     index+=1
 
+  #TODO: Get rows of data.
   #import pdb; pdb.set_trace()
 
   return df
@@ -57,6 +62,16 @@ def scrape_table_china_production(url):
   table_rows_header = table.find_all('tr')[0].find_all('th')
   df = pd.DataFrame()
 
+  index = 0
+  for header in table_rows_header:
+    if(index == 0):
+      df.insert(0,"Calendar",[],True)
+    else:
+      df.insert(index,str(header.text).strip(),[],True)
+    index+=1
+
+  #TODO: Get rows of data.
+
   return df
 
 
@@ -66,12 +81,12 @@ df_capital_investment = scrape_div_capital_investment("https://www.theglobalecon
 write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
 #Get World Production Data
-df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
+#df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
 #Write to a csv file in the correct directory
-write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
+#write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
 
 #Get China Production Data
-#df_china_production = scrape_table_china_production("https://www.investing.com/economic-calendar/chinese-industrial-production-462")
+df_china_production = scrape_table_china_production("https://tradingeconomics.com/china/industrial-production")
 #Write to a csv file in the correct directory
 #write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
 
