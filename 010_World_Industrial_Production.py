@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 import re
+import calendar
 from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
@@ -138,6 +139,7 @@ def scrape_table_china_production():
   #print(df_combined)
 
   #Print dataframe with Date, YoY, HSBC China PMI headers
+  #calendar.monthrange(2020,11)
   #import pdb; pdb.set_trace()
 
   return df_ip_yoy
