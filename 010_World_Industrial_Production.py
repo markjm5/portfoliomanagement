@@ -106,6 +106,8 @@ def scrape_table_china_production():
         index += 1
     df_ip_yoy.loc[len(df_ip_yoy.index)] = temp_row
 
+  df_ip_yoy_last = df_ip_yoy.query("Actual !=''").iloc[-1:]
+
   #TODO: Add additional column to df with China PMI Index
   page = requests.get(url=url_caixin_pmi)
   soup = BeautifulSoup(page.content, 'html.parser')
@@ -129,8 +131,14 @@ def scrape_table_china_production():
       temp_row.append(text)        
       index += 1
     df_caixin_pmi.loc[len(df_caixin_pmi.index)] = temp_row
+    df_caixin_manufacturing_pmi = df_caixin_pmi[df_caixin_pmi['Related'].isin(['Manufacturing PMI'])]
 
-  #TODO: Combine IP YoY df with Caixin PMI df
+  #Combine IP YoY df with Caixin PMI df
+  df_combined = pd.concat([df_caixin_manufacturing_pmi,df_ip_yoy_last], axis=1)
+  #print(df_combined)
+
+  #Print dataframe with Date, YoY, HSBC China PMI headers
+  #import pdb; pdb.set_trace()
 
   return df_ip_yoy
 
