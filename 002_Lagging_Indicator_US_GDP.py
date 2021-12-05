@@ -7,11 +7,6 @@ from common import get_stlouisfed_data, write_to_directory, get_excel_sheet
 
 sheet = get_excel_sheet('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database')
 
-for row in sheet.iter_rows(min_row=1,max_row=5,min_col=3, max_col=6,values_only=True):
-    print(row)
-
-import pdb; pdb.set_trace()
-
 df_DPCCRV1Q225SBEA = get_stlouisfed_data('DPCCRV1Q225SBEA')
 df_EXPGSC1 = get_stlouisfed_data('EXPGSC1')
 df_GCEC1 = get_stlouisfed_data('GCEC1')
@@ -35,5 +30,9 @@ df = pd.merge(df,df_PCECC96,"left")
 
 #Write to a csv file in the correct directory
 write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
+
+#TODO: Rather than writing to directory, update and save the sheet
+#for row in sheet.iter_rows(min_row=1,max_row=5,min_col=3, max_col=6,values_only=True):
+#    print(row)
 
 print("Done!")
