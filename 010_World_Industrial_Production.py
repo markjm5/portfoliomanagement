@@ -136,11 +136,15 @@ def scrape_table_china_production():
 
   #Combine IP YoY df with Caixin PMI df
   df_combined = pd.concat([df_caixin_manufacturing_pmi,df_ip_yoy_last], axis=1)
-  #print(df_combined)
 
   #Print dataframe with Date, YoY, HSBC China PMI headers
-  #calendar.monthrange(2020,11)
-  #import pdb; pdb.set_trace()
+  #df.rename(columns={"A": "a", "B": "c"})
+  year = df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year
+  month = df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month
+  #get last day of month using the year and month
+  day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
+
+  import pdb; pdb.set_trace()
 
   return df_ip_yoy
 
