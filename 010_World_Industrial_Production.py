@@ -1,6 +1,7 @@
 import pandas as pd
 import requests
 import re
+from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
@@ -42,24 +43,29 @@ def scrape_table_world_production(url):
   df = pd.DataFrame()
   index = 0
   for header in table_rows_header:
-    df.insert(index,str(header.text).strip(),[],True)
+    if(index == 3):
+      df.insert(3,"Month",[],True)
+    else:
+      df.insert(index,str(header.text).strip(),[],True)
     index+=1
 
-  #TODO: Get rows of data.
-  #import pdb; pdb.set_trace()
-
+  #Get rows of data.
   for tr in table_rows:
     temp_row = []
     #first_col = True
-
+    index = 0
     td = tr.find_all('td')
     for obs in td:
-      text = str(obs.text).strip()
+      if(index == 3):
+        dt_date = dt.strptime(str(obs.text),'%b/%y')
+        text = dt_date.strftime('%b-%y')
+      else:
+        text = str(obs.text).strip()
       temp_row.append(text)        
+      index += 1
 
     df.loc[len(df.index)] = temp_row
 
-  #import pdb; pdb.set_trace()
   return df
 
 def scrape_table_china_production(url):
@@ -70,7 +76,7 @@ def scrape_table_china_production(url):
 
   #TODO: Need to scrape table for china production and numbers.
   table = soup.find('table')
-  table_rows = table.find_all('tr', attrs={'align':'center'})
+  table_rows = table.find_all('tr', recursive=False)
   table_rows_header = table.find_all('tr')[0].find_all('th')
   df = pd.DataFrame()
 
@@ -82,7 +88,21 @@ def scrape_table_china_production(url):
       df.insert(index,str(header.text).strip(),[],True)
     index+=1
 
-  #TODO: Get rows of data.
+  #Get rows of data.
+  for tr in table_rows:
+    temp_row = []
+    index = 0
+    td = tr.find_all('td')
+    for obs in td:
+      if(str(obs.text).strip() == 'Industrial Production YoY'):
+        pass
+      else:
+        text = str(obs.text).strip()
+        temp_row.append(text)        
+        index += 1
+    df.loc[len(df.index)] = temp_row
+
+  #TODO: Add additional column to df with HSBC China PMI Index
 
   return df
 
@@ -100,7 +120,7 @@ write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.c
 #Get China Production Data
 df_china_production = scrape_table_china_production("https://tradingeconomics.com/china/industrial-production")
 #Write to a csv file in the correct directory
-#write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
+write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
 
 
 # Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
