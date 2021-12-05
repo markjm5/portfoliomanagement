@@ -37,7 +37,7 @@ def scrape_table_world_production(url):
   #TODO: Need to scrape table for world production countries and numbers.
   table = soup.find('table')
   #import pdb; pdb.set_trace()
-  table_rows = table.find_all('tr', attrs={'align':'center'})
+  table_rows = table.find_all('tr', recursive=False)
   table_rows_header = table.find_all('tr')[0].find_all('th')
   df = pd.DataFrame()
   index = 0
@@ -48,6 +48,18 @@ def scrape_table_world_production(url):
   #TODO: Get rows of data.
   #import pdb; pdb.set_trace()
 
+  for tr in table_rows:
+    temp_row = []
+    #first_col = True
+
+    td = tr.find_all('td')
+    for obs in td:
+      text = str(obs.text).strip()
+      temp_row.append(text)        
+
+    df.loc[len(df.index)] = temp_row
+
+  #import pdb; pdb.set_trace()
   return df
 
 def scrape_table_china_production(url):
@@ -81,9 +93,9 @@ df_capital_investment = scrape_div_capital_investment("https://www.theglobalecon
 write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
 #Get World Production Data
-#df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
+df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
 #Write to a csv file in the correct directory
-#write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
+write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
 
 #Get China Production Data
 df_china_production = scrape_table_china_production("https://tradingeconomics.com/china/industrial-production")
