@@ -146,8 +146,8 @@ def scrape_table_china_production():
   df_selections = df_combined[["Actual", "Last"]]
   df_final = df_selections.rename(columns={"Actual": "YoY", "Last": "HSBC China PMI"})
 
-  #TODO: Add date_str to df_final
-  import pdb; pdb.set_trace()
+  #Add date_str to df_final
+  df_final.insert(0, "Date", date_str, True)
 
   return df_final
 
@@ -166,7 +166,6 @@ write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.c
 df_china_production = scrape_table_china_production()
 #Write to a csv file in the correct directory
 write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
-
 
 # Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
 #Get World Industrial Production
