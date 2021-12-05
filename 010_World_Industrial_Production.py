@@ -139,8 +139,8 @@ def scrape_table_china_production():
 
   #Print dataframe with Date, YoY, HSBC China PMI headers
   #df.rename(columns={"A": "a", "B": "c"})
-  year = df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year
-  month = df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month
+  year = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year
+  month = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month
   #get last day of month using the year and month
   day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
 
