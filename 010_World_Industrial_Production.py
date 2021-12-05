@@ -143,7 +143,7 @@ def scrape_table_china_production():
   month = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month
   #get last day of month using the year and month
   day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
-
+  date_str = "%s/%s/%s" % (day,month,year)
   import pdb; pdb.set_trace()
 
   return df_ip_yoy
