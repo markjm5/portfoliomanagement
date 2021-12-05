@@ -70,8 +70,6 @@ def scrape_table_world_production(url):
   return df
 
 def scrape_table_china_production():
-  #Scrape GDP Table from https://www.investing.com/economic-calendar/chinese-industrial-production-462
-  #Scrape China PMI Index From https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753
 
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
   url_caixin_pmi = 'https://tradingeconomics.com/china/manufacturing-pmi'
@@ -138,12 +136,16 @@ def scrape_table_china_production():
   df_combined = pd.concat([df_caixin_manufacturing_pmi,df_ip_yoy_last], axis=1)
 
   #Print dataframe with Date, YoY, HSBC China PMI headers
-  #df.rename(columns={"A": "a", "B": "c"})
   year = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year
   month = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month
+
   #get last day of month using the year and month
   day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
   date_str = "%s/%s/%s" % (day,month,year)
+
+  df_selections = df_combined[["Actual", "Last"]]
+  df_final = df_selections.rename(columns={"Actual": "YoY", "Last": "HSBC China PMI"})
+
   import pdb; pdb.set_trace()
 
   return df_ip_yoy
