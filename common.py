@@ -5,6 +5,7 @@ import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
 import openpyxl
+from itertools import islice
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
@@ -127,11 +128,18 @@ def write_to_directory(df,filename):
     file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
     df.to_csv(file_name, index=False)
 
-def get_excel_sheet(excel_file_path,sheet_name):
+def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
 
   filepath = os.path.realpath(__file__)
 
   book = openpyxl.load_workbook(filepath[:filepath.rfind('/')] + excel_file_path)
   sheet = book[sheet_name]
 
-  return sheet
+  data = sheet.values
+  cols = next(data)[1:]
+  data = list(data)
+  idx = [r[0] for r in data]
+  data = (islice(r, 1, None) for r in data)
+  df = pd.DataFrame(data, index=idx, columns=cols)
+
+  return df

@@ -2,10 +2,8 @@ import requests
 import os.path
 import csv
 import pandas as pd
-import openpyxl
-from common import get_stlouisfed_data, write_to_directory, get_excel_sheet
-
-sheet = get_excel_sheet('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database')
+#import openpyxl
+from common import get_stlouisfed_data, write_to_directory, convert_excelsheet_to_dataframe
 
 df_DPCCRV1Q225SBEA = get_stlouisfed_data('DPCCRV1Q225SBEA')
 df_EXPGSC1 = get_stlouisfed_data('EXPGSC1')
@@ -31,8 +29,11 @@ df = pd.merge(df,df_PCECC96,"left")
 #Write to a csv file in the correct directory
 write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
 
-#TODO: Rather than writing to directory, update and save the sheet
-#for row in sheet.iter_rows(min_row=1,max_row=5,min_col=3, max_col=6,values_only=True):
-#    print(row)
+# Rather than writing to directory, update and save the sheet
+# Get Original Sheet and store it in a dataframe
+df_original = convert_excelsheet_to_dataframe('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database')
+
+#TODO: update df_original with the dataframe with new values, and then write back to the excel sheet
+
 
 print("Done!")
