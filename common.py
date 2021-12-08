@@ -6,6 +6,7 @@ import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
 import openpyxl
+from openpyxl.utils.dataframe import dataframe_to_rows
 from itertools import islice
 
 def get_stlouisfed_data(series_code):
@@ -135,15 +136,28 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl', index_col=0)
+  """
+  book = openpyxl.load_workbook(excel_file_path)
+  sheet = book[sheet_name]
 
-#  book = openpyxl.load_workbook(filepath[:filepath.rfind('/')] + excel_file_path)
-#  sheet = book[sheet_name]
-
-#  data = sheet.values
-#  cols = next(data)[1:]
-#  data = list(data)
-#  idx = [r[0] for r in data]
-#  data = (islice(r, 1, None) for r in data)
-#  df = pd.DataFrame(data, index=idx, columns=cols)
-
+  data = sheet.values
+  cols = next(data)[1:]
+  data = list(data)
+  idx = [r[0] for r in data]
+  data = (islice(r, 1, None) for r in data)
+  df = pd.DataFrame(data, index=idx, columns=cols)
+  """
   return df
+
+def write_dataframe_to_excel(excel_file_path,sheet_name, df):
+
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  book = openpyxl.load_workbook(excel_file_path)
+  sheet = book[sheet_name]
+
+  for r in dataframe_to_rows(df,index=True, header=True):
+    sheet.append(r)
+
+  book.save()
