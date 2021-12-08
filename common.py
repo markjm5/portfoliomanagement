@@ -1,3 +1,4 @@
+from pandas.io import excel
 import requests
 import sys
 import os.path
@@ -131,15 +132,18 @@ def write_to_directory(df,filename):
 def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
 
   filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
-  book = openpyxl.load_workbook(filepath[:filepath.rfind('/')] + excel_file_path)
-  sheet = book[sheet_name]
+  df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl', index_col=0)
 
-  data = sheet.values
-  cols = next(data)[1:]
-  data = list(data)
-  idx = [r[0] for r in data]
-  data = (islice(r, 1, None) for r in data)
-  df = pd.DataFrame(data, index=idx, columns=cols)
+#  book = openpyxl.load_workbook(filepath[:filepath.rfind('/')] + excel_file_path)
+#  sheet = book[sheet_name]
+
+#  data = sheet.values
+#  cols = next(data)[1:]
+#  data = list(data)
+#  idx = [r[0] for r in data]
+#  data = (islice(r, 1, None) for r in data)
+#  df = pd.DataFrame(data, index=idx, columns=cols)
 
   return df
