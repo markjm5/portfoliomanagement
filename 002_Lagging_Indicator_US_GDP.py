@@ -32,11 +32,11 @@ write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
 # Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database')
-
+#import pdb; pdb.set_trace()
 #TODO: update df_original with the dataframe with new values 
 
 
 #TODO: Write back to the excel sheet
-#write_dataframe_to_excel('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', df_original)
+write_dataframe_to_excel('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database', df_original)
 
 print("Done!")

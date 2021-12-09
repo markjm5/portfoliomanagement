@@ -154,10 +154,10 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df):
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
-  book = openpyxl.load_workbook(excel_file_path)
+  book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
   sheet = book[sheet_name]
-
+  #import pdb; pdb.set_trace()
   for r in dataframe_to_rows(df,index=True, header=True):
     sheet.append(r)
 
-  book.save()
+  book.save(excel_file_path)
