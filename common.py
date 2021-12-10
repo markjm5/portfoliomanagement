@@ -16,6 +16,8 @@ def get_stlouisfed_data(series_code):
   json = resp.json() 
   
   df = pd.DataFrame(columns=["DATE",series_code])
+  #TODO: Convert the Date into Time Series Date
+  # https://www.youtube.com/watch?v=UFuo7EHI8zc
 
   for i in range(len(json["observations"])):
     df = df.append({"DATE": json["observations"][i]["date"], series_code: json["observations"][i]["value"]}, ignore_index=True)
