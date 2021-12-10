@@ -38,7 +38,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 #import pdb; pdb.set_trace()
 #TODO: update df_original with the dataframe with new values 
 
-#TODO: Write back to the excel sheet
+#TODO: Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_original)
 
 print("Done!")
