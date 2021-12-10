@@ -34,10 +34,21 @@ df = pd.merge(df,df_PCECC96,"left")
 # Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
-#import pdb; pdb.set_trace()
-#TODO: update df_original with the dataframe with new values 
 
-#TODO: Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_original)
+#TODO: update df_original with the dataframe with new values 
+# 1. Make Date the index of df
+# 2. Make all the other columns Dtype float64
+# 3. Append additional row(s) to df_original
+# 4. Format date field in df_original to match the date format expected in excel doc
+
+print("df_original:")
+print(df_original.info())
+print("df_updated:")
+print(df.info())
+
+#import pdb; pdb.set_trace()
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_original, True)
 
 print("Done!")

@@ -149,7 +149,7 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
   """
   return df
 
-def write_dataframe_to_excel(excel_file_path,sheet_name, df):
+def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
@@ -161,7 +161,7 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df):
   sheet.delete_rows(1,sheet.max_row)
   
   #Write values in the df to the sheet
-  for r in dataframe_to_rows(df,index=True, header=True):
+  for r in dataframe_to_rows(df,index=include_index, header=True):
     sheet.append(r)
 
   book.save(excel_file_path)
