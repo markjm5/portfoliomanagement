@@ -3,7 +3,10 @@ import os.path
 import csv
 import pandas as pd
 #import openpyxl
-from common import get_stlouisfed_data, write_to_directory, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, write_to_directory
+
+excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm'
+sheet_name = 'Database'
 
 df_DPCCRV1Q225SBEA = get_stlouisfed_data('DPCCRV1Q225SBEA')
 df_EXPGSC1 = get_stlouisfed_data('EXPGSC1')
@@ -27,15 +30,15 @@ df = pd.merge(df,df_JCXFE,"left")
 df = pd.merge(df,df_PCECC96,"left")
 
 #Write to a csv file in the correct directory
-write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
+#write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
 
 # Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
-df_original = convert_excelsheet_to_dataframe('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database')
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 #import pdb; pdb.set_trace()
 #TODO: update df_original with the dataframe with new values 
 
 #TODO: Write back to the excel sheet
-write_dataframe_to_excel('/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm', 'Database', range, df_original)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_original)
 
 print("Done!")
