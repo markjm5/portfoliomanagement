@@ -2,10 +2,9 @@ import requests
 import os.path
 import csv
 import pandas as pd
-#import openpyxl
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, write_to_directory
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/002_lagging_indicator_us_gdp.xlsm'
+excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/002_Lagging_Indicator_US_GDP.xlsm'
 sheet_name = 'Database'
 
 df_DPCCRV1Q225SBEA = get_stlouisfed_data('DPCCRV1Q225SBEA')

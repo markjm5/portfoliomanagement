@@ -157,11 +157,8 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df):
   book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
   sheet = book[sheet_name]
 
-  #TODO: Use worksheet functions to clear contents of sheet before writing the values in the df
-  # https://openpyxl.readthedocs.io/en/stable/api/openpyxl.worksheet.worksheet.html
-  # 1. Read column headers until there is a blank. 
-  # 2. Get the position of the last column header. 
-  # 3. Delete columns from A till last column header
+  # Delete all rows so that we can replace them with our df  
+  sheet.delete_rows(1,sheet.max_row)
   
   #Write values in the df to the sheet
   for r in dataframe_to_rows(df,index=True, header=True):
