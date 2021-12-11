@@ -43,14 +43,16 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 # 3. Append additional row(s) to df_original
 # 4. Format date field in df_original to match the date format expected in excel doc
 
-print("df_original:")
-print(df_original.info())
-print("df_updated:")
-print(df.info())
+#print("df_original:")
+#print(df_original.info())
+#print("df_updated:")
+#print(df.info())
+df_updated = df_original
 
+df_updated['DATE'] = df['DATE'].dt.strftime('%d/%m/%Y')
 #import pdb; pdb.set_trace()
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_original, False)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False)
 
 print("Done!")
