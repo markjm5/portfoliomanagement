@@ -22,6 +22,10 @@ def get_stlouisfed_data(series_code):
   for i in range(len(json["observations"])):
     df = df.append({"DATE": json["observations"][i]["date"], series_code: json["observations"][i]["value"]}, ignore_index=True)
 
+  df['DATE'] = pd.to_datetime(df['DATE'])
+  df[series_code] = df[series_code].astype('float64') 
+  #df = df.set_index('DATE')
+
   print("Retrieved Data for Series %s" % (series_code,))
 
   return df
@@ -137,7 +141,9 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
-  df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl', index_col=0)
+  df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
+  df['DATE'] = pd.to_datetime(df['DATE'])
+  
   """
   book = openpyxl.load_workbook(excel_file_path)
   sheet = book[sheet_name]

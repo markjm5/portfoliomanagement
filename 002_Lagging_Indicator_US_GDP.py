@@ -17,6 +17,8 @@ df_IMPGSC1 = get_stlouisfed_data('IMPGSC1')
 df_JCXFE = get_stlouisfed_data('JCXFE')
 df_PCECC96 = get_stlouisfed_data('PCECC96')
 
+#import pdb; pdb.set_trace()
+
 #Combine all these data frames into a single data frame based on the DATE field
 
 df = pd.merge(df_DPCCRV1Q225SBEA,df_EXPGSC1,"right")
