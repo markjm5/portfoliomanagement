@@ -41,7 +41,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 # 1. Make Date the index of df (DONE)
 # 2. Make all the other columns Dtype float64 (DONE)
 # 3. Append additional row(s) to df_original
-# 4. Format date field in df_original to match the date format expected in excel doc
+# 4. Format date field in df_original to match the date format expected in excel doc (DONE)
 
 #print("df_original:")
 #print(df_original.info())
@@ -49,7 +49,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 #print(df.info())
 df_updated = df_original
 
-df_updated['DATE'] = df['DATE'].dt.strftime('%d/%m/%Y')
+df_updated['DATE'] = df['DATE'].dt.strftime('%-d/%-m/%Y')
 #import pdb; pdb.set_trace()
 
 # Write the updated df back to the excel sheet

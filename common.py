@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from itertools import islice
+import datetime
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
@@ -143,7 +144,7 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
 
   df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
   df['DATE'] = pd.to_datetime(df['DATE'])
-  
+
   """
   book = openpyxl.load_workbook(excel_file_path)
   sheet = book[sheet_name]
@@ -159,11 +160,14 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
 
 def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
 
+  #TODO: Consider trying XLXWRITER because it allows greater control of formatting
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
   sheet = book[sheet_name]
+
+  book.active = sheet
 
   # Delete all rows so that we can replace them with our df  
   sheet.delete_rows(1,sheet.max_row)
@@ -172,4 +176,26 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
   for r in dataframe_to_rows(df,index=include_index, header=True):
     sheet.append(r)
 
+  #from openpyxl.styles import NamedStyle
+
+  #date_style = NamedStyle(name='date_style', number_format='d/m/yy')
+  
+  for row in sheet[2:sheet.max_row]: # skip the header
+    cell = row[0]   # column A
+    cell.number_format = 'YYYY-mm-dd'
+    cell._bind_value(cell.value)
+    #import pdb; pdb.set_trace()
+
+    #TODO: Fix This Error: https://support.google.com/docs/thread/45207816/number-format-not-used-until-manually-applied?hl=en
+    #TODO: Open the excel spreadsheet for real and re-save the worksheet?
+
+    """
+    if(cell.is_date == False):
+      insertDate = datetime.datetime.strptime(cell.value, '%m/%d/%Y').date()
+      #cell.value = insertDate.strftime('%-m/%-d/%Y')      
+      #cell.style = date_style      
+
+      import pdb; pdb.set_trace()
+    """
+    
   book.save(excel_file_path)
