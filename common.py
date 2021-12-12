@@ -23,7 +23,7 @@ def get_stlouisfed_data(series_code):
   for i in range(len(json["observations"])):
     df = df.append({"DATE": json["observations"][i]["date"], series_code: json["observations"][i]["value"]}, ignore_index=True)
 
-  df['DATE'] = pd.to_datetime(df['DATE'])
+  df['DATE'] = pd.to_datetime(df['DATE'],format='%Y-%m-%d')
   df[series_code] = df[series_code].astype('float64') 
   #df = df.set_index('DATE')
 
@@ -143,24 +143,13 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
-  df['DATE'] = pd.to_datetime(df['DATE'])
 
-  """
-  book = openpyxl.load_workbook(excel_file_path)
-  sheet = book[sheet_name]
+  df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
 
-  data = sheet.values
-  cols = next(data)[1:]
-  data = list(data)
-  idx = [r[0] for r in data]
-  data = (islice(r, 1, None) for r in data)
-  df = pd.DataFrame(data, index=idx, columns=cols)
-  """
   return df
 
 def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
 
-  #TODO: Consider trying XLXWRITER because it allows greater control of formatting
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
@@ -168,34 +157,24 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
   sheet = book[sheet_name]
 
   book.active = sheet
-
-  # Delete all rows so that we can replace them with our df  
+  
+  # Delete all rows after the header so that we can replace them with our df  
   sheet.delete_rows(1,sheet.max_row)
   
-  #Write values in the df to the sheet
+  #Write values from the df to the sheet
   for r in dataframe_to_rows(df,index=include_index, header=True):
     sheet.append(r)
 
-  #from openpyxl.styles import NamedStyle
-
-  #date_style = NamedStyle(name='date_style', number_format='d/m/yy')
-  
   for row in sheet[2:sheet.max_row]: # skip the header
-    cell = row[0]   # column A
-    cell.number_format = 'YYYY-mm-dd'
-    cell._bind_value(cell.value)
-    #import pdb; pdb.set_trace()
-
-    #TODO: Fix This Error: https://support.google.com/docs/thread/45207816/number-format-not-used-until-manually-applied?hl=en
-    #TODO: Open the excel spreadsheet for real and re-save the worksheet?
-
-    """
-    if(cell.is_date == False):
-      insertDate = datetime.datetime.strptime(cell.value, '%m/%d/%Y').date()
-      #cell.value = insertDate.strftime('%-m/%-d/%Y')      
-      #cell.style = date_style      
-
-      import pdb; pdb.set_trace()
-    """
+    cell = row[0]   # column A is a Date Field.
+    cell.number_format = 'dd-mm-YYYY'
     
   book.save(excel_file_path)
+  book.close()
+
+def write_dataframe_to_excel1(excel_file_path,sheet_name, df, include_index):
+
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  #TODO: Use another method to write to excel
