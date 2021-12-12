@@ -95,8 +95,13 @@ def get_oecd_data(dataset, dimensions, params):
     case 'QTR':
       #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
       date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
-      date_range_list = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
+      date_ranges = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
 
+      date_range_list = date_ranges.tolist()
+
+      # Need to align QTR and DATE between df_original and df_QoQ.
+      date_list.pop(0)
+      date_range_list.pop()
     case 'MTH':
       #From year_start to year_end, calculate all the months. Populate date_range_list and date_list
       date_range_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='MS').strftime("%Y-%m").tolist()
@@ -122,6 +127,9 @@ def get_oecd_data(dataset, dimensions, params):
 
           #match based on quarter and country, then add the observation value
           df.loc[obs_row, current_country] = round(float(obs_value),9)        
+
+  #Set the date to the correct datatype, and ensure the format accounts for the correct positioning of day and month values
+  df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
 
   return df
 
@@ -181,3 +189,7 @@ def append_new_rows_to_df(df_original, df_new, col_name):
       df_original = pd.concat([df_original, df_new_row], ignore_index=False)
 
   return df_original  
+  
+def util_check_diff_list(li1, li2):
+  # Python code t get difference of two lists
+  return list(set(li1) - set(li2))
