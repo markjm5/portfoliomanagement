@@ -10,8 +10,9 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-from common import get_oecd_data, write_to_directory
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, append_new_rows_to_df, write_to_directory
 
+excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
 #TODO: Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
 # https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
@@ -159,7 +160,9 @@ def scrape_world_gdp_table(url):
 
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
 
-#Get QoQ Data from OECD
+##########################
+# Get QoQ Data from OECD #
+##########################
 country = ['AUS','AUT','BEL','CAN','CHL','COL','CRI','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LTU','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','NAFTA','OECDE','G-20','OECD','ARG','BRA','BGR','CHN','IND','IDN','ROU','RUS','SAU','ZAF']
 #subject = ['B1_GE','P31S14_S15','P3S13','P51','P52_P53','B11','P6','P7']
 subject = ['B1_GE']
@@ -173,9 +176,26 @@ endDate = '%s-Q4' % (todays_date.year)
 df_QoQ = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '003_QoQ.xml'})
 
 #Write to a csv file in the correct directory
-write_to_directory(df_QoQ,'003_Lagging_Indicator_World_GDP_QoQ.csv')
+#write_to_directory(df_QoQ,'003_Lagging_Indicator_World_GDP_QoQ.csv')
 
-#Get YoY Data from OECD
+sheet_name = 'Data qoq'
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+
+#TODO: Need to align QTR and DATE between df_original and df_QoQ. Use df_original as source of truth
+#TODO: Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
+#TODO: Need to make DATE field in df_QoQ a proper date field that aligns with df_original
+#TODO: Need to Rename column header in df_QoQ for some columns such as G7 to match df_original. 
+#TODO: Need to remove unnecessary columns from df_QoQ
+
+print(df_original.head())
+print(df_QoQ.head())
+
+import pdb; pdb.set_trace()
+#df_updated = append_new_rows_to_df(df_original, df_QoQ, 'DATE')
+
+##########################
+# Get YoY Data from OECD #
+##########################
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
 
 country = ['AUS','AUT','BEL','CAN','CHL','COL','CRI','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LTU','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','NAFTA','OECDE','G-20','OECD','ARG','BRA','BGR','CHN','IND','IDN','ROU','RUS','SAU','ZAF']
@@ -191,8 +211,16 @@ endDate = '%s-Q4' % (todays_date.year)
 df_YoY = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '003_YoY.xml'})
 
 #Write to a csv file in the correct directory
-write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
+#write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
 
+sheet_name = 'Data yoy'
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+#df_updated = append_new_rows_to_df(df_original, df, 'DATE')
+
+##################################################
+# Get World GDP Data from Trading Economics Site #
+##################################################
 df_World_GDP = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
 #Write to a csv file in the correct directory
