@@ -171,10 +171,3 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
     
   book.save(excel_file_path)
   book.close()
-
-def write_dataframe_to_excel1(excel_file_path,sheet_name, df, include_index):
-
-  filepath = os.path.realpath(__file__)
-  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
-
-  #TODO: Use another method to write to excel
