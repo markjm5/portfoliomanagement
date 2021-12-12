@@ -171,3 +171,12 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
     
   book.save(excel_file_path)
   book.close()
+
+def append_new_rows_to_df(df_original, df_new, col_name):
+
+  for index, row in df_new.iterrows():
+    if(row[col_name] not in df_original.values):
+      df_new_row = df_new[df_new[col_name]==row[col_name]]
+      df_original = pd.concat([df_original, df_new_row], ignore_index=False)
+
+  return df_original  

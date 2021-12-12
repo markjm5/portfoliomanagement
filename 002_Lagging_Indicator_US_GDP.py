@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, append_new_rows_to_df, write_to_directory
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/002_Lagging_Indicator_US_GDP.xlsm'
 sheet_name = 'Database'
@@ -36,12 +36,15 @@ df = pd.merge(df,df_PCECC96,"left")
 # Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
-df_updated = df_original
+df_updated = append_new_rows_to_df(df_original, df, 'DATE')
 
+"""
+df_updated = df_original
 for index, row in df.iterrows():
     if(row['DATE'] not in df_original.values):
         df_new_row = df[df['DATE']==row['DATE']]
         df_updated = pd.concat([df_updated, df_new_row], ignore_index=False)
+"""
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False)
