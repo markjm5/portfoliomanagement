@@ -36,13 +36,12 @@ df = pd.merge(df,df_PCECC96,"left")
 # Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
-
-#TODO: update df_original with the dataframe with new values 
-# 3. Append additional row(s) to df_original
-
 df_updated = df_original
-#print(df_original['DATE'])
-#print(df['DATE'])
+
+for index, row in df.iterrows():
+    if(row['DATE'] not in df_original.values):
+        df_new_row = df[df['DATE']==row['DATE']]
+        df_updated = pd.concat([df_updated, df_new_row], ignore_index=False)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False)
