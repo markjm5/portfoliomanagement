@@ -185,7 +185,6 @@ sheet_name = 'Data qoq'
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
 #TODO: Need to Rename column header in df_QoQ for some columns such as G7 to match df_original. 
-
 #TODO: Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
 
 print(df_original.head())
@@ -197,7 +196,12 @@ print(Diff(df_QoQ.columns.tolist(), df_original.columns.tolist()))
 """
 
 import pdb; pdb.set_trace()
-#df_updated = append_new_rows_to_df(df_original, df_QoQ, 'DATE')
+df_updated = append_new_rows_to_df(df_original, df_QoQ, 'DATE')
+
+import pdb; pdb.set_trace()
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False)
 
 ##########################
 # Get YoY Data from OECD #
