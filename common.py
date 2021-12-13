@@ -189,14 +189,21 @@ def append_new_rows_to_df(df_original, df_new, col_name):
       col_values_new = df_new[column]
       col_values_original = df_original[column]
 
-      #TODO: For each col, go to the last row of data, and check df_new has data for the next date for that same col
-      #TODO: If data exists, add the additional data and then move onto the next col
-      #TODO: Return the df with the modifications
+      import pdb; pdb.set_trace()
 
-    except requests.exceptions.KeyError as e:
+      for row in col_values_new:
+        #TODO: The below code only works for strings. Need to make it work for Timestamp and other data types
+        if(col_values_original.str.contains(row, regex=False).any(axis=None) == False):
+
+          #If data does not exist, add the additional data to the last row
+          df_original.loc[len(df_original) + 1, column] = row
+
+
+    except KeyError as e:
       print("Column Not Found: " + column)      
 
   import pdb; pdb.set_trace()
+  
   """
   for index, row in df_new.iterrows():
     if(row[col_name] not in df_original.values):
@@ -204,6 +211,7 @@ def append_new_rows_to_df(df_original, df_new, col_name):
       df_original = pd.concat([df_original, df_new_row], ignore_index=False)
   """
 
+  #TODO: Return the df with the modifications
   return df_original  
   
 def util_check_diff_list(li1, li2):
