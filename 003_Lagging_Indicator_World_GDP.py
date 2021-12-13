@@ -185,15 +185,13 @@ sheet_name = 'Data qoq'
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
 # Need to Rename column header in df_QoQ for some columns such as G7 to match df_original. 
-df_QoQ = df_QoQ.rename(columns={"G-7": "G7", "EU27_2020": "EU28", "CHN": "CHI"})
+#df_QoQ = df_QoQ.rename(columns={"G-7": "G7", "EU27_2020": "EU28", "CHN": "CHI"})
 
 # Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
 df_QoQ = df_QoQ.iloc[1: , :]
 
 #print(df_original.head())
 #print(df_QoQ.head())
-
-import pdb; pdb.set_trace()
 
 """
 # Check for difference between original and new lists
