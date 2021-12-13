@@ -166,7 +166,7 @@ def scrape_world_gdp_table(url):
 #country = ['AUS','AUT','BEL','CAN','CHL','COL','CRI','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LTU','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','NAFTA','OECDE','G-20','OECD','ARG','BRA','BGR','CHN','IND','IDN','ROU','RUS','SAU','ZAF']
 #remove 'G-7', 'EU27_2020'
 
-country = ['AUS','AUT','BEL','CAN','CHL','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','OECD','ARG','BRA','IND','RUS','ZAF']
+country = ['AUS','AUT','BEL','CAN','CHL','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','OECD','ARG','BRA','IND','RUS','ZAF', 'CHN']
 
 subject = ['B1_GE']
 measure = ['GPSA']
@@ -184,21 +184,22 @@ df_QoQ = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 sheet_name = 'Data qoq'
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
-#TODO: Need to Rename column header in df_QoQ for some columns such as G7 to match df_original. 
-#TODO: Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
+# Need to Rename column header in df_QoQ for some columns such as G7 to match df_original. 
+df_QoQ = df_QoQ.rename(columns={"G-7": "G7", "EU27_2020": "EU28", "CHN": "CHI"})
 
-print(df_original.head())
-print(df_QoQ.head())
+# Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
+df_QoQ = df_QoQ.iloc[1: , :]
+
+#print(df_original.head())
+#print(df_QoQ.head())
+
+import pdb; pdb.set_trace()
 
 """
 # Check for difference between original and new lists
 print(Diff(df_QoQ.columns.tolist(), df_original.columns.tolist()))
 """
-
-import pdb; pdb.set_trace()
 df_updated = append_new_rows_to_df(df_original, df_QoQ, 'DATE')
-
-import pdb; pdb.set_trace()
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False)

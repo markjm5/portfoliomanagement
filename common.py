@@ -182,11 +182,17 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
   book.close()
 
 def append_new_rows_to_df(df_original, df_new, col_name):
+  #TODO: This function needs to be more sophisticated.
+  #TODO: Loop through each col in df_original. 
+  #TODO: For each col, go to the last row of data, and check df_new has data for the next date for that same col
+  #TODO: If data exists, add the additional data and then move onto the next col
+  #TODO: Return the df with the modifications
 
   for index, row in df_new.iterrows():
     if(row[col_name] not in df_original.values):
       df_new_row = df_new[df_new[col_name]==row[col_name]]
       df_original = pd.concat([df_original, df_new_row], ignore_index=False)
+
 
   return df_original  
   
