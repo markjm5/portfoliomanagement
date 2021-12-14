@@ -185,22 +185,23 @@ def append_new_rows_to_df(df_original, df_new, col_name):
 
   # Loop through each col in df_original. 
   for column in df_original.columns:
-    try:
-      col_values_new = df_new[column]
-      col_values_original = df_original[column]
+    col_values_new = df_new[column]
+    col_values_original = df_original[column]
 
-      import pdb; pdb.set_trace()
-
-      for row in col_values_new:
-        #TODO: The below code only works for strings. Need to make it work for Timestamp and other data types
-        if(col_values_original.str.contains(row, regex=False).any(axis=None) == False):
-
-          #If data does not exist, add the additional data to the last row
-          df_original.loc[len(df_original) + 1, column] = row
-
-
-    except KeyError as e:
-      print("Column Not Found: " + column)      
+    for row in col_values_new:
+      try:
+        row_not_found = (col_values_original.str.contains(row, regex=False).any(axis=None) == False)
+      except AttributeError as e:
+        print(col_values_original)
+        print(row)
+        #TODO: Check Timestamp exists in df that contains a datetime64 attribute, and set the row_not_found attribute 
+        import pdb; pdb.set_trace()
+      
+      if(row_not_found):
+        #If data does not exist, add the additional data to the last row
+        #TODO: Make sure the row is added after the last value, and not just after the length of the df
+        # Because the last few rows could contain 'NaT'
+        df_original.loc[len(df_original) + 1, column] = row
 
   import pdb; pdb.set_trace()
   
