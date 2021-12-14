@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, append_new_rows_to_df, write_to_directory
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
@@ -188,20 +188,32 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 #df_QoQ = df_QoQ.rename(columns={"G-7": "G7", "EU27_2020": "EU28", "CHN": "CHI"})
 
 # Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
-df_QoQ = df_QoQ.iloc[1: , :]
-
-#print(df_original.head())
-#print(df_QoQ.head())
+df_QoQ = df_QoQ.iloc[1: , :].reset_index(drop=True)
 
 """
 # Check for difference between original and new lists
 print(Diff(df_QoQ.columns.tolist(), df_original.columns.tolist()))
 """
-df_updated = append_new_rows_to_df(df_original, df_QoQ, 'DATE')
+df_updated = combine_df(df_original, df_QoQ)
+
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('QTR')))
+cols.insert(1, cols.pop(cols.index('DATE')))
+
+# reorder
+df_updated = df_updated[cols]
+
+# format date
+df_updated['DATE'] = pd.to_datetime(df_updated['DATE'],format='%d/%m/%Y')
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 1)
 
+import pdb; pdb.set_trace()
+
+#TODO: Fix the other data sets as well!!
 ##########################
 # Get YoY Data from OECD #
 ##########################

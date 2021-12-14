@@ -157,7 +157,7 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
 
   return df
 
-def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
+def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
@@ -175,46 +175,19 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index):
     sheet.append(r)
 
   for row in sheet[2:sheet.max_row]: # skip the header
-    cell = row[0]   # column A is a Date Field.
+    cell = row[date_position]   # column A is a Date Field.
     cell.number_format = 'dd-mm-YYYY'
     
   book.save(excel_file_path)
   book.close()
 
-def append_new_rows_to_df(df_original, df_new, col_name):
+def combine_df(df_original, df_new):
 
-  # Loop through each col in df_original. 
-  for column in df_original.columns:
-    col_values_new = df_new[column]
-    col_values_original = df_original[column]
-
-    for row in col_values_new:
-      try:
-        row_not_found = (col_values_original.str.contains(row, regex=False).any(axis=None) == False)
-      except AttributeError as e:
-        print(col_values_original)
-        print(row)
-        #TODO: Check Timestamp exists in df that contains a datetime64 attribute, and set the row_not_found attribute 
-        import pdb; pdb.set_trace()
-      
-      if(row_not_found):
-        #If data does not exist, add the additional data to the last row
-        #TODO: Make sure the row is added after the last value, and not just after the length of the df
-        # Because the last few rows could contain 'NaT'
-        df_original.loc[len(df_original) + 1, column] = row
-
-  import pdb; pdb.set_trace()
-  
-  """
-  for index, row in df_new.iterrows():
-    if(row[col_name] not in df_original.values):
-      df_new_row = df_new[df_new[col_name]==row[col_name]]
-      df_original = pd.concat([df_original, df_new_row], ignore_index=False)
-  """
-
-  #TODO: Return the df with the modifications
-  return df_original  
+  return df_original.combine(df_new, take_larger, overwrite=False)  
   
 def util_check_diff_list(li1, li2):
   # Python code t get difference of two lists
   return list(set(li1) - set(li2))
+
+def take_larger(s1, s2):
+  return s2
