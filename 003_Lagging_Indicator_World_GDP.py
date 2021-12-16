@@ -184,9 +184,6 @@ df_QoQ = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 sheet_name = 'Data qoq'
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
-# Need to Rename column header in df_QoQ for some columns such as G7 to match df_original. 
-#df_QoQ = df_QoQ.rename(columns={"G-7": "G7", "EU27_2020": "EU28", "CHN": "CHI"})
-
 # Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
 df_QoQ = df_QoQ.iloc[1: , :].reset_index(drop=True)
 
