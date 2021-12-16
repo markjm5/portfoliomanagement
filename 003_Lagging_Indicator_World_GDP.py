@@ -267,6 +267,9 @@ import pdb; pdb.set_trace()
 ##################################################
 df_World_GDP = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
+#TODO: Format df_world_GDP
+#TODO: Write df_world GDP to correct location in excel file
+
 #Write to a csv file in the correct directory
 write_to_directory(df_World_GDP,'003_Lagging_Indicator_World_GDP.csv')
 
