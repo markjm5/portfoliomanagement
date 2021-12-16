@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
@@ -85,7 +85,7 @@ df_QoQ = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 #write_to_directory(df_QoQ,'003_Lagging_Indicator_World_GDP_QoQ.csv')
 
 sheet_name = 'Data qoq'
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+df_original_QoQ = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
 # Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
 df_QoQ = df_QoQ.iloc[1: , :].reset_index(drop=True)
@@ -94,7 +94,7 @@ df_QoQ = df_QoQ.iloc[1: , :].reset_index(drop=True)
 # Check for difference between original and new lists
 print(Diff(df_QoQ.columns.tolist(), df_original.columns.tolist()))
 """
-df_updated_QoQ = combine_df(df_original, df_QoQ)
+df_updated_QoQ = combine_df(df_original_QoQ, df_QoQ)
 
 # get a list of columns
 cols = list(df_updated_QoQ)
@@ -108,18 +108,19 @@ df_updated_QoQ = df_updated_QoQ[cols]
 # format date
 df_updated_QoQ['DATE'] = pd.to_datetime(df_updated_QoQ['DATE'],format='%d/%m/%Y')
 
+#TODO: Compare numbers with original excel numbers and fix any discrepancies
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_QoQ, False, 1)
 
-#TODO: Fix the other data sets as well!!
 ##########################
 # Get YoY Data from OECD #
 ##########################
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
 
-#TODO: Align this country list with countries list from df_original
-country = ['AUS','AUT','BEL','CAN','CHL','COL','CRI','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LTU','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','NAFTA','OECDE','G-20','OECD','ARG','BRA','BGR','CHN','IND','IDN','ROU','RUS','SAU','ZAF']
-#subject = ['B1_GE','P31S14_S15','P3S13','P51','P52_P53','B11','P6','P7']
+#country = ['AUS','AUT','BEL','CAN','CHL','COL','CRI','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LTU','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','NAFTA','OECDE','G-20','OECD','ARG','BRA','BGR','CHN','IND','IDN','ROU','RUS','SAU','ZAF']
+country = ['AUS','AUT','BEL','CAN','CHL','CZE','DNK','EST','FIN','FRA','DEU','GRC','HUN','ISL','IRL','ISR','ITA','JPN','KOR','LVA','LUX','MEX','NLD','NZL','NOR','POL','PRT','SVK','SVN','ESP','SWE','CHE','TUR','GBR','USA','EA19','EU27_2020','G-7','OECD','ARG','BRA','CHN','IND','RUS','ZAF']
+
 subject = ['B1_GE']
 measure = ['GYSA']
 frequency = 'Q'
@@ -134,32 +135,31 @@ df_YoY = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 #write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
 
 sheet_name = 'Data yoy'
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
-
-print(df_original.head())
-print(df_YoY.head())
-
-print(df_original.tail())
-print(df_YoY.tail())
-
-import pdb; pdb.set_trace()
+df_original_YoY = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
 # Need to remove additional unnecessary rows from beginning of df_YoY dataframe
-#df_YoY = df_YoY.iloc[1: , :].reset_index(drop=True)
+df_YoY = df_YoY.iloc[1: , :].reset_index(drop=True)
 
-#df_updated_YoY = combine_df(df_original, df_QoQ)
+# Check for difference between original and new lists
+#print(util_check_diff_list(df_YoY.columns.tolist(), df_original.columns.tolist()))
+
+df_updated_YoY = combine_df(df_original_YoY, df_YoY)
 
 # get a list of columns
-#cols = list(df_updated_YoY)
+cols = list(df_updated_YoY)
 # move the column to head of list using index, pop and insert
-#cols.insert(0, cols.pop(cols.index('QTR')))
-#cols.insert(1, cols.pop(cols.index('DATE')))
+cols.insert(0, cols.pop(cols.index('QTR')))
+cols.insert(1, cols.pop(cols.index('DATE')))
 
 # reorder
-#df_updated_YoY = df_updated_YoY[cols]
+df_updated_YoY = df_updated_YoY[cols]
 
 # format date
-#df_updated_YoY['DATE'] = pd.to_datetime(df_updated_YoY['DATE'],format='%d/%m/%Y')
+df_updated_YoY['DATE'] = pd.to_datetime(df_updated_YoY['DATE'],format='%d/%m/%Y')
+
+#TODO: Compare numbers with original excel numbers and fix any discrepancies
+
+import pdb; pdb.set_trace()
 
 # Write the updated df back to the excel sheet
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_YoY, False, 1)
