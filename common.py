@@ -166,7 +166,7 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
   sheet = book[sheet_name]
 
   book.active = sheet
-  
+
   # Delete all rows after the header so that we can replace them with our df  
   sheet.delete_rows(1,sheet.max_row)
   
@@ -180,6 +180,29 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
     
   book.save(excel_file_path)
   book.close()
+
+def write_dataframe_to_excel_position(excel_file_path,sheet_name, df, include_index):
+
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
+  sheet = book[sheet_name]
+
+  book.active = sheet
+
+  # Delete all rows after the header so that we can replace them with our df  
+  # TODO: replace with specific location in excel to write to
+  # sheet.delete_rows(1,sheet.max_row)
+  import pdb; pdb.set_trace()
+  
+  #Write values from the df to the sheet
+  #for r in dataframe_to_rows(df,index=include_index, header=True):
+  #  sheet.append(r)
+    
+  book.save(excel_file_path)
+  book.close()
+
 
 def combine_df(df_original, df_new):
 

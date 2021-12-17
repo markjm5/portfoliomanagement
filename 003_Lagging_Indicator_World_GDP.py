@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, write_dataframe_to_excel_position
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
@@ -159,21 +159,21 @@ df_updated_YoY['DATE'] = pd.to_datetime(df_updated_YoY['DATE'],format='%d/%m/%Y'
 
 #TODO: Compare numbers with original excel numbers and fix any discrepancies
 
-import pdb; pdb.set_trace()
-
 # Write the updated df back to the excel sheet
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_YoY, False, 1)
-
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_YoY, False, 1)
 
 ##################################################
 # Get World GDP Data from Trading Economics Site #
 ##################################################
+
+sheet_name = 'World GDP'
 df_World_GDP = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
-#TODO: Format df_world_GDP
-#TODO: Write df_world GDP to correct location in excel file
+#TODO: Get GDP table from excel file, using the write position
+#TODO: Combine GDP table with World GDP df
 
-#Write to a csv file in the correct directory
-write_to_directory(df_World_GDP,'003_Lagging_Indicator_World_GDP.csv')
+import pdb; pdb.set_trace()
+#TODO: Write combined df into correct position in excel file
+write_dataframe_to_excel_position(excel_file_path, sheet_name, df_World_GDP, False)
 
 print("Done!")
