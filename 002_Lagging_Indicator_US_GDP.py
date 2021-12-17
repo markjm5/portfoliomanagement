@@ -33,7 +33,7 @@ df = pd.merge(df,df_PCECC96,"left")
 
 # Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 #df_updated = append_new_rows_to_df(df_original, df, 'DATE')
 
 df_updated = combine_df(df_original, df)

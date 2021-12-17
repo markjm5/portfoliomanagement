@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, write_dataframe_to_excel_position
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
@@ -85,7 +85,7 @@ df_QoQ = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 #write_to_directory(df_QoQ,'003_Lagging_Indicator_World_GDP_QoQ.csv')
 
 sheet_name = 'Data qoq'
-df_original_QoQ = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+df_original_QoQ = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 # Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
 df_QoQ = df_QoQ.iloc[1: , :].reset_index(drop=True)
@@ -135,7 +135,7 @@ df_YoY = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startT
 #write_to_directory(df_YoY,'003_Lagging_Indicator_World_GDP_YoY.csv')
 
 sheet_name = 'Data yoy'
-df_original_YoY = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+df_original_YoY = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 # Need to remove additional unnecessary rows from beginning of df_YoY dataframe
 df_YoY = df_YoY.iloc[1: , :].reset_index(drop=True)
@@ -166,14 +166,19 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_YoY, False, 1)
 # Get World GDP Data from Trading Economics Site #
 ##################################################
 
-sheet_name = 'World GDP'
-df_World_GDP = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
+sheet_name = 'Data World GDP'
 
-#TODO: Get GDP table from excel file, using the write position
-#TODO: Combine GDP table with World GDP df
+df_original_world_gdp = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+df_world_gdp = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
+
+#TODO: format df_original_world_gdp and df_world_gdp so that they match
+#TODO: Combine df_original_world_gdp with df_world_gdp
 
 import pdb; pdb.set_trace()
-#TODO: Write combined df into correct position in excel file
-write_dataframe_to_excel_position(excel_file_path, sheet_name, df_World_GDP, False)
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_world_gdp, False)
+
+#TODO: Fix VLookup in Excel to use new Data World GDP sheet
 
 print("Done!")

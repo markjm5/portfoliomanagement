@@ -145,19 +145,19 @@ def write_to_directory(df,filename):
     file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
     df.to_csv(file_name, index=False)
 
-def convert_excelsheet_to_dataframe(excel_file_path,sheet_name):
+def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
-  #import pdb; pdb.set_trace()
-  #print(df['DATE'])
-  df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
+
+  if(date_exists):
+    df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
 
   return df
 
-def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position):
+def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
@@ -174,35 +174,13 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
   for r in dataframe_to_rows(df,index=include_index, header=True):
     sheet.append(r)
 
-  for row in sheet[2:sheet.max_row]: # skip the header
-    cell = row[date_position]   # column A is a Date Field.
-    cell.number_format = 'dd-mm-YYYY'
+  if(date_position):
+    for row in sheet[2:sheet.max_row]: # skip the header
+      cell = row[date_position]   # column date_position is a Date Field.
+      cell.number_format = 'dd-mm-YYYY'
     
   book.save(excel_file_path)
   book.close()
-
-def write_dataframe_to_excel_position(excel_file_path,sheet_name, df, include_index):
-
-  filepath = os.path.realpath(__file__)
-  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
-
-  book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
-  sheet = book[sheet_name]
-
-  book.active = sheet
-
-  # Delete all rows after the header so that we can replace them with our df  
-  # TODO: replace with specific location in excel to write to
-  # sheet.delete_rows(1,sheet.max_row)
-  import pdb; pdb.set_trace()
-  
-  #Write values from the df to the sheet
-  #for r in dataframe_to_rows(df,index=include_index, header=True):
-  #  sheet.append(r)
-    
-  book.save(excel_file_path)
-  book.close()
-
 
 def combine_df(df_original, df_new):
 
