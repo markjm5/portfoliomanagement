@@ -170,14 +170,22 @@ sheet_name = 'Data World GDP'
 
 df_original_world_gdp = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 df_world_gdp = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
+"""
+print(df_original_world_gdp.head())
+print(df_world_gdp.head())
+print(df_original_world_gdp.tail())
+print(df_world_gdp.tail())
+"""
+#Fix datatypes of df_world_gdp
+for column in df_world_gdp:
+  if(column != 'Country'):
+    df_world_gdp[column] = pd.to_numeric(df_world_gdp[column])
 
-#TODO: format df_original_world_gdp and df_world_gdp so that they match
-#TODO: Combine df_original_world_gdp with df_world_gdp
-
-import pdb; pdb.set_trace()
+#Combine df_original_world_gdp with df_world_gdp
+df_updated_world_gdp = combine_df(df_original_world_gdp, df_world_gdp)
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_world_gdp, False)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_world_gdp, False)
 
 #TODO: Fix VLookup in Excel to use new Data World GDP sheet
 
