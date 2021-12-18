@@ -1,16 +1,57 @@
 import requests
 import os.path
 import csv
+import re
 import pandas as pd
+from bs4 import BeautifulSoup
 from datetime import date
 from common import get_stlouisfed_data, get_oecd_data, write_to_directory, convert_excelsheet_to_dataframe, combine_df, write_dataframe_to_excel, util_check_diff_list
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/005_Lagging_Indicator_Job_Market_US_World.xlsm'
-sheet_name = 'Database'
+
+#Scrape this table and get latest ADP number
+def scrape_world_gdp_table(url):
+  #Scrape GDP Table from Trading Economics
+
+  page = requests.get(url=url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  table = soup.find('table')
+  table_rows = table.find_all('tr', attrs={'class':'an-estimate-row'})
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df = pd.DataFrame()
+
+  index = 0
+
+  for header in table_rows_header:
+    if(index == 0):
+      df.insert(0,"DATE",[],True)
+    else:
+      df.insert(index,str(header.text).strip(),[],True)
+
+    index+=1
+
+  #Insert New Row. Format the data to show percentage as float
+  for tr in table_rows:
+    temp_row = []
+
+    td = tr.find_all('td')
+    for obs in td:
+        if(str(obs.text).strip() == 'ADP Employment Change'):
+            pass #Hidden field, need to pass over
+        else:
+            text = str(obs.text).strip()
+            temp_row.append(text)        
+
+    df.loc[len(df.index)] = temp_row
+
+  return df
 
 ##################################
 #   Get Data from St Louis Fed   #
 ##################################
+"""
+sheet_name = 'Database'
 
 df_CIVPART = get_stlouisfed_data('CIVPART')
 df_PAYEMS = get_stlouisfed_data('PAYEMS')
@@ -53,7 +94,6 @@ startDate = '1955-Q1'
 todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
-#TODO: CHANGE THIS FUNCTION SO THAT IT SHOWS MONTHS INSTEAD OF QUARTERS
 df_unemployed_world = get_oecd_data('STLABOUR', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '005_Job_Market_World.xml'})
 
 df_unemployed_world = df_unemployed_world.drop('MTH', 1)
@@ -78,5 +118,44 @@ df_updated_unemployed_world['DATE'] = pd.to_datetime(df_updated_unemployed_world
 
 #Write to a csv file in the correct directory
 #write_to_directory(df_unemployed_world,'005_Lagging_Indicator_Job_Market_World.csv')
+"""
+#######################################################
+# Get Employment ADP Data from Trading Economics Site #
+#######################################################
+
+sheet_name = 'Database ADP'
+
+df_original_adp = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
+df_adp = scrape_world_gdp_table("https://tradingeconomics.com/united-states/adp-employment-change")
+
+#Drop unnecessary columns
+df_adp = df_adp.drop('GMT', 1)
+df_adp = df_adp.drop('Reference', 1)
+df_adp = df_adp.drop('Previous', 1)
+df_adp = df_adp.drop('Consensus', 1)
+df_adp = df_adp.drop('TEForecast', 1)
+
+#Rename column
+df_adp = df_adp.rename(columns={"Actual": "ADP"})
+
+"""
+print(df_original_adp.head())
+print(df_adp.head())
+print(df_original_adp.tail())
+print(df_adp.tail())
+"""
+
+#Fix datatypes of df_world_gdp
+df_adp['DATE'] = pd.to_datetime(df_adp['DATE'],format='%Y-%m-%d')
+df_adp['ADP'] = df_adp['ADP'].str.slice(0,3)  #Remove the K from the end of the string, and convert it to an int
+
+import pdb; pdb.set_trace()
+
+#Combine df_original_world_gdp with df_world_gdp
+#TODO: Need to find a way to append these dataframes together. Combine_df wont work. 
+#df_updated_adp = combine_df(df_original_adp, df_adp)
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_original_adp, False)
 
 print("Done!")
