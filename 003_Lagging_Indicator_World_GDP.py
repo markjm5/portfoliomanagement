@@ -187,6 +187,4 @@ df_updated_world_gdp = combine_df(df_original_world_gdp, df_world_gdp)
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_world_gdp, False)
 
-#TODO: Fix VLookup in Excel to use new Data World GDP sheet
-
 print("Done!")
