@@ -50,7 +50,7 @@ def scrape_world_gdp_table(url):
 ##################################
 #   Get Data from St Louis Fed   #
 ##################################
-"""
+
 sheet_name = 'Database'
 
 df_CIVPART = get_stlouisfed_data('CIVPART')
@@ -116,9 +116,13 @@ df_updated_unemployed_world = df_updated_unemployed_world[cols]
 # format date
 df_updated_unemployed_world['DATE'] = pd.to_datetime(df_updated_unemployed_world['DATE'],format='%d/%m/%Y')
 
+import pdb; pdb.set_trace()
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_unemployed_world, False, 0)
+
 #Write to a csv file in the correct directory
 #write_to_directory(df_unemployed_world,'005_Lagging_Indicator_Job_Market_World.csv')
-"""
+
 #######################################################
 # Get Employment ADP Data from Trading Economics Site #
 #######################################################
@@ -149,11 +153,12 @@ print(df_adp.tail())
 df_adp['DATE'] = pd.to_datetime(df_adp['DATE'],format='%Y-%m-%d')
 df_adp['ADP'] = df_adp['ADP'].str.slice(0,3)  #Remove the K from the end of the string, and convert it to an int
 
-import pdb; pdb.set_trace()
+last_row_original_adp = df_original_adp.iloc[-1]
 
-#Combine df_original_world_gdp with df_world_gdp
-#TODO: Need to find a way to append these dataframes together. Combine_df wont work. 
-#df_updated_adp = combine_df(df_original_adp, df_adp)
+# Loop through each row in df_adp and if it doesn't exist in df_original_adp add it to the end. 
+for index, row in df_adp.iterrows():
+  if(last_row_original_adp['DATE'] != row['DATE']):
+    df_original_adp = df_original_adp.append(row, ignore_index = True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_original_adp, False)
