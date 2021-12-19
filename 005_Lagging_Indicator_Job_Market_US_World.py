@@ -116,7 +116,7 @@ df_updated_unemployed_world = df_updated_unemployed_world[cols]
 # format date
 df_updated_unemployed_world['DATE'] = pd.to_datetime(df_updated_unemployed_world['DATE'],format='%d/%m/%Y')
 
-import pdb; pdb.set_trace()
+#import pdb; pdb.set_trace()
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_unemployed_world, False, 0)
 
@@ -158,7 +158,11 @@ last_row_original_adp = df_original_adp.iloc[-1]
 # Loop through each row in df_adp and if it doesn't exist in df_original_adp add it to the end. 
 for index, row in df_adp.iterrows():
   if(last_row_original_adp['DATE'] != row['DATE']):
-    df_original_adp = df_original_adp.append(row, ignore_index = True)
+    if(not pd.isnull(row['ADP'])):
+      df_original_adp = df_original_adp.append(row, ignore_index = True)
+
+df_original_adp['ADP'] = pd.to_numeric(df_original_adp['ADP'])
+df_original_adp['DATE'] = pd.to_datetime(df_original_adp['DATE'],format='%d/%m/%Y')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_original_adp, False)
