@@ -46,7 +46,7 @@ def scrape_world_gdp_table(url):
     df.loc[len(df.index)] = temp_row
 
   return df
-
+"""
 ##################################
 #   Get Data from St Louis Fed   #
 ##################################
@@ -122,7 +122,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_unemployed_worl
 
 #Write to a csv file in the correct directory
 #write_to_directory(df_unemployed_world,'005_Lagging_Indicator_Job_Market_World.csv')
-
+"""
 #######################################################
 # Get Employment ADP Data from Trading Economics Site #
 #######################################################
@@ -157,14 +157,13 @@ last_row_original_adp = df_original_adp.iloc[-1]
 
 # Loop through each row in df_adp and if it doesn't exist in df_original_adp add it to the end. 
 for index, row in df_adp.iterrows():
-  if(last_row_original_adp['DATE'] != row['DATE']):
+  if(not row['DATE'] in df_original_adp['DATE'].values):
     if(not pd.isnull(row['ADP'])):
       df_original_adp = df_original_adp.append(row, ignore_index = True)
 
 df_original_adp['ADP'] = pd.to_numeric(df_original_adp['ADP'])
-df_original_adp['DATE'] = pd.to_datetime(df_original_adp['DATE'],format='%d/%m/%Y')
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_original_adp, False)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_original_adp, False,0)
 
 print("Done!")

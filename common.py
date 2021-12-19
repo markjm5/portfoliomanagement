@@ -174,12 +174,10 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
   for r in dataframe_to_rows(df,index=include_index, header=True):
     sheet.append(r)
 
-  #import pdb; pdb.set_trace()
-  if(date_position):
-    if(date_position >= 0):
-      for row in sheet[2:sheet.max_row]: # skip the header
-        cell = row[date_position]   # column date_position is a Date Field.
-        cell.number_format = 'dd-mm-YYYY'
+  if(date_position >= 0):
+    for row in sheet[2:sheet.max_row]: # skip the header
+      cell = row[date_position]   # column date_position is a Date Field.
+      cell.number_format = 'dd-mm-YYYY'
     
   book.save(excel_file_path)
   book.close()
