@@ -46,7 +46,7 @@ def scrape_world_gdp_table(url):
     df.loc[len(df.index)] = temp_row
 
   return df
-"""
+
 ##################################
 #   Get Data from St Louis Fed   #
 ##################################
@@ -122,7 +122,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_unemployed_worl
 
 #Write to a csv file in the correct directory
 #write_to_directory(df_unemployed_world,'005_Lagging_Indicator_Job_Market_World.csv')
-"""
+
 #######################################################
 # Get Employment ADP Data from Trading Economics Site #
 #######################################################
