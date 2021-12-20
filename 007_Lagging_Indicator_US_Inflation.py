@@ -88,17 +88,16 @@ df_FEDFUNDS = df_FEDFUNDS.merge(df_ff_target_rate, how="left")
 # get a list of columns
 cols = list(df_FEDFUNDS)
 
-# move the column to head of list using index, pop and insert
+# Move the column to head of list using index, pop and insert
 cols.insert(0, cols.pop(cols.index('DATE')))
 cols.insert(1, cols.pop(cols.index('EFFR')))
 cols.insert(2, cols.pop(cols.index('FEDFUNDS')))
 
-# reorder
+# Reorder
 df_FEDFUNDS = df_FEDFUNDS[cols]
 
-#TODO: Rename columns
-
-
+# Rename columns
+df_FEDFUNDS = df_FEDFUNDS.rename(columns={'EFFR': 'Fed Target', 'FEDFUNDS': 'Fed Funds Rate'})
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_FEDFUNDS, False, 0)
 
