@@ -18,14 +18,26 @@ def get_newyorkfed_target_rate(type, dimensions):
   json = resp.json() 
 
   df = pd.DataFrame(columns=["DATE",dimensions[0].upper()])
+  current_month = None
+  current_year = None
 
   for i in range(len(json["refRates"])):
-    try:
-        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): str(json["refRates"][i]['targetRateTo'])}, ignore_index=True)
-    except KeyError as e:
-        df = df.append({"DATE": json["refRates"][i]['effectiveDate'], dimensions[0].upper(): str(json["refRates"][i]['targetRateFrom'])}, ignore_index=True)
+    datetime_ref_rates = datetime.strptime(json["refRates"][i]['effectiveDate'], '%Y-%m-%d')
+
+    if('%s-%s' % (datetime_ref_rates.year,datetime_ref_rates.month) != '%s-%s' % (current_year,current_month)):
+      current_month = datetime_ref_rates.month
+      current_year = datetime_ref_rates.year
+      converted_date = datetime.strptime('%s-%s-%s' % (current_year, current_month, '01'), '%Y-%m-%d')
+      try:
+          df = df.append({"DATE": converted_date, dimensions[0].upper(): str(json["refRates"][i]['targetRateTo'])}, ignore_index=True)
+      except KeyError as e:
+          df = df.append({"DATE": converted_date, dimensions[0].upper(): str(json["refRates"][i]['targetRateFrom'])}, ignore_index=True)
+
+  df['DATE'] = pd.to_datetime(df['DATE'],format='%Y-%m-%d')
+  df[dimensions[0].upper()] = pd.to_numeric(df[dimensions[0].upper()])
 
   df = df.sort_values(by='DATE')
+  df = df.reset_index(drop=True)
 
   return df  
 
@@ -61,24 +73,33 @@ df_FEDFUNDS = get_stlouisfed_data('FEDFUNDS')
 #Get Fed Funds Target from markets.newyorkfed.org
 #unsecured/effr/search.json?startDate=01/01/1971&endDate=11/01/2021
 dataset = 'effr'
+
+currentMonth = datetime.now().month
+currentYear = datetime.now().year
+
 startDate = '01/01/1971'
-endDate = '11/01/2021'
+endDate = '%s/01/%s' % (currentMonth, currentYear)
+
 df_ff_target_rate = get_newyorkfed_target_rate('unsecured', [dataset,startDate,endDate])
-
-df_ff_target_rate['DATE'] = pd.to_datetime(df_ff_target_rate['DATE'],format='%Y-%m-%d')
-df_ff_target_rate['EFFR'] = pd.to_numeric(df_ff_target_rate['EFFR'])
-
-#TODO: Fill in blanks in EFFR
 
 df_FEDFUNDS = df_FEDFUNDS.merge(df_ff_target_rate, how="left")
 
-#TODO: Rename and reorder columns
+#Reorder columns
+# get a list of columns
+cols = list(df_FEDFUNDS)
+
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('EFFR')))
+cols.insert(2, cols.pop(cols.index('FEDFUNDS')))
+
+# reorder
+df_FEDFUNDS = df_FEDFUNDS[cols]
+
+#TODO: Rename columns
+
 
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_FEDFUNDS, False, 0)
-
-#Write to a csv file in the correct directory
-#write_to_directory(df,'007_Lagging_Indicator_US_Inflation.csv')
-#write_to_directory(df_FEDFUNDS,'007_Lagging_Indicator_US_Fed_Fund_Rate_Target.csv')
 
 print("Done!")
