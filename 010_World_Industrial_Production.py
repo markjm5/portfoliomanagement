@@ -172,20 +172,26 @@ df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-#TODO: format df_capital_investment so that it matches df_original. 
-# 1. Add index
-# 2. rename 'economy' to 'Code'
-# 3. rename 'NE.GDI.TOTL.ZS' to 'Investment Percentage'
+# Add new index
+df_capital_investment.reset_index(level=0, inplace=True)
+
+# Rename columns in df_capital_investment
+df_capital_investment = df_capital_investment.rename(columns={'economy': 'Code', 'NE.GDI.TOTL.ZS': 'Investment_Percentage'})
 
 #TODO: combine df_original with df_capital_investment
 #df_updated = combine_df(df_original, df_capital_investment)
+df_updated = df_original.merge(df_capital_investment, on='Code')
 
-import pdb; pdb.set_trace()
-#Write to a csv file in the correct directory
+df_updated = df_updated.drop(['Investment_Percentage_x'], axis=1)
+df_updated = df_updated.rename(columns={'Investment_Percentage_y': 'Investment_Percentage'})
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+
+#LEGACY: Write to a csv file in the correct directory
 #write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
 #TODO: Get World GDP, and update df_updated with latest world GDP figures. Should we import function from 003 World GDP?
-
+import pdb; pdb.set_trace()
 ##################################################
 #   Get World IP Data from Trading Economics     #
 ##################################################
