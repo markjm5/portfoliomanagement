@@ -6,7 +6,9 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, write_to_directory
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
+
+excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
 
 def scrape_div_capital_investment(url):
@@ -151,21 +153,36 @@ def scrape_table_china_production():
 
   return df_final
 
+#####################################
+#   Get Capital Investment Data     #
+#####################################
 
 #Get Capital Investment Data
 df_capital_investment = scrape_div_capital_investment("https://www.theglobaleconomy.com/rankings/Capital_investment/")
 #Write to a csv file in the correct directory
 write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
+##################################################
+#   Get World IP Data from Trading Economics     #
+##################################################
+
 #Get World Production Data
 df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
 #Write to a csv file in the correct directory
 write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
 
+##################################################
+#   Get China IP Data from Trading Economics     #
+##################################################
+
 #Get China Production Data
 df_china_production = scrape_table_china_production()
 #Write to a csv file in the correct directory
 write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
+
+#####################################
+#   Get World IP Data from OECD     #
+#####################################
 
 # Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
 #Get World Industrial Production
