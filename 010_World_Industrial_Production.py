@@ -1,4 +1,5 @@
 import pandas as pd
+import wbgapi as wb
 import requests
 import re
 import calendar
@@ -13,6 +14,11 @@ excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/010_Lag
 
 def scrape_div_capital_investment(url):
   #Scrape GDP Table from https://www.theglobaleconomy.com/rankings/Capital_investment/
+  #World Bank Data API: https://pypi.org/project/wbgapi/
+  
+  wb_df = wb.data.DataFrame(['NE.GDI.TOTL.ZS'], ['CAN','USA','CHN'], mrv=1) # most recent 5 years
+
+  import pdb; pdb.set_trace()
 
   page = requests.get(url=url)
 
@@ -156,9 +162,11 @@ def scrape_table_china_production():
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-
+#TODO: Use worldbank API to get capital investment data
 #Get Capital Investment Data
 df_capital_investment = scrape_div_capital_investment("https://www.theglobaleconomy.com/rankings/Capital_investment/")
+
+import pdb; pdb.set_trace()
 #Write to a csv file in the correct directory
 write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
