@@ -11,14 +11,13 @@ from common import get_oecd_data, convert_excelsheet_to_dataframe, write_datafra
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
-
-def scrape_div_capital_investment(url):
+"""
+def get_wb_capital_investment(country_list):
   #Scrape GDP Table from https://www.theglobaleconomy.com/rankings/Capital_investment/
   #World Bank Data API: https://pypi.org/project/wbgapi/
-  
-  wb_df = wb.data.DataFrame(['NE.GDI.TOTL.ZS'], ['CAN','USA','CHN'], mrv=1) # most recent 5 years
+  #https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS?end=2020&start=1960&view=chart
 
-  import pdb; pdb.set_trace()
+  wb_df = wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 5 years
 
   page = requests.get(url=url)
 
@@ -36,7 +35,8 @@ def scrape_div_capital_investment(url):
   else:
     print(page.status_code)
 
-  return df
+  return wb_df
+  """
 
 def scrape_table_world_production(url):
   #Scrape GDP Table from https://tradingeconomics.com/country-list/industrial-production?continent=world
@@ -163,12 +163,15 @@ def scrape_table_china_production():
 #   Get Capital Investment Data     #
 #####################################
 #TODO: Use worldbank API to get capital investment data
-#Get Capital Investment Data
-df_capital_investment = scrape_div_capital_investment("https://www.theglobaleconomy.com/rankings/Capital_investment/")
+#Get Capital Investment Data for the following countries
+country_list = ['USA','CHN','EUN','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
+df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 5 years
+
+#TODO: get original data from excel, and combine with df_capital_investment data. Then save the data back to excel
 
 import pdb; pdb.set_trace()
 #Write to a csv file in the correct directory
-write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
+#write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
 ##################################################
 #   Get World IP Data from Trading Economics     #
