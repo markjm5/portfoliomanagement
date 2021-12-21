@@ -9,6 +9,9 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from itertools import islice
 import datetime
+from bs4 import BeautifulSoup
+from requests.models import parse_header_links
+import re
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
@@ -138,6 +141,53 @@ def get_oecd_data(dataset, dimensions, params):
   #  exc_type, exc_obj, exc_tb = sys.exc_info()
   #  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   #  print(exc_type, fname, exc_tb.tb_lineno)
+
+
+def scrape_world_gdp_table(url):
+  #Scrape GDP Table from Trading Economics
+  #url = "https://tradingeconomics.com/matrix"
+
+  page = requests.get(url=url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  table = soup.find('table')
+  table_rows = table.find_all('tr', attrs={'align':'center'})
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df = pd.DataFrame()
+
+  index = 0
+  for header in table_rows_header:
+    if(index == 0):
+      df.insert(0,"Country",[],True)
+    else:
+      df.insert(index,header.text,[],True)
+
+    index+=1
+
+  #Insert New Row. Format the data to show percentage as float
+
+  for tr in table_rows:
+    temp_row = []
+    first_col = True
+
+    td = tr.find_all('td')
+    for obs in td:
+      if(first_col):
+        text = ''.join(e for e in obs.text if e.isalnum())
+        text = re.sub("([A-Z])", " \\1", text).strip()
+      else:
+        if(obs.text.find('%') < 0):
+          text = obs.text
+        else:
+          text = obs.text.strip('%')
+          text = float(text.strip('%'))/100
+
+      temp_row.append(text)        
+      first_col = False
+
+    df.loc[len(df.index)] = temp_row
+
+  return df
 
 def write_to_directory(df,filename):
     #Write to a csv file in the correct directory

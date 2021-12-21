@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
@@ -179,19 +179,29 @@ df_capital_investment.reset_index(level=0, inplace=True)
 df_capital_investment = df_capital_investment.rename(columns={'economy': 'Code', 'NE.GDI.TOTL.ZS': 'Investment_Percentage'})
 
 #TODO: combine df_original with df_capital_investment
-#df_updated = combine_df(df_original, df_capital_investment)
 df_updated = df_original.merge(df_capital_investment, on='Code')
 
 df_updated = df_updated.drop(['Investment_Percentage_x'], axis=1)
 df_updated = df_updated.rename(columns={'Investment_Percentage_y': 'Investment_Percentage'})
 
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-
 #LEGACY: Write to a csv file in the correct directory
 #write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
-#TODO: Get World GDP, and update df_updated with latest world GDP figures. Should we import function from 003 World GDP?
-import pdb; pdb.set_trace()
+#Get World GDP, and update df_updated with latest world GDP figures. Should we import function from 003 World GDP?
+
+df_world_gdp = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
+
+#Drop unnecessary columns
+col_drop = ['GDP YoY','GDP QoQ','Interest rate','Inflation rate','Jobless rate','Gov. Budget','Debt/GDP','Current Account','Currency','Population']
+df_world_gdp = df_world_gdp.drop(col_drop, axis=1)
+
+#Fix datatypes of df_world_gdp
+df_world_gdp['GDP'] = pd.to_numeric(df_world_gdp['GDP'])
+
+df_updated = pd.merge(df_updated,df_world_gdp,"left")
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+
 ##################################################
 #   Get World IP Data from Trading Economics     #
 ##################################################
@@ -204,7 +214,7 @@ write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.c
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
-
+import pdb; pdb.set_trace()
 #Get China Production Data
 df_china_production = scrape_table_china_production()
 #Write to a csv file in the correct directory
