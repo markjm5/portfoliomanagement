@@ -162,16 +162,29 @@ def scrape_table_china_production():
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-#TODO: Use worldbank API to get capital investment data
+
+sheet_name = 'Data World GDP'
+
+# Use worldbank API to get capital investment data
 #Get Capital Investment Data for the following countries
 country_list = ['USA','CHN','EUN','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
 df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 5 years
 
-#TODO: get original data from excel, and combine with df_capital_investment data. Then save the data back to excel
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#TODO: format df_capital_investment so that it matches df_original. 
+# 1. Add index
+# 2. rename 'economy' to 'Code'
+# 3. rename 'NE.GDI.TOTL.ZS' to 'Investment Percentage'
+
+#TODO: combine df_original with df_capital_investment
+#df_updated = combine_df(df_original, df_capital_investment)
 
 import pdb; pdb.set_trace()
 #Write to a csv file in the correct directory
 #write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
+
+#TODO: Get World GDP, and update df_updated with latest world GDP figures. Should we import function from 003 World GDP?
 
 ##################################################
 #   Get World IP Data from Trading Economics     #
