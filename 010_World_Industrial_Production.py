@@ -206,6 +206,8 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 #   Get World IP Data from Trading Economics     #
 ##################################################
 
+import pdb; pdb.set_trace()
+
 #Get World Production Data
 df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
 #Write to a csv file in the correct directory
@@ -214,7 +216,7 @@ write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.c
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
-import pdb; pdb.set_trace()
+
 #Get China Production Data
 df_china_production = scrape_table_china_production()
 #Write to a csv file in the correct directory
