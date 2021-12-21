@@ -181,7 +181,7 @@ df_capital_investment.reset_index(level=0, inplace=True)
 # Rename columns in df_capital_investment
 df_capital_investment = df_capital_investment.rename(columns={'economy': 'Code', 'NE.GDI.TOTL.ZS': 'Investment_Percentage'})
 
-#TODO: combine df_original with df_capital_investment
+# Combine df_original with df_capital_investment
 df_updated = df_original.merge(df_capital_investment, on='Code')
 
 df_updated = df_updated.drop(['Investment_Percentage_x'], axis=1)
