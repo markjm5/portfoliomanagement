@@ -2,7 +2,10 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+
+excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/011_Lagging_Indicator_Retail_Sales.xlsm'
+sheet_name = 'Database'
 
 df_RSAFS = get_stlouisfed_data('RSAFs')
 df_RSFSXMV = get_stlouisfed_data('RSFSXMV')
@@ -37,7 +40,16 @@ df = pd.merge(df,df_RSFHFS,"left")
 df = pd.merge(df,df_RSCCAS,"left")
 df = pd.merge(df,df_RSMSR,"left")
 
-#Write to a csv file in the correct directory
-write_to_directory(df,'011_Lagging_Indicator_Retail_Sales.csv')
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+
+#TODO: Make sure column headers between original and df match. Problem is with the lower case
+
+df_updated = combine_df(df_original, df)
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+#LEGACY Write to a csv file in the correct directory
+#write_to_directory(df,'011_Lagging_Indicator_Retail_Sales.csv')
 
 print("Done!")
