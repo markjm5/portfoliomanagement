@@ -157,6 +157,10 @@ def scrape_table_china_production():
   #Add date_str to df_final
   df_final.insert(0, "Date", date_str, True)
 
+  df_final['Date'] = pd.to_datetime(df_final['Date'],format='%d/%m/%Y')
+  df_final['HSBC China PMI'] = pd.to_numeric(df_final['HSBC China PMI'])
+  df_final['YoY'] = float(df_final['YoY'].str.strip('%'))/100
+
   return df_final
 
 #####################################
@@ -246,7 +250,6 @@ df_china_production = scrape_table_china_production()
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-#TODO: convert datatypes in df_china_production to datetime64, float64 and float64 datatypes
 #TODO: check if row does not already exist, and if it doesnt append it to the end. 
 
 import pdb; pdb.set_trace()
