@@ -195,12 +195,15 @@ def write_to_directory(df,filename):
     file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
     df.to_csv(file_name, index=False)
 
-def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False):
+def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False, index_col=None):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
-  df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
+  if(index_col):
+    df = pd.read_excel(excel_file_path, sheet_name=sheet_name, index_col=index_col, engine='openpyxl')
+  else:
+    df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
 
   if(date_exists):
     df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
@@ -220,8 +223,13 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
   # Delete all rows after the header so that we can replace them with our df  
   sheet.delete_rows(1,sheet.max_row)
   
+  if(include_index):
+    df.reset_index(level=0, inplace=True)
+    # Need to remove additional unnecessary rows from beginning of df_QoQ dataframe
+    df = df.iloc[1: , :].reset_index(drop=True)    
+
   #Write values from the df to the sheet
-  for r in dataframe_to_rows(df,index=include_index, header=True):
+  for r in dataframe_to_rows(df,index=False, header=True):
     sheet.append(r)
 
   if(date_position >= 0):

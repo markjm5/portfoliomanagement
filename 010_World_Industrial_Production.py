@@ -218,22 +218,21 @@ sheet_name = 'World Production data'
 #Get World Production Data
 df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
 
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False, 'Country')
 
 #Fix datatypes of df_world_gdp
 df_world_production['Last'] = pd.to_numeric(df_world_production['Last'])
 df_world_production['Previous'] = pd.to_numeric(df_world_production['Previous'])
-#df_world_production['Month'] = pd.to_datetime(df_world_production['Month']) #TODO: Needs to be turned into datetime64, with first day of month
 
 #Make the Country col the index so that we can combine
-df_original.set_index('Country', inplace=True)
+#df_original.set_index('Country', inplace=True)
 df_world_production.set_index('Country', inplace=True)
 
 df_updated = combine_df(df_original, df_world_production)
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
 
-#Write to a csv file in the correct directory
+#LEGACY Write to a csv file in the correct directory
 #write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
 
 ##################################################
