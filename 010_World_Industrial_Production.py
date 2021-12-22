@@ -265,7 +265,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 #   Get World IP Data from OECD     #
 #####################################
 
-import pdb; pdb.set_trace()
+sheet_name = 'Database'
 
 # Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
 #Get World Industrial Production
@@ -281,7 +281,28 @@ endDate = '%s-Q4' % (todays_date.year)
 
 df_world_industrial_production = get_oecd_data('KEI', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '010_World_Industrial_Production.xml'})
 
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+df_world_industrial_production = df_world_industrial_production.drop('MTH', 1)
+
+# Check for difference between original and new lists
+#print(util_check_diff_list(df_world_industrial_production.columns.tolist(), df_original.columns.tolist()))
+
+df_updated_world_industrial_production = combine_df(df_original, df_world_industrial_production)
+
+# get a list of columns
+cols = list(df_updated_world_industrial_production)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+
+# reorder
+df_updated_world_industrial_production = df_updated_world_industrial_production[cols]
+
+# format date
+df_updated_world_industrial_production['DATE'] = pd.to_datetime(df_updated_world_industrial_production['DATE'],format='%d/%m/%Y')
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_world_industrial_production, False, 0)
+
 #Write to a csv file in the correct directory
-write_to_directory(df_world_industrial_production,'010_Lagging_Indicator_World_Indistrial_Production.csv')
+#write_to_directory(df_world_industrial_production,'010_Lagging_Indicator_World_Indistrial_Production.csv')
 
 print("Done!")
