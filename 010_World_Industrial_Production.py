@@ -250,16 +250,22 @@ df_china_production = scrape_table_china_production()
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-#TODO: check if row does not already exist, and if it doesnt append it to the end. 
+# check if row does not already exist, and if it doesnt append it to the end. 
+if(not df_china_production['Date'].values in df_original['Date'].values):
+  df_updated = df_original.append(df_china_production, ignore_index=True)
+else:
+  df_updated = df_original
 
-import pdb; pdb.set_trace()
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-#Write to a csv file in the correct directory
-write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
+#LEGACY Write to a csv file in the correct directory
+#write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
 
 #####################################
 #   Get World IP Data from OECD     #
 #####################################
+
+import pdb; pdb.set_trace()
 
 # Get OECD Data Using API: https://stackoverflow.com/questions/40565871/read-data-from-oecd-api-into-python-and-pandas
 #Get World Industrial Production
