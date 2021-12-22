@@ -239,8 +239,15 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
 #   Get China IP Data from Trading Economics     #
 ##################################################
 
+sheet_name = 'China Production data'
+
 #Get China Production Data
 df_china_production = scrape_table_china_production()
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#TODO: convert datatypes in df_china_production to datetime64, float64 and float64 datatypes
+#TODO: check if row does not already exist, and if it doesnt append it to the end. 
 
 import pdb; pdb.set_trace()
 
