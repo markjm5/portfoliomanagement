@@ -169,7 +169,7 @@ sheet_name = 'Data World GDP'
 #Get Capital Investment Data for the following countries
 country_list = ['USA','CHN','CEB','EUN','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
 
-df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 5 years
+df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 1 year
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
@@ -188,8 +188,6 @@ df_updated = df_updated.rename(columns={'Investment_Percentage_y': 'Investment_P
 #LEGACY: Write to a csv file in the correct directory
 #write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
-#Get World GDP, and update df_updated with latest world GDP figures. Should we import function from 003 World GDP?
-
 df_world_gdp = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
 #Drop unnecessary columns
@@ -198,8 +196,6 @@ df_world_gdp = df_world_gdp.drop(col_drop, axis=1)
 
 #Fix datatypes of df_world_gdp
 df_world_gdp['GDP'] = pd.to_numeric(df_world_gdp['GDP'])
-
-#import pdb; pdb.set_trace()
 
 df_updated = pd.merge(df_updated,df_world_gdp,"left", on='Country')
 
@@ -229,10 +225,16 @@ df_world_production['Last'] = pd.to_numeric(df_world_production['Last'])
 df_world_production['Previous'] = pd.to_numeric(df_world_production['Previous'])
 #df_world_production['Month'] = pd.to_datetime(df_world_production['Month']) #TODO: Needs to be turned into datetime64, with first day of month
 
-import pdb; pdb.set_trace()
+#Make the Country col the index so that we can combine
+df_original.set_index('Country', inplace=True)
+df_world_production.set_index('Country', inplace=True)
+
+df_updated = combine_df(df_original, df_world_production)
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
 
 #Write to a csv file in the correct directory
-write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
+#write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
 
 ##################################################
 #   Get China IP Data from Trading Economics     #
@@ -240,6 +242,9 @@ write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.c
 
 #Get China Production Data
 df_china_production = scrape_table_china_production()
+
+import pdb; pdb.set_trace()
+
 #Write to a csv file in the correct directory
 write_to_directory(df_china_production,'010_Lagging_Indicator_China_Production.csv')
 
