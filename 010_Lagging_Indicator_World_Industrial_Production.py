@@ -144,8 +144,8 @@ sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
 #Get Capital Investment Data for the following countries
-country_list = ['USA','CHN','CEB','EUN','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
-
+country_list = ['USA','CHN','CEB','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
+#'EUN',
 df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 1 year
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
@@ -173,14 +173,13 @@ df_world_gdp = df_world_gdp.drop(col_drop, axis=1)
 
 #Fix datatypes of df_world_gdp
 df_world_gdp['GDP'] = pd.to_numeric(df_world_gdp['GDP'])
-
-df_updated = pd.merge(df_updated,df_world_gdp,"left", on='Country')
+df_updated = pd.merge(df_updated,df_world_gdp,"right", on='Country')
 
 #Drop unnecessary columns
 df_updated_1 = df_updated.drop('GDP_x', axis=1)
 df_updated_2 = df_updated_1.rename(columns={'GDP_y': 'GDP'})
 
-column_names = ["Code", "Country", "GDP", "Investment_Percentage"]
+column_names = ["Country", "GDP", "Investment_Percentage", "Code"]
 
 df_updated_3 = df_updated_2.reindex(columns=column_names)
 
