@@ -14,55 +14,6 @@ from common import get_oecd_data, convert_excelsheet_to_dataframe, write_datafra
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
-"""
-def scrape_world_gdp_table(url):
-  #Scrape GDP Table from Trading Economics
-  #url = "https://tradingeconomics.com/matrix"
-
-  page = requests.get(url=url)
-  soup = BeautifulSoup(page.content, 'html.parser')
-
-  table = soup.find('table')
-  table_rows = table.find_all('tr', attrs={'align':'center'})
-  table_rows_header = table.find_all('tr')[0].find_all('th')
-  df = pd.DataFrame()
-
-  index = 0
-  for header in table_rows_header:
-    if(index == 0):
-      df.insert(0,"Country",[],True)
-    else:
-      df.insert(index,header.text,[],True)
-
-    index+=1
-
-  #Insert New Row. Format the data to show percentage as float
-
-  for tr in table_rows:
-    temp_row = []
-    first_col = True
-
-    td = tr.find_all('td')
-    for obs in td:
-      if(first_col):
-        text = ''.join(e for e in obs.text if e.isalnum())
-        text = re.sub("([A-Z])", " \\1", text).strip()
-      else:
-        if(obs.text.find('%') < 0):
-          text = obs.text
-        else:
-          text = obs.text.strip('%')
-          text = float(text.strip('%'))/100
-
-      temp_row.append(text)        
-      first_col = False
-
-    df.loc[len(df.index)] = temp_row
-
-  return df
-  """
-
-
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
 
 ##########################

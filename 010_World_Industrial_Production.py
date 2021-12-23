@@ -11,33 +11,6 @@ from common import get_oecd_data, convert_excelsheet_to_dataframe, write_datafra
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
-"""
-def get_wb_capital_investment(country_list):
-  #Scrape GDP Table from https://www.theglobaleconomy.com/rankings/Capital_investment/
-  #World Bank Data API: https://pypi.org/project/wbgapi/
-  #https://data.worldbank.org/indicator/NE.GDI.TOTL.ZS?end=2020&start=1960&view=chart
-
-  wb_df = wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 5 years
-
-  page = requests.get(url=url)
-
-  if(page.status_code == 200):
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    #Need to scrape div for capital investment list countries and numbers.
-    value = soup.find('input', {'id': 'export_data'}).get('value')
-    countries = value.split('=')[4].split('&')[0]
-    numbers = value.split('=')[3].split('&')[0]
-
-    #Need to put countries and numbers into a pandas dataframe.
-    dataframe_values = {'COUNTRY': countries.split('|'), 'CAPITAL_INVESTMENT': numbers.split('|')}
-    df = pd.DataFrame(data=dataframe_values)
-  else:
-    print(page.status_code)
-
-  return wb_df
-  """
-
 def scrape_table_world_production(url):
   #Scrape GDP Table from https://tradingeconomics.com/country-list/industrial-production?continent=world
 

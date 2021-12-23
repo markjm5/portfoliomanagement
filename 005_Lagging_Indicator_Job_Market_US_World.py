@@ -116,8 +116,6 @@ df_updated_unemployed_world = df_updated_unemployed_world[cols]
 # format date
 df_updated_unemployed_world['DATE'] = pd.to_datetime(df_updated_unemployed_world['DATE'],format='%d/%m/%Y')
 
-#import pdb; pdb.set_trace()
-
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_unemployed_world, False, 0)
 
 #Write to a csv file in the correct directory
@@ -141,13 +139,6 @@ df_adp = df_adp.drop('TEForecast', 1)
 
 #Rename column
 df_adp = df_adp.rename(columns={"Actual": "ADP"})
-
-"""
-print(df_original_adp.head())
-print(df_adp.head())
-print(df_original_adp.tail())
-print(df_adp.tail())
-"""
 
 #Fix datatypes of df_world_gdp
 df_adp['DATE'] = pd.to_datetime(df_adp['DATE'],format='%Y-%m-%d')
