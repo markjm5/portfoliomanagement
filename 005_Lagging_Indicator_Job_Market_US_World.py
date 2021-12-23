@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from datetime import date
 from common import get_stlouisfed_data, get_oecd_data, write_to_directory, convert_excelsheet_to_dataframe, combine_df, write_dataframe_to_excel, util_check_diff_list
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/005_Lagging_Indicator_Job_Market_US_World.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/005_Lagging_Indicator_Job_Market_US_World.xlsm'
 
 #Scrape this table and get latest ADP number
 def scrape_world_gdp_table(url):

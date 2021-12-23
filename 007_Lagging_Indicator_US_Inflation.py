@@ -5,7 +5,7 @@ import pandas as pd
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
 from datetime import datetime
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/007_Lagging_Indicator_US_Inflation.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/007_Lagging_Indicator_US_Inflation.xlsm'
 
 def get_newyorkfed_target_rate(type, dimensions):
 

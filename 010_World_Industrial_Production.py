@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
 """
 def get_wb_capital_investment(country_list):

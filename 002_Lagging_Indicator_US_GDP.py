@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/002_Lagging_Indicator_US_GDP.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/002_Lagging_Indicator_US_GDP.xlsm'
 sheet_name = 'Database'
 
 df_DPCCRV1Q225SBEA = get_stlouisfed_data('DPCCRV1Q225SBEA')

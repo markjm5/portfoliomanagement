@@ -2,7 +2,7 @@ from datetime import date
 import pandas as pd
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/008_Lagging_Indicator_Global_Inflation.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/008_Lagging_Indicator_Global_Inflation.xlsm'
 
 #####################################
 #   Get Global CPI Data from OECD   #

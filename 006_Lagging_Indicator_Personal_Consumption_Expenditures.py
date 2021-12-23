@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
 
-excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/006_Lagging_Indicator_Personal_Consumption_Expenditures.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/006_Lagging_Indicator_Personal_Consumption_Expenditures.xlsm'
 sheet_name = 'Database'
 
 df_PCEPI = get_stlouisfed_data('PCEPI')
