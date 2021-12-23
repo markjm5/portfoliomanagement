@@ -7,3 +7,5 @@ python 006_Lagging_Indicator_Personal_Consumption_Expenditures.py
 python 007_Lagging_Indicator_US_Inflation.py
 python 008_Lagging_Indicator_Global_Inflation.py
 python 009_Lagging_Indicator_US_Industrial_Production.py
+python 010_World_Industrial_Production.py
+python 011_Lagging_Indicator_Retail_Sales.py
