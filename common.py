@@ -38,7 +38,7 @@ def get_oecd_data(dataset, dimensions, params):
 
   dim_args = ['+'.join(d) for d in dimensions]
   dim_str = '.'.join(dim_args)
-  
+
   date_range = dimensions[3][0]
   match date_range:
     case 'Q':
@@ -47,7 +47,7 @@ def get_oecd_data(dataset, dimensions, params):
       date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
-
+  file_path = 'XML/%s' % params['filename'] 
   try:
     #resp = requests.get(url=url,params=params)
     resp = requests.get(url=url,verify=False)
@@ -59,14 +59,14 @@ def get_oecd_data(dataset, dimensions, params):
 
     resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
     # Write response to an XML File
-    with open(params['filename'], 'w') as f:
+    with open(file_path, 'w') as f:
       f.write(resp_formatted)
 
   except requests.exceptions.ConnectionError:
     print("Connection refused, Opening from File...")
 
   # Load in the XML file into ElementTree
-  tree = ET.parse(params['filename'])
+  tree = ET.parse(file_path)
 
   #Load into a dataframe and return the data frame
   root = tree.getroot()
