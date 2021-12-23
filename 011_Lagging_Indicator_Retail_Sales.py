@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
 
 excel_file_path = '/trading_excel_files/01_lagging_coincident_indicators/011_Lagging_Indicator_Retail_Sales.xlsm'
 sheet_name = 'Database'
@@ -22,6 +22,7 @@ df_RSBMGESD = get_stlouisfed_data('RSBMGESD')
 df_RSFHFS = get_stlouisfed_data('RSFHFS')
 df_RSCCAS = get_stlouisfed_data('RSCCAS')
 df_RSMSR = get_stlouisfed_data('RSMSR')
+df_RSEAS = get_stlouisfed_data('RSEAS')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
@@ -39,10 +40,15 @@ df = pd.merge(df,df_RSBMGESD,"left")
 df = pd.merge(df,df_RSFHFS,"left")
 df = pd.merge(df,df_RSCCAS,"left")
 df = pd.merge(df,df_RSMSR,"left")
+df = pd.merge(df,df_RSEAS,"left")
+
+#Make all column names uppercase
+df.columns = map(str.upper, df.columns)
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-#TODO: Make sure column headers between original and df match. Problem is with the lower case
+# Check for difference between original and new lists
+#print(util_check_diff_list(df_original.columns.tolist(), df.columns.tolist()))
 
 df_updated = combine_df(df_original, df)
 
