@@ -24,7 +24,11 @@ def get_stlouisfed_data(series_code):
   # https://www.youtube.com/watch?v=UFuo7EHI8zc
 
   for i in range(len(json["observations"])):
-    df = df.append({"DATE": json["observations"][i]["date"], series_code: json["observations"][i]["value"]}, ignore_index=True)
+    if(json["observations"][i]["value"] == '.'):
+      obs = '0.00'
+    else:
+      obs = json["observations"][i]["value"]
+    df = df.append({"DATE": json["observations"][i]["date"], series_code: obs}, ignore_index=True)
 
   df['DATE'] = pd.to_datetime(df['DATE'],format='%Y-%m-%d')
   df[series_code] = df[series_code].astype('float64') 
