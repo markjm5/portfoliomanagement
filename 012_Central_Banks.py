@@ -6,10 +6,6 @@ from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_d
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/012_Central_Banks.xlsm'
 
-df_DDDI06JPA156NWDB = get_stlouisfed_data('DDDI06JPA156NWDB')
-
-import pdb; pdb.set_trace()
-
 #######################################
 #   Get St Louis Fed Data for Rates   #
 #######################################
@@ -71,7 +67,7 @@ nikkei_df = return_yf_data("^N225", "1mo", "1998-04-01", "2021-12-01")
 
 #TODO: Get data of BOJ balance sheet as % of GDP
 # https://research.stlouisfed.org/publications/economic-synopses/2019/07/15/the-asset-holdings-of-the-bank-of-japan
-# https://fred.stlouisfed.org/series/DDDI06JPA156NWDB
+# Get GDP from St Louis Fed (JPNNGDP) and calculate % against JPNASSETS
 
 import pdb; pdb.set_trace()
 
