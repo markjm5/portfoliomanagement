@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, return_yf_data
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/012_Central_Banks.xlsm'
 
@@ -61,6 +61,13 @@ df_updated = combine_df(df_original, df_JPNASSETS)
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
+#TODO: Get and write Nikkei close data to excel
+nikkei_df = return_yf_data("^N225", "1mo", "1998-04-01", "2021-12-01")
+
+#TODO: Get data of BOJ balance sheet as % of GDP
+# https://research.stlouisfed.org/publications/economic-synopses/2019/07/15/the-asset-holdings-of-the-bank-of-japan
+
+import pdb; pdb.set_trace()
 
 ######################################
 #   Get St Louis ECB Balance Sheet   #
