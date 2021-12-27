@@ -61,24 +61,27 @@ todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
 # Get Nikkei 225 close monthly intervals
-nikkei_df = get_yf_data("^N225", "1mo", "1998-04-01", date_str)
+df_NIKKEI = get_yf_data("^N225", "1mo", "1998-04-01", date_str)
 
-#Format Dataframes
+# Format JPNNGDP series so that the DATE is monthly rather than quarterly
 df_JPNNGDP['JPNNGDP'] = df_JPNNGDP['JPNNGDP'] * 10
+#df['date'] = pd.to_datetime(df['date'])
+#df = df.sort_values(by=['date'], ascending=[True])
+df_JPNNGDP.set_index('DATE', inplace=True)
+df_JPNNGDP = df_JPNNGDP.asfreq('MS', method='bfill').reset_index() #.to_period('M').reset_index()
 """
 print(df_JPNNGDP.head())
 print(df_JPNASSETS.head())
 print('###################')
 print(df_JPNNGDP.tail())
 print(df_JPNASSETS.tail())
+print('###################')
+print(df_NIKKEI.head())
+print(df_NIKKEI.tail())
 """
-
-#TODO: Format JPNNGDP series so that the DATE is monthly rather than quarterly
-#TODO: Combine JPNNGDP with JPNASSETS
-#TODO: Create new Column that shows percentage of JPNASSETS to JPNNGDP
-#TODO: Write to excel
-
 import pdb; pdb.set_trace()
+
+#TODO: Combine df_JPNNGDP with df_JPNASSETS and df_NIKKEI
 
 #Get Original Dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)

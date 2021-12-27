@@ -296,5 +296,8 @@ def get_yf_data(ticker, interval, start, end):
     proxy = None
   )
 
-  return data
+  df_yf = data.reset_index()
+  df_yf = df_yf.rename(columns={"Date": "DATE"})
+
+  return df_yf
 
