@@ -29,6 +29,8 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 df_updated = combine_df(df_original, df)
 
+#TODO: Why are we not getting the latest rates?
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
@@ -56,6 +58,7 @@ sheet_name = 'Database BOJ'
 #Get Dataframes
 df_JPNASSETS = get_stlouisfed_data('JPNASSETS')
 df_JPNNGDP = get_stlouisfed_data('JPNNGDP')
+#df_JPNNGDP = get_stlouisfed_data('JPNRGDPEXP')
 
 todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
@@ -69,28 +72,22 @@ df_JPNNGDP['JPNNGDP'] = df_JPNNGDP['JPNNGDP'] * 10
 #df = df.sort_values(by=['date'], ascending=[True])
 df_JPNNGDP.set_index('DATE', inplace=True)
 df_JPNNGDP = df_JPNNGDP.asfreq('MS', method='bfill').reset_index() #.to_period('M').reset_index()
-"""
-print(df_JPNNGDP.head())
-print(df_JPNASSETS.head())
-print('###################')
-print(df_JPNNGDP.tail())
-print(df_JPNASSETS.tail())
-print('###################')
-print(df_NIKKEI.head())
-print(df_NIKKEI.tail())
-"""
-import pdb; pdb.set_trace()
 
-#TODO: Combine df_JPNNGDP with df_JPNASSETS and df_NIKKEI
+# Combine df_JPNNGDP with df_JPNASSETS and df_NIKKEI
+df = pd.merge(df_JPNASSETS,df_JPNNGDP,"left")
+df = pd.merge(df,df_NIKKEI,"left")
+
+# Clean up columns
+df = df.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+df = df.rename(columns={"Close": "N225"})
 
 #Get Original Dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-#df_updated = combine_df(df_original, df_JPNASSETS)
+df_updated = combine_df(df_original, df)
 
 # Write the updated df back to the excel sheet
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 ######################################
 #   Get St Louis ECB Balance Sheet   #
