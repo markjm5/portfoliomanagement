@@ -257,7 +257,7 @@ def take_larger(s1, s2):
   return s2
 
 
-def return_yf_data(ticker, interval, start, end):
+def get_yf_data(ticker, interval, start, end):
   data = yf.download(  # or pdr.get_data_yahoo(...
     # tickers list or string as well
     tickers = ticker,
