@@ -301,3 +301,8 @@ def get_yf_data(ticker, interval, start, end):
 
   return df_yf
 
+def merge_two_df(df1, df2):
+
+  #TODO: If df1 has a more recent date than df2, merge left. Otherwise, merge right
+  df = pd.merge(df1,df2,"right")
+  df = pd.merge(df1,df2,"left")

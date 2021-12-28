@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, merge_two_df
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/002_Lagging_Indicator_US_GDP.xlsm'
 sheet_name = 'Database'

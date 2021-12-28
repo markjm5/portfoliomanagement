@@ -47,7 +47,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 df_updated = combine_df(df_original, df_WALCL)
 
-#TODO: Also get Fed Balance Sheet as % of US GDP
+#TODO: Get Fed Balance Sheet as % of US GDP
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
