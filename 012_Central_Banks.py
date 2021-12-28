@@ -19,7 +19,7 @@ df_M2SL = get_stlouisfed_data('M2SL')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
-df = pd.merge(df_INTDSRUSM193N,df_FEDFUNDS,"left")
+df = pd.merge(df_INTDSRUSM193N,df_FEDFUNDS,"right")
 df = pd.merge(df,df_M2SL,"left")
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
@@ -28,8 +28,6 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 #print(util_check_diff_list(df_original.columns.tolist(), df.columns.tolist()))
 
 df_updated = combine_df(df_original, df)
-
-#TODO: Why are we not getting the latest rates?
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
@@ -45,6 +43,8 @@ df_WALCL = get_stlouisfed_data('WALCL')
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 df_updated = combine_df(df_original, df_WALCL)
+
+#TODO: Also get Fed Balance Sheet as % of US GDP
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
