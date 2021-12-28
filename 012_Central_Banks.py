@@ -19,6 +19,9 @@ df_M2SL = get_stlouisfed_data('M2SL')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
+#TODO: write a merge function that always ensures latest data is not cut out when 
+#merging right or merging left
+
 df = pd.merge(df_INTDSRUSM193N,df_FEDFUNDS,"right")
 df = pd.merge(df,df_M2SL,"left")
 
