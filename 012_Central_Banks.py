@@ -3,7 +3,9 @@ import os.path
 import csv
 import pandas as pd
 from datetime import date
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, get_yf_data, get_oecd_data
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import combine_df, write_to_directory, util_check_diff_list, get_yf_data, get_oecd_data
+from common import append_two_df
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/012_Central_Banks.xlsm'
 
@@ -22,8 +24,11 @@ df_M2SL = get_stlouisfed_data('M2SL')
 #TODO: write a merge function that always ensures latest data is not cut out when 
 #merging right or merging left
 
-df = pd.merge(df_INTDSRUSM193N,df_FEDFUNDS,"right")
-df = pd.merge(df,df_M2SL,"left")
+df = append_two_df(df_INTDSRUSM193N, df_FEDFUNDS)
+df = append_two_df(df,df_M2SL)
+
+#df = pd.merge(df_INTDSRUSM193N,df_FEDFUNDS,"left")
+#df = pd.merge(df,df_M2SL,"left")
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
