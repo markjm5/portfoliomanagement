@@ -10,6 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
+import investpy
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
@@ -62,6 +63,18 @@ print("Done!")
 # TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
 country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
+# https://pypi.org/project/investpy/
+# df_example = investpy.get_stock_historical_data(stock='AAPL', country='United States', from_date='01/01/2010', to_date='01/01/2020')
+
+for country in country_list:
+    """
+    if(country == 'mexico'):
+        url = "https://www.investing.com/rates-bonds/mexico-10-year-historical-data"
+    else:
+        url = "https://www.investing.com/rates-bonds/%s-10-year-bond-yield-historical-data" % (country,)
+    resp = requests.get(url=url)
+    """
+    import pdb; pdb.set_trace()
 
 ###############################################
 # Scrape 10y database Data from Investing.com #

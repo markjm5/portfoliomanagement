@@ -14,6 +14,10 @@ from requests.models import parse_header_links
 import re
 import yfinance as yf
 
+############################
+# Data Retrieval Functions #
+############################
+
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
 
@@ -149,6 +153,49 @@ def get_oecd_data(dataset, dimensions, params):
   #  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   #  print(exc_type, fname, exc_tb.tb_lineno)
 
+def get_yf_data(ticker, interval, start, end):
+  data = yf.download(  # or pdr.get_data_yahoo(...
+    # tickers list or string as well
+    tickers = ticker,
+
+    start=start, 
+    end=end, 
+
+    # use "period" instead of start/end
+    # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
+    # (optional, default is '1mo')
+    period = "ytd",
+
+    # fetch data by interval (including intraday if period < 60 days)
+    # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
+    # (optional, default is '1d')
+    interval = interval,
+
+    # group by ticker (to access via data['SPY'])
+    # (optional, default is 'column')
+    group_by = 'ticker',
+
+    # adjust all OHLC automatically
+    # (optional, default is False)
+    auto_adjust = True,
+
+    # download pre/post regular market hours data
+    # (optional, default is False)
+    prepost = True,
+
+    # use threads for mass downloading? (True/False/Integer)
+    # (optional, default is True)
+    threads = True,
+
+    # proxy URL scheme use use when downloading?
+    # (optional, default is None)
+    proxy = None
+  )
+
+  df_yf = data.reset_index()
+  df_yf = df_yf.rename(columns={"Date": "DATE"})
+
+  return df_yf
 
 def scrape_world_gdp_table(url):
   #Scrape GDP Table from Trading Economics
@@ -196,11 +243,9 @@ def scrape_world_gdp_table(url):
 
   return df
 
-def write_to_directory(df,filename):
-    #Write to a csv file in the correct directory
-    userhome = os.path.expanduser('~')
-    file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
-    df.to_csv(file_name, index=False)
+####################
+# Output Functions #
+####################
 
 def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False, index_col=None):
 
@@ -216,6 +261,12 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False
     df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
 
   return df
+
+def write_to_directory(df,filename):
+    #Write to a csv file in the correct directory
+    userhome = os.path.expanduser('~')
+    file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
+    df.to_csv(file_name, index=False)
 
 def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None):
 
@@ -247,10 +298,18 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
   book.save(excel_file_path)
   book.close()
 
+####################
+# Helper Functions #
+####################
+
 def combine_df(df_original, df_new):
 
   return df_original.combine(df_new, take_larger, overwrite=False)  
-  
+
+def append_two_df(df1, df2):
+  merged_data = pd.merge(df1, df2, how='outer', on='DATE')
+  return merged_data
+
 def util_check_diff_list(li1, li2):
   # Python code t get difference of two lists
   return list(set(li1) - set(li2))
@@ -259,50 +318,3 @@ def take_larger(s1, s2):
   return s2
 
 
-def get_yf_data(ticker, interval, start, end):
-  data = yf.download(  # or pdr.get_data_yahoo(...
-    # tickers list or string as well
-    tickers = ticker,
-
-    start=start, 
-    end=end, 
-
-    # use "period" instead of start/end
-    # valid periods: 1d,5d,1mo,3mo,6mo,1y,2y,5y,10y,ytd,max
-    # (optional, default is '1mo')
-    period = "ytd",
-
-    # fetch data by interval (including intraday if period < 60 days)
-    # valid intervals: 1m,2m,5m,15m,30m,60m,90m,1h,1d,5d,1wk,1mo,3mo
-    # (optional, default is '1d')
-    interval = interval,
-
-    # group by ticker (to access via data['SPY'])
-    # (optional, default is 'column')
-    group_by = 'ticker',
-
-    # adjust all OHLC automatically
-    # (optional, default is False)
-    auto_adjust = True,
-
-    # download pre/post regular market hours data
-    # (optional, default is False)
-    prepost = True,
-
-    # use threads for mass downloading? (True/False/Integer)
-    # (optional, default is True)
-    threads = True,
-
-    # proxy URL scheme use use when downloading?
-    # (optional, default is None)
-    proxy = None
-  )
-
-  df_yf = data.reset_index()
-  df_yf = df_yf.rename(columns={"Date": "DATE"})
-
-  return df_yf
-
-def append_two_df(df1, df2):
-  merged_data = pd.merge(df1, df2, how='outer', on='DATE')
-  return merged_data
