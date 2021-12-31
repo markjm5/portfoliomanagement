@@ -18,19 +18,21 @@ excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.
 # Get Database 10y Data from OECD #
 ###################################
 
-country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHI','TUR','BRA']
+country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 
 #TODO: update params to get 10y rates from OECD
 
-subject = ['B1_GE']
-measure = ['GPSA']
+subject = ['IRLTLT01']
+measure = ['ST']
 frequency = 'M'
 startDate = '1950-Q1'
 
 todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
-df_db_10y = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '013_Interest_Rates.xml'})
+df_db_10y = get_oecd_data('KEI', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '013_Interest_Rates.xml'})
+
+import pdb; pdb.set_trace()
 
 sheet_name = 'Database 10y'
 df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
