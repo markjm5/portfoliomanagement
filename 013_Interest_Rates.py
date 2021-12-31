@@ -65,12 +65,16 @@ print("Done!")
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
 #country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
 
-country_list = ['argentina', 'australia', 'austria', 'bahrain', 'bangladesh', 'belgium', 'botswana', 'brazil', 'bulgaria', 'canada', 'chile', 'china', 'colombia', 'croatia', 'cyprus', 'czech republic', 'denmark', 'egypt', 'finland', 'france', 'germany', 'greece', 'hong kong', 'hungary', 'iceland', 'india', 'indonesia', 'ireland', 'israel', 'italy', 'japan', 'jordan', 'kenya', 'latvia', 'lithuania', 'luxembourg', 'malaysia', 'malta', 'mauritius', 'mexico', 'morocco', 'namibia', 'netherlands', 'new zealand', 'nigeria', 'norway', 'pakistan', 'peru', 'philippines', 'poland', 'portugal', 'qatar', 'romania', 'russia', 'saudi arabia', 'serbia', 'singapore', 'slovakia', 'slovenia', 'south africa', 'south korea', 'spain', 'sri lanka', 'sweden', 'switzerland', 'taiwan', 'thailand', 'turkey', 'uganda', 'ukraine', 'united kingdom', 'united states', 'venezuela', 'vietnam']
+complete_country_list = ['argentina', 'australia', 'austria', 'bahrain', 'bangladesh', 'belgium', 'botswana', 'brazil', 'bulgaria', 'canada', 'chile', 'china', 'colombia', 'croatia', 'cyprus', 'czech republic', 'denmark', 'egypt', 'finland', 'france', 'germany', 'greece', 'hong kong', 'hungary', 'iceland', 'india', 'indonesia', 'ireland', 'israel', 'italy', 'japan', 'jordan', 'kenya', 'latvia', 'lithuania', 'luxembourg', 'malaysia', 'malta', 'mauritius', 'mexico', 'morocco', 'namibia', 'netherlands', 'new zealand', 'nigeria', 'norway', 'pakistan', 'peru', 'philippines', 'poland', 'portugal', 'qatar', 'romania', 'russia', 'saudi arabia', 'serbia', 'singapore', 'slovakia', 'slovenia', 'south africa', 'south korea', 'spain', 'sri lanka', 'sweden', 'switzerland', 'taiwan', 'thailand', 'turkey', 'uganda', 'ukraine', 'united kingdom', 'united states', 'venezuela', 'vietnam']
+
+country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
+
+country_missing = ['denmark','sweden']
 
 # https://pypi.org/project/investpy/
 # df_example = investpy.get_stock_historical_data(stock='AAPL', country='United States', from_date='01/01/2010', to_date='01/01/2020')
 
-for country in country_list:
+for country in country_missing:
     """
     if(country == 'mexico'):
         url = "https://www.investing.com/rates-bonds/mexico-10-year-historical-data"
