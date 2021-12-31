@@ -12,7 +12,7 @@ from requests.models import parse_header_links
 import re
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
 
-excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/013_Interest_Rates.xlsm'
+excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
 ###################################
 # Get Database 10y Data from OECD #
@@ -24,13 +24,13 @@ country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FR
 
 subject = ['B1_GE']
 measure = ['GPSA']
-frequency = 'Q'
-startDate = '1947-Q1'
+frequency = 'M'
+startDate = '1950-Q1'
 
 todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
-df_db_10y = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '003_QoQ.xml'})
+df_db_10y = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '013_Interest_Rates.xml'})
 
 sheet_name = 'Database 10y'
 df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
