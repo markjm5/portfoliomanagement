@@ -19,9 +19,6 @@ excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.
 ###################################
 
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
-
-#TODO: update params to get 10y rates from OECD
-
 subject = ['IRLTLT01']
 measure = ['ST']
 frequency = 'M'
@@ -35,9 +32,6 @@ df_db_10y = df_db_10y.drop('MTH', 1)
 
 sheet_name = 'Database 10y'
 df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-
-# Need to remove additional unnecessary rows from beginning of df_db_10y dataframe
-#df_db_10y = df_db_10y.iloc[1: , :].reset_index(drop=True)
 
 """
 # Check for difference between original and new lists
@@ -60,3 +54,16 @@ df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
 
 print("Done!")
+
+##############################################
+# Scrape 2y database Data from Investing.com #
+##############################################
+
+# TODO
+
+
+###############################################
+# Scrape 10y database Data from Investing.com #
+###############################################
+
+# TODO
