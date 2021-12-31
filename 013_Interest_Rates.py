@@ -75,13 +75,6 @@ country_missing = ['denmark','sweden']
 # df_example = investpy.get_stock_historical_data(stock='AAPL', country='United States', from_date='01/01/2010', to_date='01/01/2020')
 
 for country in country_missing:
-    """
-    if(country == 'mexico'):
-        url = "https://www.investing.com/rates-bonds/mexico-10-year-historical-data"
-    else:
-        url = "https://www.investing.com/rates-bonds/%s-10-year-bond-yield-historical-data" % (country,)
-    resp = requests.get(url=url)
-    """
     bond = "%s %sy" % (country, '10')
 
     try:
