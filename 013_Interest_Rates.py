@@ -59,8 +59,9 @@ print("Done!")
 # Scrape 2y database Data from Investing.com #
 ##############################################
 
-# TODO
-
+# TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
+# mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
+country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
 
 ###############################################
 # Scrape 10y database Data from Investing.com #
