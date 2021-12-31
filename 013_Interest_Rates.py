@@ -31,34 +31,32 @@ todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
 df_db_10y = get_oecd_data('KEI', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '013_Interest_Rates.xml'})
-
-import pdb; pdb.set_trace()
+df_db_10y = df_db_10y.drop('MTH', 1)
 
 sheet_name = 'Database 10y'
 df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 # Need to remove additional unnecessary rows from beginning of df_db_10y dataframe
-df_db_10y = df_db_10y.iloc[1: , :].reset_index(drop=True)
+#df_db_10y = df_db_10y.iloc[1: , :].reset_index(drop=True)
 
 """
 # Check for difference between original and new lists
-print(Diff(df_QoQ.columns.tolist(), df_original.columns.tolist()))
+print(Diff(df_db_10y.columns.tolist(), df_original_db_10y.columns.tolist()))
 """
 df_updated_db_10y = combine_df(df_original_db_10y, df_db_10y)
 
 # get a list of columns
 cols = list(df_updated_db_10y)
 # move the column to head of list using index, pop and insert
-cols.insert(0, cols.pop(cols.index('QTR')))
-cols.insert(1, cols.pop(cols.index('DATE')))
+cols.insert(0, cols.pop(cols.index('DATE')))
 
 # reorder
 df_updated_db_10y = df_updated_db_10y[cols]
 
 # format date
-df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%d/%m/%Y')
+df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-%m-%d')
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
 
 print("Done!")
