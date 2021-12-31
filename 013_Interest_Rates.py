@@ -58,7 +58,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 
 print("Done!")
 """
 ##############################################
-# Scrape 2y database Data from Investing.com #
+# Scrape 10y database Data from Investing.com #
 ##############################################
 
 # TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
@@ -73,18 +73,18 @@ country_missing = ['denmark','sweden']
 
 # https://pypi.org/project/investpy/
 # df_example = investpy.get_stock_historical_data(stock='AAPL', country='United States', from_date='01/01/2010', to_date='01/01/2020')
-
+import pdb; pdb.set_trace()
 for country in country_missing:
     bond = "%s %sy" % (country, '10')
 
-    try:
-        time.sleep(10)
-        data = investpy.get_bond_historical_data(bond=bond, from_date='01/01/2010', to_date='01/01/2019')
-        print(country)
-        print(data.head())
+    #try:
+    time.sleep(10)
+    data = investpy.get_bond_historical_data(bond=bond, from_date='01/01/2010', to_date='01/01/2019')
+    print(country)
+    print(data.head())
 
-    except RuntimeError as e:
-        print("%s does not exist" % (bond))
+    #except RuntimeError as e:
+    #    print("%s does not exist" % (bond))
 
 
 import pdb; pdb.set_trace()
