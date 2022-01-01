@@ -55,7 +55,7 @@ df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
 
-"""
+
 ############################################
 # Get 10y database Data from Investing.com #
 ############################################
@@ -103,11 +103,12 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, Fal
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
 #country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
 
-sheet_name = '2y Database New'
-df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
-#df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
-write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_2y, False, 0)
+sheet_name = 'DB 2y' #TODO: Make sure excel file 013 has updated sheet name
+#df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
+df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_2y, False, 0)
 
+#TODO: match country list with what is in excel file, without the missing_country list.
 country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
 #country_missing = ['denmark','sweden', 'mexico', 'greece', 'hungary', 'indonesia']
 
@@ -129,5 +130,5 @@ df_updated_invest_2y = df_updated_invest_2y[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
-"""
+
 print("Done!")
