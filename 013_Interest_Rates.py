@@ -65,10 +65,11 @@ print("Done!")
 #country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
 
 country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
-
 #country_missing = ['denmark','sweden']
 
 df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
+
+import pdb; pdb.set_trace()
 
 #TODO: Rename countries so that they match excel file
 

@@ -205,19 +205,30 @@ def get_invest_data(country_list, bond_year, from_date):
   todays_date_full = "%s/%s/%s" % (todays_date.day, todays_date.month, todays_date.year)
 
   df = pd.DataFrame()
+  df.insert(0,"DATE",[],True)
 
   for country in country_list:
     bond = "%s %sy" % (country, bond_year)
 
+    print("Getting Data For: %s" % (country,))
+
     time.sleep(10)
     data = invest.get_bond_historical_data(bond=bond, from_date=from_date, to_date=todays_date_full)
+
+    # Transformations to do: 
+    # 1) get the relevant column
+    # 2) convert series to df
+    # 3) make the index a column
+    # 4) Rename columns
+    # 5) Append to master df
+
     data = data['Close']
     data = data.to_frame()
-    data = data.rename(columns={"Close": country})
+    data.reset_index(level=0, inplace=True)
+    data = data.rename(columns={"Date": "DATE" ,"Close": country})
+    df = append_two_df(df, data)
 
-    #TODO: keep appending to df until all countries have been completed in the loop
-    import pdb;pdb.set_trace()
-
+  df = df.sort_values(by='DATE')
   return df
 
 def scrape_world_gdp_table(url):
