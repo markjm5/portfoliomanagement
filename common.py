@@ -228,7 +228,7 @@ def get_invest_data(country_list, bond_year, from_date):
     data = data.rename(columns={"Date": "DATE" ,"Close": country})
     df = append_two_df(df, data)
 
-  df = df.sort_values(by='DATE')
+  df = df.sort_values(by='DATE', ignore_index=True)
   return df
 
 def scrape_world_gdp_table(url):
