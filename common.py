@@ -285,7 +285,7 @@ def scrape_world_gdp_table(url):
 # Output Functions #
 ####################
 
-def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False, index_col=None):
+def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False, index_col=None, date_format='%d/%m/%Y'):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
@@ -296,7 +296,7 @@ def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False
     df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
 
   if(date_exists):
-    df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
+    df['DATE'] = pd.to_datetime(df['DATE'],format=date_format)
 
   return df
 

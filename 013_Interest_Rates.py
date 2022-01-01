@@ -55,7 +55,7 @@ df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
 
 print("Done!")
-
+"""
 ############################################
 # Get 10y database Data from Investing.com #
 ############################################
@@ -69,12 +69,8 @@ country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','sp
 
 df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
 
-import pdb; pdb.set_trace()
-
-#TODO: Rename countries so that they match excel file
-
-sheet_name = '10y database new'
-df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+sheet_name = '10y database NEW'
+df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
 
 df_updated_invest_10y = combine_df(df_original_invest_10y, df_invest_10y)
 
@@ -91,7 +87,7 @@ df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],for
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, False, 0)
-"""
+
 ###########################################
 # Get 2y database Data from Investing.com #
 ###########################################
@@ -111,7 +107,7 @@ import pdb; pdb.set_trace()
 #TODO: Rename countries so that they match excel file
 
 sheet_name = '2y database new'
-df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
 
 df_updated_invest_2y = combine_df(df_original_invest_2y, df_invest_2y)
 
