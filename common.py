@@ -210,25 +210,29 @@ def get_invest_data(country_list, bond_year, from_date):
   for country in country_list:
     bond = "%s %sy" % (country, bond_year)
 
-    print("Getting Data For: %s" % (country,))
+    print("Getting %s-Y Data For: %s" % (bond_year, country,))
 
     time.sleep(10)
-    data = invest.get_bond_historical_data(bond=bond, from_date=from_date, to_date=todays_date_full)
+    try:
+      data = invest.get_bond_historical_data(bond=bond, from_date=from_date, to_date=todays_date_full)
 
-    # Transformations to do: 
-    # 1) get the relevant column
-    # 2) convert series to df
-    # 3) make the index a column
-    # 4) Rename columns
-    # 5) Append to master df
+      # Transformations to do: 
+      # 1) get the relevant column
+      # 2) convert series to df
+      # 3) make the index a column
+      # 4) Rename columns
+      # 5) Append to master df
 
-    data = data['Close']
-    data = data.to_frame()
-    data.reset_index(level=0, inplace=True)
-    data = data.rename(columns={"Date": "DATE" ,"Close": country})
-    df = append_two_df(df, data)
+      data = data['Close']
+      data = data.to_frame()
+      data.reset_index(level=0, inplace=True)
+      data = data.rename(columns={"Date": "DATE" ,"Close": country})
+      df = append_two_df(df, data)
+    except RuntimeError as e:
+      print("NO %s-Y DATA FOR: %s" % (bond_year, country,))
 
   df = df.sort_values(by='DATE', ignore_index=True)
+
   return df
 
 def scrape_world_gdp_table(url):

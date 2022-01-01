@@ -100,10 +100,11 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, Fal
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
 #country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
 
-country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
-#country_missing = ['denmark','sweden']
+country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','norway','switzerland', 'u.k.','russia','turkey','poland','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','south korea','philippines','thailand','vietnam']
+#country_missing = ['denmark','sweden', 'mexico', 'greece', 'hungary', 'indonesia']
 
-df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
+#df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
+df_invest_2y = get_invest_data(country_missing, '2', '28/12/2000')
 
 import pdb; pdb.set_trace()
 
