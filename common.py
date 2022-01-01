@@ -8,11 +8,13 @@ import xml.etree.ElementTree as ET
 import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from itertools import islice
-import datetime
+from datetime import date
+import time
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
 import yfinance as yf
+import investpy as invest
 
 ############################
 # Data Retrieval Functions #
@@ -25,7 +27,7 @@ def get_stlouisfed_data(series_code):
   json = resp.json() 
   
   df = pd.DataFrame(columns=["DATE",series_code])
-  #TODO: Convert the Date into Time Series Date
+  # Convert the Date into Time Series Date
   # https://www.youtube.com/watch?v=UFuo7EHI8zc
 
   for i in range(len(json["observations"])):
@@ -99,7 +101,7 @@ def get_oecd_data(dataset, dimensions, params):
         df.insert(index,value.get('value'),[],True)
     index+=1
 
-  #Add Dates  TODO: This needs to account for both Quarterly and Monthly data.
+  # This needs to account for both Quarterly and Monthly data.
   date_range_list = []
   date_list = []
   year_start, qtr_start =  params['startTime'].split('-Q')
@@ -196,6 +198,27 @@ def get_yf_data(ticker, interval, start, end):
   df_yf = df_yf.rename(columns={"Date": "DATE"})
 
   return df_yf
+
+def get_invest_data(country_list, bond_year, from_date):
+
+  todays_date = date.today()
+  todays_date_full = "%s/%s/%s" % (todays_date.day, todays_date.month, todays_date.year)
+
+  df = pd.DataFrame()
+
+  for country in country_list:
+    bond = "%s %sy" % (country, bond_year)
+
+    time.sleep(10)
+    data = invest.get_bond_historical_data(bond=bond, from_date=from_date, to_date=todays_date_full)
+    data = data['Close']
+    data = data.to_frame()
+    data = data.rename(columns={"Close": country})
+
+    #TODO: keep appending to df until all countries have been completed in the loop
+    import pdb;pdb.set_trace()
+
+  return df
 
 def scrape_world_gdp_table(url):
   #Scrape GDP Table from Trading Economics

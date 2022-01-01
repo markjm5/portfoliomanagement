@@ -11,8 +11,7 @@ from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
 import investpy
-import time
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
+from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
@@ -65,29 +64,14 @@ print("Done!")
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
 #country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
 
-complete_country_list = ['argentina', 'australia', 'austria', 'bahrain', 'bangladesh', 'belgium', 'botswana', 'brazil', 'bulgaria', 'canada', 'chile', 'china', 'colombia', 'croatia', 'cyprus', 'czech republic', 'denmark', 'egypt', 'finland', 'france', 'germany', 'greece', 'hong kong', 'hungary', 'iceland', 'india', 'indonesia', 'ireland', 'israel', 'italy', 'japan', 'jordan', 'kenya', 'latvia', 'lithuania', 'luxembourg', 'malaysia', 'malta', 'mauritius', 'mexico', 'morocco', 'namibia', 'netherlands', 'new zealand', 'nigeria', 'norway', 'pakistan', 'peru', 'philippines', 'poland', 'portugal', 'qatar', 'romania', 'russia', 'saudi arabia', 'serbia', 'singapore', 'slovakia', 'slovenia', 'south africa', 'south korea', 'spain', 'sri lanka', 'sweden', 'switzerland', 'taiwan', 'thailand', 'turkey', 'uganda', 'ukraine', 'united kingdom', 'united states', 'venezuela', 'vietnam']
+country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
 
-country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
+#country_missing = ['denmark','sweden']
 
-country_missing = ['denmark','sweden']
+df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
 
-# https://pypi.org/project/investpy/
-# df_example = investpy.get_stock_historical_data(stock='AAPL', country='United States', from_date='01/01/2010', to_date='01/01/2020')
-import pdb; pdb.set_trace()
-for country in country_missing:
-    bond = "%s %sy" % (country, '10')
+#TODO: Rename countries so that they match excel file
 
-    #try:
-    time.sleep(10)
-    data = investpy.get_bond_historical_data(bond=bond, from_date='01/01/2010', to_date='01/01/2019')
-    print(country)
-    print(data.head())
-
-    #except RuntimeError as e:
-    #    print("%s does not exist" % (bond))
-
-
-import pdb; pdb.set_trace()
 
 ###############################################
 # Scrape 10y database Data from Investing.com #
