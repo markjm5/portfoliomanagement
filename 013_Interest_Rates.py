@@ -71,7 +71,7 @@ df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_10y, False, 0)
 
 #country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
-country_list = ['u.s.', 'canada'] 
+country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain'] 
 
 #TODO: Works with US and Canada only, but when we add additional cols it falls apart. Use 013_Interest_Rates_working2 to continue testing
 
@@ -80,6 +80,9 @@ df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
 
 #TODO: make sure merging of new and original df results in similar data to original
 df_updated_invest_10y = combine_df_on_index(df_original_invest_10y, df_invest_10y, 'DATE')
+
+import pdb; pdb.set_trace()
+#TODO: Something goes wonky once we add more countries. Need to figure out what it is
 
 # get a list of columns
 cols = list(df_updated_invest_10y)

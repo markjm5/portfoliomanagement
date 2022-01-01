@@ -228,6 +228,7 @@ def get_invest_data(country_list, bond_year, from_date):
       data.reset_index(level=0, inplace=True)
       data = data.rename(columns={"Date": "DATE" ,"Close": country})
       df = append_two_df(df, data)
+
     except RuntimeError as e:
       print("NO %s-Y DATA FOR: %s" % (bond_year, country,))
 
