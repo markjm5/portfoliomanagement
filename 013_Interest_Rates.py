@@ -55,10 +55,10 @@ df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
 
 print("Done!")
-"""
-##############################################
-# Scrape 10y database Data from Investing.com #
-##############################################
+
+############################################
+# Get 10y database Data from Investing.com #
+############################################
 
 # TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
@@ -73,9 +73,57 @@ import pdb; pdb.set_trace()
 
 #TODO: Rename countries so that they match excel file
 
+sheet_name = '10y database new'
+df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-###############################################
-# Scrape 10y database Data from Investing.com #
-###############################################
+df_updated_invest_10y = combine_df(df_original_invest_10y, df_invest_10y)
 
-# TODO
+# get a list of columns
+cols = list(df_updated_invest_10y)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+
+# reorder
+df_updated_invest_10y = df_updated_invest_10y[cols]
+
+# format date
+df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],format='%Y-%m-%d')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, False, 0)
+"""
+###########################################
+# Get 2y database Data from Investing.com #
+###########################################
+
+# TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
+# mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
+#country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
+
+country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
+#country_missing = ['denmark','sweden']
+
+df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
+
+import pdb; pdb.set_trace()
+
+#TODO: Rename countries so that they match excel file
+
+sheet_name = '2y database new'
+df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+
+df_updated_invest_2y = combine_df(df_original_invest_2y, df_invest_2y)
+
+# get a list of columns
+cols = list(df_updated_invest_2y)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+
+# reorder
+df_updated_invest_2y = df_updated_invest_2y[cols]
+
+# format date
+df_updated_invest_2y['DATE'] = pd.to_datetime(df_updated_invest_2y['DATE'],format='%Y-%m-%d')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
