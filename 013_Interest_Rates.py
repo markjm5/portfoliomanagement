@@ -71,6 +71,9 @@ df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
 sheet_name = '10y database NEW'
 df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
 
+#TODO: make sure merging of new and original df results in similar data to original
+import pdb; pdb.set_trace()
+
 df_updated_invest_10y = combine_df(df_original_invest_10y, df_invest_10y)
 
 # get a list of columns
@@ -82,7 +85,7 @@ cols.insert(0, cols.pop(cols.index('DATE')))
 df_updated_invest_10y = df_updated_invest_10y[cols]
 
 # format date
-df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],format='%Y-%m-%d')
+df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],format='%b %d, %Y')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, False, 0)
@@ -115,7 +118,7 @@ cols.insert(0, cols.pop(cols.index('DATE')))
 df_updated_invest_2y = df_updated_invest_2y[cols]
 
 # format date
-df_updated_invest_2y['DATE'] = pd.to_datetime(df_updated_invest_2y['DATE'],format='%Y-%m-%d')
+df_updated_invest_2y['DATE'] = pd.to_datetime(df_updated_invest_2y['DATE'],format='%b %d, %Y')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
