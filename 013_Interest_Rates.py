@@ -54,8 +54,6 @@ def scrape_table_country_rating(url):
     df = df.drop(['TE'], axis=1)
     return df
 
-
-
 ###################################
 # Get Database 10y Data from OECD #
 ###################################
