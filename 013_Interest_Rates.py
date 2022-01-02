@@ -19,7 +19,7 @@ excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.
 ###################################
 # Get Database 10y Data from OECD #
 ###################################
-"""
+
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 subject = ['IRLTLT01']
 measure = ['ST']
@@ -34,7 +34,6 @@ df_db_10y = df_db_10y.drop('MTH', 1)
 
 sheet_name = 'Database 10y'
 df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-
 
 # Check for difference between original and new lists
 #print(Diff(df_db_10y.columns.tolist(), df_original_db_10y.columns.tolist()))
@@ -94,7 +93,7 @@ df_updated_invest_10y = df_updated_invest_10y[cols]
 #import pdb; pdb.set_trace()
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, False, 0)
-"""
+
 ###########################################
 # Get 2y database Data from Investing.com #
 ###########################################
