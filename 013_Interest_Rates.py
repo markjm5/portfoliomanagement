@@ -18,44 +18,41 @@ excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.
 
 def scrape_table_country_rating(url):
 
-  page = requests.get(url=url)
-  soup = BeautifulSoup(page.content, 'html.parser')
+    page = requests.get(url=url)
+    soup = BeautifulSoup(page.content, 'html.parser')
 
-  #TODO: Need to scrape table for world production countries and numbers.
-  table = soup.find('table')
+    #TODO: Need to scrape table for world production countries and numbers.
+    table = soup.find('table')
 
-  table_rows = table.find_all('tr', recursive=False)
-  table_rows_header = table.find_all('tr')[0].find_all('th')
-  df = pd.DataFrame()
-  index = 0
-  for header in table_rows_header:
-    if(index == 0):
-      df.insert(0,"Country",[],True)
-    else:
-        df.insert(index,str(header.text).strip().replace("'", ""),[],True)
-    index+=1
-
-  #Get rows of data.
-  for tr in table_rows:
-    temp_row = []
-    #first_col = True
+    table_rows = table.find_all('tr', recursive=False)
+    #table_rows = table.find_all('tr', attrs={'class':'an-estimate-row'})
+    table_rows_header = table.find_all('tr')[0].find_all('th')
+    df = pd.DataFrame()
     index = 0
-    td = tr.find_all('td')
+    for header in table_rows_header:
+        if(index == 0):
+            df.insert(0,"Country",[],True)
+        else:
+            df.insert(index,str(header.text).strip().replace("'", ""),[],True)
+        index+=1
 
-    import pdb; pdb.set_trace()
+    #Get rows of data.
+    for tr in table_rows:
+        temp_row = []
+        #first_col = True
+        index = 0
+        td = tr.find_all('td')
 
-    for obs in td:
-      if(index == 3):
-        dt_date = dt.strptime(str(obs.text),'%b/%y')
-        text = dt_date.strftime('%b-%y')
-      else:
-        text = str(obs.text).strip()
-      temp_row.append(text)        
-      index += 1
+        if(td):        
+            for obs in td:
+                text = str(obs.text).strip()
+                temp_row.append(text)        
+                index += 1
 
-    df.loc[len(df.index)] = temp_row
+            df.loc[len(df.index)] = temp_row
 
-  return df
+    df = df.drop(['TE'], axis=1)
+    return df
 
 
 
@@ -184,17 +181,10 @@ sheet_name = 'DB Credit Rating'
 #Get World Production Data
 df_country_credit_rating = scrape_table_country_rating("https://tradingeconomics.com/country-list/rating")
 
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False, 'Country')
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 
-#Fix datatypes of df_world_gdp
-df_country_credit_rating['Last'] = pd.to_numeric(df_country_credit_rating['Last'])
-df_country_credit_rating['Previous'] = pd.to_numeric(df_country_credit_rating['Previous'])
+df_updated = combine_df_on_index(df_original, df_country_credit_rating, 'Country')
 
-#Make the Country col the index so that we can combine
-df_country_credit_rating.set_index('Country', inplace=True)
-
-df_updated = combine_df(df_original, df_country_credit_rating)
-
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 print("Done!")
