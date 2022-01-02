@@ -109,7 +109,7 @@ df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_n
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_2y, False, 0)
 
 #TODO: match country list with what is in excel file, without the missing_country list.
-country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland', 'u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
+country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','norway','switzerland', 'u.k.','russia','turkey','poland','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','south korea','philippines','thailand','vietnam']
 #country_missing = ['denmark','sweden', 'mexico', 'greece', 'hungary', 'indonesia']
 
 df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
