@@ -59,7 +59,7 @@ def scrape_table_country_rating(url):
 ###################################
 # Get Database 10y Data from OECD #
 ###################################
-"""
+
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 subject = ['IRLTLT01']
 measure = ['ST']
@@ -169,7 +169,6 @@ df_updated_invest_2y = df_updated_invest_2y[cols]
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
 
-"""
 #################################################
 # Get Credit Rating Data from Trading Economics #
 #################################################
