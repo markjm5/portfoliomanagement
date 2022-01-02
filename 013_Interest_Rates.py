@@ -16,10 +16,53 @@ from common import combine_df_on_index
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
+def scrape_table_country_rating(url):
+
+  page = requests.get(url=url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  #TODO: Need to scrape table for world production countries and numbers.
+  table = soup.find('table')
+
+  table_rows = table.find_all('tr', recursive=False)
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df = pd.DataFrame()
+  index = 0
+  for header in table_rows_header:
+    if(index == 0):
+      df.insert(0,"Country",[],True)
+    else:
+        df.insert(index,str(header.text).strip().replace("'", ""),[],True)
+    index+=1
+
+  #Get rows of data.
+  for tr in table_rows:
+    temp_row = []
+    #first_col = True
+    index = 0
+    td = tr.find_all('td')
+
+    import pdb; pdb.set_trace()
+
+    for obs in td:
+      if(index == 3):
+        dt_date = dt.strptime(str(obs.text),'%b/%y')
+        text = dt_date.strftime('%b-%y')
+      else:
+        text = str(obs.text).strip()
+      temp_row.append(text)        
+      index += 1
+
+    df.loc[len(df.index)] = temp_row
+
+  return df
+
+
+
 ###################################
 # Get Database 10y Data from OECD #
 ###################################
-
+"""
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 subject = ['IRLTLT01']
 measure = ['ST']
@@ -53,7 +96,6 @@ df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
-
 
 ############################################
 # Get 10y database Data from Investing.com #
@@ -129,5 +171,30 @@ df_updated_invest_2y = df_updated_invest_2y[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
+
+"""
+#################################################
+# Get Credit Rating Data from Trading Economics #
+#################################################
+
+#https://tradingeconomics.com/country-list/rating
+
+sheet_name = 'DB Credit Rating'
+
+#Get World Production Data
+df_country_credit_rating = scrape_table_country_rating("https://tradingeconomics.com/country-list/rating")
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False, 'Country')
+
+#Fix datatypes of df_world_gdp
+df_country_credit_rating['Last'] = pd.to_numeric(df_country_credit_rating['Last'])
+df_country_credit_rating['Previous'] = pd.to_numeric(df_country_credit_rating['Previous'])
+
+#Make the Country col the index so that we can combine
+df_country_credit_rating.set_index('Country', inplace=True)
+
+df_updated = combine_df(df_original, df_country_credit_rating)
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
 
 print("Done!")
