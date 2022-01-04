@@ -12,7 +12,7 @@ from requests.models import parse_header_links
 import re
 import investpy
 from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
-from common import combine_df_on_index
+from common import combine_df_on_index, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
@@ -109,12 +109,9 @@ df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_
 country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
 #country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal'] 
 
-#TODO: Works with US and Canada only, but when we add additional cols it falls apart. Use 013_Interest_Rates_working2 to continue testing
-
 #country_missing = ['denmark','sweden']
 df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
 
-#TODO: make sure merging of new and original df results in similar data to original
 df_updated_invest_10y = combine_df_on_index(df_original_invest_10y, df_invest_10y, 'DATE')
 
 # get a list of columns
@@ -124,6 +121,15 @@ cols.insert(0, cols.pop(cols.index('DATE')))
 
 # reorder
 df_updated_invest_10y = df_updated_invest_10y[cols]
+
+#Get Yahoo Finance Data for EUR/USD up to todays date
+todays_date = date.today()
+date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
+
+# Get EUR/USD close day intervals
+df_EUR_USD = get_yf_data("EURUSD=X", "1mo", "1998-04-01", date_str)
+
+#TODO: Combine df_EUR_USD with df_updated_invest_10y, using left join
 
 # format date
 #df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],format='%b %d, %Y')
