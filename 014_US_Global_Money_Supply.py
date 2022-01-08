@@ -93,6 +93,8 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Get Monthly Money Supply Data from Trading Economics #
 ########################################################
 
+sheet_name = 'DB Trading Economics'
+
 # Scrape Money Supply Table from Trading Economics Site
 df_te_money_supply = scrape_money_supply_table("https://tradingeconomics.com/country-list/money-supply-m2?continent=g20")
 
