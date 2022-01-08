@@ -16,10 +16,46 @@ from common import combine_df_on_index, get_stlouisfed_data
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/014_US_Global_Money_Supply.xlsm'
 
+#Scrape this table and get latest ADP number
+def scrape_money_supply_table(url):
+  #Scrape GDP Table from Trading Economics
+  page = requests.get(url=url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  table = soup.find('table')
+  table_rows = table.find_all('tr')
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df = pd.DataFrame()
+
+  index = 0
+
+  for header in table_rows_header:
+    df.insert(index,str(header.text).strip(),[],True)
+    index+=1
+
+  #Insert New Row. Format the data to show percentage as float
+  for tr in table_rows:
+    temp_row = []
+
+    td = tr.find_all('td')
+
+    if(td): 
+        for obs in td:
+            #if(str(obs.text).strip() == 'ADP Employment Change'):
+            #    pass #Hidden field, need to pass over
+            #else:
+            text = str(obs.text).strip()
+            temp_row.append(text)        
+
+        df.loc[len(df.index)] = temp_row
+
+  return df
+
+
 #################################################
 # Get US M1, M2 Monthly Data from St Louis Fred #
 #################################################
-
+"""
 sheet_name = 'DB Money Supply'
 
 df_M1REAL = get_stlouisfed_data('M1REAL')
@@ -52,15 +88,20 @@ df_updated = df_updated[cols]
 
 #Write to excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
-import pdb; pdb.set_trace()
-
+"""
 ########################################################
 # Get Monthly Money Supply Data from Trading Economics #
 ########################################################
 
-#TODO: Scrape Data from Trading Economics Site
+# Scrape Money Supply Table from Trading Economics Site
+df_te_money_supply = scrape_money_supply_table("https://tradingeconomics.com/country-list/money-supply-m2?continent=g20")
 
+#TODO: Rename Reference field to Month, and make it a legit date field
+#TODO: Rename Unit Field to Currency
+#TODO: Reorder FIelds
+#TODO: Write to sheet in 014 excel file
+
+import pdb; pdb.set_trace()
 
 ##########################################
 # Get Global Money Supply Data from OECD #
