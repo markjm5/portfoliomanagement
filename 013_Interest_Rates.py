@@ -57,7 +57,7 @@ def scrape_table_country_rating(url):
 ###################################
 # Get Database 10y Data from OECD #
 ###################################
-"""
+
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 subject = ['IRLTLT01']
 measure = ['ST']
@@ -91,7 +91,7 @@ df_updated_db_10y['DATE'] = pd.to_datetime(df_updated_db_10y['DATE'],format='%Y-
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_db_10y, False, 0)
-"""
+
 ############################################
 # Get 10y database Data from Investing.com #
 ############################################
@@ -106,25 +106,13 @@ df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_
 #df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_10y, False, 0)
 
-#country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
-country_list = ['u.s.'] 
+country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
+#country_list = ['u.s.'] 
 
 #country_missing = ['denmark','sweden']
 df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
 
-#Get Yahoo Finance Data for EUR/USD up to todays date
-todays_date = date.today()
-date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
-
-# Get EUR/USD close day intervals
-df_EUR_USD = get_yf_data("EURUSD=X", "1d", "2000-12-28", date_str)
-
-#TODO: Remove unnecessary columns from df_EUR_USD
-import pdb; pdb.set_trace()
-
 df_updated_invest_10y = combine_df_on_index(df_original_invest_10y, df_invest_10y, 'DATE')
-
-#TODO: Combine df_EUR_USD with df_updated_invest_10y, using left join on DATE field
 
 # get a list of columns
 cols = list(df_updated_invest_10y)
@@ -136,9 +124,31 @@ df_updated_invest_10y = df_updated_invest_10y[cols]
 
 # format date
 #df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],format='%b %d, %Y')
-#import pdb; pdb.set_trace()
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, False, 0)
+
+###############################
+# Get EURUSD Data from YF.com #
+###############################
+
+sheet_name = 'EURUSD'
+df_original_EURUSD = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+
+#get date range
+todays_date = date.today()
+date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
+
+# Get EUR/USD close day intervals using above date range
+df_EURUSD = get_yf_data("EURUSD=X", "1d", "2000-12-28", date_str)
+
+#Remove unnecessary columns from df_EUR_USD and rename columns
+df_EURUSD = df_EURUSD.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+df_EURUSD = df_EURUSD.rename(columns={"Close": "EURUSD"})
+
+df_updated_EURUSD = combine_df_on_index(df_original_EURUSD, df_EURUSD, 'DATE')
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_EURUSD, False, 0)
 
 ###########################################
 # Get 2y database Data from Investing.com #
