@@ -16,9 +16,32 @@ from common import combine_df_on_index, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/014_US_Global_Money_Supply.xlsm'
 
-###################################
-# Get Database 10y Data from OECD #
-###################################
+#############################################
+# Get US M1 Real Monthly from St Louis Fred #
+#############################################
+
+
+
+#############################################
+# Get US M2 Real Monthly from St Louis Fred #
+#############################################
+
+
+########################################
+# Get US M1 Monthly from St Louis Fred #
+########################################
+
+
+
+########################################
+# Get US M2 Monthly from St Louis Fred #
+########################################
+
+
+
+##########################################
+# Get Global Money Supply Data from OECD #
+##########################################
 
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 subject = ['IRLTLT01']
