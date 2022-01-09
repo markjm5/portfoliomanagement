@@ -60,7 +60,7 @@ def scrape_money_supply_table(url):
 #################################################
 # Get US M1, M2 Monthly Data from St Louis Fred #
 #################################################
-
+"""
 sheet_name = 'DB Money Supply'
 
 df_M1REAL = get_stlouisfed_data('M1REAL')
@@ -131,7 +131,7 @@ df_updated = df_updated[cols]
 
 #Write to excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-
+"""
 ##########################################
 # Get Global Money Supply Data from OECD #
 ##########################################
@@ -139,20 +139,21 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 #TODO: Get data from correct OECD time series
 #TODO: Update excel sheet to remove unnecessary columns
 # https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI_FIN/MABM.AUS+CAN+CHL+COL+CZE+DNK+HUN+ISL+ISR+JPN+KOR+MEX+NZL+NOR+POL+SWE+CHE+TUR+GBR+USA+EA19+OECD+NMEC+BRA+CHN+IND+IDN+RUS+ZAF.M/all?startTime=2018&endTime=2021
-import pdb; pdb.set_trace()
+# https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI_FIN/AUS+BEL+BRA+CAN+CHE+CHL+CHN+COL+CRI+CZE+DEU+DNK+EA19+ESP+EST+EU27_2020+FIN+FRA+G-20+G-7+GBR+GRC+HUN+IDN+IND+IRL+ISL+ISR+ITA+JPN+KOR+LTU+LUX+LVA+MEX+NLD+NOR+OECD+OECDE+POL+PRT+RUS+SAU+SVK+SVN+SWE+TUR+USA+ZAF+NZL.MABM.M/all?startTime=1951-Q1&endTime=2022-Q4
+# No EU27_2020, G-20, G-7
 
-country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
+country = ['AUS','BEL','BRA','CAN','CHE','CHL','CHN','COL','CRI','CZE','DEU','DNK','EA19','ESP','EST','FIN','FRA','GBR','GRC','HUN','IDN','IND','IRL','ISL','ISR','ITA','JPN','KOR','LTU','LUX','LVA','MEX','NLD','NOR','OECD','OECDE','POL','PRT','RUS','SAU','SVK','SVN','SWE','TUR','USA','ZAF','NZL']
 subject = ['MABM']
-measure = ['ST'] #****Does not seem to exist****
+measure = []
 frequency = 'M'
-startDate = '1950-Q1'
+startDate = '1951-Q1'
 
 todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
 df_money_supply = get_oecd_data('MEI_FIN', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '014_US_Global_Money_Supply.xml'})
 df_money_supply = df_money_supply.drop('MTH', 1)
-
+import pdb; pdb.set_trace()
 sheet_name = 'Data'
 df_original_money_supply = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 

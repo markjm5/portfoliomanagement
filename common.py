@@ -48,7 +48,7 @@ def get_stlouisfed_data(series_code):
 def get_oecd_data(dataset, dimensions, params):
 
   dim_args = ['+'.join(d) for d in dimensions]
-  dim_str = '.'.join(dim_args)
+  dim_str = '.'.join(dim_args).replace('..','.')
 
   date_range = dimensions[3][0]
   match date_range:
@@ -60,13 +60,13 @@ def get_oecd_data(dataset, dimensions, params):
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
   file_path = 'XML/%s' % params['filename'] 
   try:
-
     #resp = requests.get(url=url,params=params)
     resp = requests.get(url=url,verify=False)
 
     if(resp.status_code == 400):
       #It didnt work with the original order of the params so lets try again
       url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s.%s.%s.%s/all?startTime=%s&endTime=%s" % (dataset, dim_args[1],dim_args[0],dim_args[2],dim_args[3],params['startTime'],params['endTime'])
+      url = url.replace('..','.')
 
       resp = requests.get(url=url,verify=False)
 
