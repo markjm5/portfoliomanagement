@@ -60,7 +60,6 @@ def scrape_money_supply_table(url):
 
   return df
 
-
 #################################################
 # Get US M1, M2 Monthly Data from St Louis Fred #
 #################################################
@@ -71,11 +70,13 @@ df_M1REAL = get_stlouisfed_data('M1REAL')
 df_M2REAL = get_stlouisfed_data('M2REAL')
 df_M1 = get_stlouisfed_data('M1')
 df_M2SL = get_stlouisfed_data('M2SL')
+df_M2V = get_stlouisfed_data('M2V')
 
 #Combine all these data frames into a single data frame based on the DATE field
 df = combine_df_on_index(df_M1REAL, df_M2REAL, 'DATE')
 df = combine_df_on_index(df_M1, df, 'DATE')
 df = combine_df_on_index(df_M2SL, df, 'DATE')
+df = combine_df_on_index(df_M2V, df, 'DATE')
 
 #Get original data from sheet
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
@@ -133,7 +134,6 @@ df_updated = df_updated[cols]
 
 #Write to excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-import pdb; pdb.set_trace()
 
 ##########################################
 # Get Global Money Supply Data from OECD #
@@ -141,6 +141,7 @@ import pdb; pdb.set_trace()
 
 #TODO: Get data from correct OECD time series
 #TODO: Update excel sheet to remove unnecessary columns
+import pdb; pdb.set_trace()
 
 country = ['AUS','AUT','BEL','CAN','CHL','CZE','DEU','DNK','ESP','EST','FIN','FRA','GBR','GRC','HUN','IRL','ISL','ISR','ITA','JPN','KOR','LUX','LVA','MEX','NLD','NOR','OECD','POL','PRT','SVK','SVN','SWE','USA','EA19','EU27_2020','G-7','CHE','IND','ZAF','RUS','CHN','TUR','BRA']
 subject = ['IRLTLT01']
