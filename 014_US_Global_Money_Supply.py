@@ -60,7 +60,7 @@ def scrape_money_supply_table(url):
 #################################################
 # Get US M1, M2 Monthly Data from St Louis Fred #
 #################################################
-"""
+
 sheet_name = 'DB Money Supply'
 
 df_M1REAL = get_stlouisfed_data('M1REAL')
@@ -131,7 +131,7 @@ df_updated = df_updated[cols]
 
 #Write to excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-"""
+
 ##########################################
 # Get Global Money Supply Data from OECD #
 ##########################################
