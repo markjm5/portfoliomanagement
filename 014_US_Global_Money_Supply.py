@@ -6,9 +6,11 @@ import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
 from inspect import getmembers, isclass, isfunction
+from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
+import calendar
 import re
 import investpy
 from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
@@ -33,21 +35,28 @@ def scrape_money_supply_table(url):
     df.insert(index,str(header.text).strip(),[],True)
     index+=1
 
-  #Insert New Row. Format the data to show percentage as float
+  #Insert New Row
   for tr in table_rows:
     temp_row = []
-
+    index = 0
     td = tr.find_all('td')
 
     if(td): 
-        for obs in td:
-            #if(str(obs.text).strip() == 'ADP Employment Change'):
-            #    pass #Hidden field, need to pass over
-            #else:
-            text = str(obs.text).strip()
-            temp_row.append(text)        
+      for obs in td:
+        if(index == 3):
+          dt_date = dt.strptime(str(obs.text),'%b/%y')
+          text = dt_date.strftime('%-d/%-m/%Y')
+        else:
+          text = str(obs.text).strip()
+        temp_row.append(text)        
+        index += 1
 
-        df.loc[len(df.index)] = temp_row
+      df.loc[len(df.index)] = temp_row
+
+  #Format datatypes
+  df['Last'] = pd.to_numeric(df['Last'])
+  df['Previous'] = pd.to_numeric(df['Previous'])
+  df['Reference'] = pd.to_datetime(df['Reference'],format='%d/%m/%Y')
 
   return df
 
@@ -55,7 +64,7 @@ def scrape_money_supply_table(url):
 #################################################
 # Get US M1, M2 Monthly Data from St Louis Fred #
 #################################################
-"""
+
 sheet_name = 'DB Money Supply'
 
 df_M1REAL = get_stlouisfed_data('M1REAL')
@@ -88,7 +97,7 @@ df_updated = df_updated[cols]
 
 #Write to excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
+
 ########################################################
 # Get Monthly Money Supply Data from Trading Economics #
 ########################################################
@@ -98,11 +107,32 @@ sheet_name = 'DB Trading Economics'
 # Scrape Money Supply Table from Trading Economics Site
 df_te_money_supply = scrape_money_supply_table("https://tradingeconomics.com/country-list/money-supply-m2?continent=g20")
 
-#TODO: Rename Reference field to Month, and make it a legit date field
-#TODO: Rename Unit Field to Currency
-#TODO: Reorder FIelds
-#TODO: Write to sheet in 014 excel file
+#Rename Reference field to Month
+df_te_money_supply = df_te_money_supply.rename(columns={"Reference": "Month"})
 
+#Rename Unit Field to Currency
+df_te_money_supply = df_te_money_supply.rename(columns={"Unit": "Currency"})
+
+#Get original data from sheet
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_te_money_supply, 'Country')
+
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('Country')))
+cols.insert(1, cols.pop(cols.index('Last')))
+cols.insert(2, cols.pop(cols.index('Month')))
+cols.insert(3, cols.pop(cols.index('Previous')))
+cols.insert(4, cols.pop(cols.index('Currency')))
+
+# Reorder Fields
+df_updated = df_updated[cols]
+
+#Write to excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 import pdb; pdb.set_trace()
 
 ##########################################
