@@ -4,11 +4,12 @@ import requests
 import os.path
 import csv
 import calendar
+import re
 import pandas as pd
 import xml.etree.ElementTree as ET
 from inspect import getmembers, isclass, isfunction
 from datetime import datetime as dt
-from dateutil import parser
+from dateutil import parser, relativedelta
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
@@ -28,36 +29,35 @@ def scrape_conference_board_lei():
   page = requests.get(url=url_lei,verify=False)
   soup = BeautifulSoup(page.content, 'html.parser')
 
+  date_string = soup.find("p", {"class": "date"}).text[0 + len('Released: '):len(soup.find("p", {"class": "date"}).text)].replace(',','')
+
+  # Convert article date into datetime, and get the previous month because that will be the LEI month
+  article_date = dt.strptime(date_string, "%A %B %d %Y")
+  lei_date = article_date - relativedelta.relativedelta(months=1)
+
   paragraph = "" #The para that contains the LEI monthly value
-  lei_month = "" #The month extrated from the para
+  lei_month_string = lei_date.strftime("%B") #The month before article_date
   lei_value = "" # The LEI value that is extracted from the para
 
-  # get the correct month from the correct paragraph
-  for para in soup.find_all("p"):
-    if(para.text.startswith('The Conference Board Leading Economic Index® (LEI)')):
-        for word in para.text.split(' '):
-            try:
-                dt.strptime(word, '%B').month 
+  #get all paragraphs
+  paras = soup.find_all("p", attrs={'class': None})
 
-                #This word is the month of the LEI release. So get the month name, and grab the whole para as well 
-                #Because it will contain the LEI value
-                lei_month = word  
-                paragraph = para.text
-                break
-            except ValueError as e:
-                pass
+  for para in paras:
+    #Get the specific paragraph that contains the LEI value based on whether the month name exists in the para
+    if(para.text.startswith('The Conference Board Leading Economic Index® (LEI)') and para.text.find(lei_month_string + ' to') > -1):
+        paragraph = para.text
 
-  #Extract LEI value from the paragraph using the Month substring
-  lei_value = paragraph[paragraph.find(lei_month) + len(lei_month):paragraph.find(' (2016')].split(' ')[2]  
-
-  print(lei_month)
-  print(lei_value)      
+  #Extract LEI value from the paragraph using the Month string
+  lei_value = paragraph[paragraph.find(lei_month_string) + len(lei_month_string):paragraph.find(' (2016')].split(' ')[2]  
 
   df_lei = pd.DataFrame()
 
+  lei_date = "01/%s/%s" % (lei_date.month, lei_date.year)
+
   import pdb; pdb.set_trace()
 
-  #TODO: return a dataframe with lei_month and lei_value
+
+  #TODO: return a dataframe with lei_month and lei_value, as DATE and LEI columns
 
   return df_lei
 
