@@ -51,13 +51,17 @@ def scrape_conference_board_lei():
   lei_value = paragraph[paragraph.find(lei_month_string) + len(lei_month_string):paragraph.find(' (2016')].split(' ')[2]  
 
   df_lei = pd.DataFrame()
+  df_lei.insert(0,"DATE",[],True)
+  df_lei.insert(1,"LEI",[],True)
 
   lei_date = "01/%s/%s" % (lei_date.month, lei_date.year)
 
-  import pdb; pdb.set_trace()
+  # return a dataframe with lei_month and lei_value, as DATE and LEI columns
+  df_lei = df_lei.append({'DATE': lei_date, 'LEI': lei_value}, ignore_index=True)
 
-
-  #TODO: return a dataframe with lei_month and lei_value, as DATE and LEI columns
+  # format columns in dataframe
+  df_lei['DATE'] = pd.to_datetime(df_lei['DATE'],format='%d/%m/%Y')
+  df_lei['LEI'] = pd.to_numeric(df_lei['LEI'])
 
   return df_lei
 
@@ -69,7 +73,7 @@ def scrape_conference_board_lei():
 #Scrape LEI Month, Year and Value from Conference Board monthly article
 
 df_lei = scrape_conference_board_lei()
-
+import pdb; pdb.set_trace()
 #Get US GDP
 df_GDPC1 = get_stlouisfed_data('GDPC1')
 
