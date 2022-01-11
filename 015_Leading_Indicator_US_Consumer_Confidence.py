@@ -71,12 +71,12 @@ def scrape_conference_board_lei():
 #########################################
 
 #Scrape LEI Month, Year and Value from Conference Board monthly article
-
 df_lei = scrape_conference_board_lei()
-import pdb; pdb.set_trace()
+
 #Get US GDP
 df_GDPC1 = get_stlouisfed_data('GDPC1')
 
+import pdb; pdb.set_trace()
 #TODO: Get S&P500 from YF
 #TODO: Get UMICI Index
 
