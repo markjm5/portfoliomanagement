@@ -100,14 +100,19 @@ df_SP500 = df_SP500.rename(columns={"Close": "SP500"})
 # Get UMCSI Index Data #
 ########################
 
-#TODO: Get UMCSI Index
+# Get UMCSI Index
+#df_UMCSENT = get_stlouisfed_data('UMCSENT')
+df_UMCSI = pd.read_csv('http://www.sca.isr.umich.edu/files/tbmics.csv')
+
+# Summary Indexes
+df_UM_SUMMARY = pd.read_csv('http://www.sca.isr.umich.edu/files/tbmiccice.csv')
+
+#TODO: Transform dataframes so that they have DATE fields
 
 import pdb; pdb.set_trace()
 
 #TODO: Load original data from excel file into original df
-
 #TODO: Combine df_LEI, df_GDPC1, df_SP500 and df_UMCSI into original df
-
 #TODO: Write to excel sheet
 
 print("Done!")
