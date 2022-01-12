@@ -120,6 +120,7 @@ df_UM_SUMMARY = pd.read_csv('http://www.sca.isr.umich.edu/files/tbmiccice.csv')
 df_UM_SUMMARY["YYYY"] = df_UM_SUMMARY["YYYY"].apply(str)
 df_UM_SUMMARY["DATE"] = pd.to_datetime(df_UM_SUMMARY["YYYY"] + "-" + df_UM_SUMMARY["Month"] + "-01", format='%Y-%B-%d')
 df_UM_SUMMARY = df_UM_SUMMARY.drop(['Month', 'YYYY'], axis=1)
+df_UM_SUMMARY = df_UM_SUMMARY.rename(columns={"ICC": "CURRENT", "ICE": "EXPECTED"})
 
 # get a list of columns
 cols = list(df_UM_SUMMARY)
