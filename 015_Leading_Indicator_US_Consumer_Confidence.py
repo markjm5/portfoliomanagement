@@ -66,7 +66,6 @@ def scrape_conference_board_lei():
 
   return df_lei
 
-
 #########################################
 # Scrape Latest US Conference Board LEI #
 #########################################
@@ -103,11 +102,34 @@ df_SP500 = df_SP500.rename(columns={"Close": "SP500"})
 # Get UMCSI Index
 #df_UMCSENT = get_stlouisfed_data('UMCSENT')
 df_UMCSI = pd.read_csv('http://www.sca.isr.umich.edu/files/tbmics.csv')
+df_UMCSI["YYYY"] = df_UMCSI["YYYY"].apply(str)
+df_UMCSI["DATE"] = pd.to_datetime(df_UMCSI["YYYY"] + "-" + df_UMCSI["Month"] + "-01", format='%Y-%B-%d')
+df_UMCSI = df_UMCSI.drop(['Month', 'YYYY'], axis=1)
+df_UMCSI = df_UMCSI.rename(columns={"ICS_ALL": "UMCSI"})
+
+# get a list of columns
+cols = list(df_UMCSI)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('DATE')))
+
+# reorder
+df_UMCSI = df_UMCSI[cols]
 
 # Summary Indexes
 df_UM_SUMMARY = pd.read_csv('http://www.sca.isr.umich.edu/files/tbmiccice.csv')
+df_UM_SUMMARY["YYYY"] = df_UM_SUMMARY["YYYY"].apply(str)
+df_UM_SUMMARY["DATE"] = pd.to_datetime(df_UM_SUMMARY["YYYY"] + "-" + df_UM_SUMMARY["Month"] + "-01", format='%Y-%B-%d')
+df_UM_SUMMARY = df_UM_SUMMARY.drop(['Month', 'YYYY'], axis=1)
 
-#TODO: Transform dataframes so that they have DATE fields
+# get a list of columns
+cols = list(df_UM_SUMMARY)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('DATE')))
+
+# reorder
+df_UM_SUMMARY = df_UM_SUMMARY[cols]
+
+#TODO: Combine df_UMCSI and df_UM_SUMMARY
 
 import pdb; pdb.set_trace()
 
