@@ -17,7 +17,7 @@ from common import get_oecd_data, get_invest_data, convert_excelsheet_to_datafra
 from common import combine_df_on_index, get_stlouisfed_data, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_Consumer_Confidence.xlsm'
-sheet_name = 'Database'
+sheet_name = 'DB LEI'
 
 def scrape_conference_board_lei():
   # https://www.conference-board.org/pdf_free/press/US%20LEI%20PRESS%20RELEASE%20-%20December%202021.pdf
@@ -130,12 +130,33 @@ cols.insert(0, cols.pop(cols.index('DATE')))
 # reorder
 df_UM_SUMMARY = df_UM_SUMMARY[cols]
 
-#TODO: Combine df_UMCSI and df_UM_SUMMARY
+# Combine df_LEI, df_GDPC1, df_SP500 and df_UMCSI into original df
+df = combine_df_on_index(df_LEI, df_GDPC1, 'DATE')
+df = combine_df_on_index(df_SP500, df, 'DATE')
+df = combine_df_on_index(df_UMCSI, df, 'DATE')
+df = combine_df_on_index(df_UM_SUMMARY, df, 'DATE')
 
-import pdb; pdb.set_trace()
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-#TODO: Load original data from excel file into original df
-#TODO: Combine df_LEI, df_GDPC1, df_SP500 and df_UMCSI into original df
-#TODO: Write to excel sheet
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df, 'DATE')
+
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('LEI')))
+cols.insert(2, cols.pop(cols.index('GDPC1')))
+cols.insert(3, cols.pop(cols.index('SP500')))
+cols.insert(4, cols.pop(cols.index('UMCSI')))
+cols.insert(5, cols.pop(cols.index('CURRENT')))
+cols.insert(5, cols.pop(cols.index('EXPECTED')))
+
+# reorder
+df_updated = df_updated[cols]
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 print("Done!")
