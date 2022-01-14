@@ -80,6 +80,9 @@ df_LEI = scrape_conference_board_lei()
 #Get US GDP
 df_GDPC1 = get_stlouisfed_data('GDPC1')
 
+df_GDPC1['GDPQoQ'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift()) / df_GDPC1['GDPC1']
+df_GDPC1['GDPYoY'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift(periods=4)) / df_GDPC1['GDPC1']
+
 ###########################################
 # Get S&P500 Monthly Close Prices from YF #
 ###########################################
@@ -147,11 +150,13 @@ cols = list(df_updated)
 # move the column to head of list
 cols.insert(0, cols.pop(cols.index('DATE')))
 cols.insert(1, cols.pop(cols.index('LEI')))
-cols.insert(2, cols.pop(cols.index('GDPC1')))
-cols.insert(3, cols.pop(cols.index('SP500')))
-cols.insert(4, cols.pop(cols.index('UMCSI')))
-cols.insert(5, cols.pop(cols.index('CURRENT')))
+cols.insert(2, cols.pop(cols.index('SP500')))
+cols.insert(3, cols.pop(cols.index('UMCSI')))
+cols.insert(4, cols.pop(cols.index('CURRENT')))
 cols.insert(5, cols.pop(cols.index('EXPECTED')))
+cols.insert(6, cols.pop(cols.index('GDPC1')))
+cols.insert(7, cols.pop(cols.index('GDPQoQ')))
+cols.insert(8, cols.pop(cols.index('GDPYoY')))
 
 # reorder
 df_updated = df_updated[cols]
