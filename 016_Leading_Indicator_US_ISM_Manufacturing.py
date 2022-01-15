@@ -26,16 +26,45 @@ def scrape_pmi_manufacturing_index():
 
     #use todays date to get pmi month (last month) and use the month string to call the url
     pmi_date = todays_date - relativedelta.relativedelta(months=1)
-    pmi_month = pmi_date.strftime("%B").lower()
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month,)
+    pmi_month = pmi_date.strftime("%B")
+    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
 
+    #TODO: Can we be more specific about which tables to get, rather than getting ALL tables?
+    tables = soup.find_all('table')
+    
+    table_manufacturing_at_a_glance = tables[0]
+    table_last_12_months_a = tables[1] 
+    table_last_12_months_b = tables[2] 
+    table_new_orders = tables[3] 
+    table_production = tables[4] 
+
+    #get all paragraphs
+    paras = soup.find_all("p", attrs={'class': None})
+
+    para_manufacturing = "" 
+    para_new_orders = ""
+    para_production = ""
+
+    for para in paras:
+        #Get the specific paragraph
+        if('manufacturing industries reporting growth in %s' % (pmi_month) in para.text):
+            para_manufacturing = para.text
+
+        if('growth in new orders' in para.text and '%s' % (pmi_month) in para.text):
+            para_new_orders = para.text
+
+        if('growth in production' in para.text and '%s' % (pmi_month) in para.text):
+            para_production = para.text
+
     import pdb; pdb.set_trace()
 
+    return df_manufacturing, df_new_orders, df_production
 
-scrape_pmi_manufacturing_index()
+
+df_manufacturing, df_new_orders, df_production = scrape_pmi_manufacturing_index()
 
 #TODO: Get ISM data for the following tabs:
 #Sectors Trend

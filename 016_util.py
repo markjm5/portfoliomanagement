@@ -16,8 +16,8 @@ from requests.models import parse_header_links
 from common import _transform_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
-sheet_name_original = 'DB OLD'
-sheet_name_new = 'DB New Orders'
+sheet_name_original = 'DB OLD Production'
+sheet_name_new = 'DB Production'
 
 _transform_data(excel_file_path, sheet_name_original, sheet_name_new)
 
