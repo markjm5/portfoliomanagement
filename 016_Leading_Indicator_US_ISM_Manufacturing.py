@@ -67,8 +67,43 @@ def scrape_pmi_manufacturing_index():
 
     return df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production
 
+def extract_rankings(industry_str):
+
+    #TODO: convert para text into ranking of industries
+    substr = industry_str[industry_str.index(': ')+2:industry_str.index('.')]
+    arr_substr = substr.replace('and ', '').split(';')
+
+    #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
+    # Example - October 2021 - 
+    # Apparel, Leather & Allied Products; 16
+    # Furniture & Related Products; 15
+    # Textile Mills; 14
+    # Electrical Equipment, Appliances & Components; 13
+    # Machinery; 12
+    # Printing & Related Support Activities; 11
+    # Food, Beverage & Tobacco Products; 10
+    # Computer & Electronic Products; 9
+    # Chemical Products; 8
+    # Fabricated Metal Products; 7 
+    # Miscellaneous Manufacturing; 6 
+    # Petroleum & Coal Products; 5 
+    # Plastics & Rubber Products; 4
+    # Paper Products; 3
+    # Primary Metals; 2 
+    # Transportation Equipment. 1
+    # The two industries reporting a decrease in October compared to September are 
+    # Wood Products; -2
+    # Nonmetallic Mineral Products. -1
+
+    return arr_substr
 
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index()
+
+arr_manufacturing = extract_rankings(para_manufacturing)
+arr_new_orders = extract_rankings(para_new_orders)
+arr_production = extract_rankings(para_production)
+
+import pdb; pdb.set_trace()
 
 #print(df_at_a_glance.head())
 #print(df_new_orders.head())
@@ -76,9 +111,6 @@ df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_order
 #print(para_manufacturing)
 #print(para_new_orders)
 #print(para_production)
-
-#TODO: convert para text into ranking of industries
-import pdb; pdb.set_trace()
 
 #TODO: Update the the following tabs:
 #Sectors Trend
