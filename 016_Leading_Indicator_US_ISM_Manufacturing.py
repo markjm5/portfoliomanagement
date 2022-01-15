@@ -25,7 +25,7 @@ def scrape_pmi_manufacturing_index():
     todays_date = date.today()
 
     #use todays date to get pmi month (last month) and use the month string to call the url
-    pmi_date = todays_date - relativedelta.relativedelta(months=1)
+    pmi_date = todays_date - relativedelta.relativedelta(months=2)
     pmi_month = pmi_date.strftime("%B")
     url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
 
@@ -70,10 +70,17 @@ def scrape_pmi_manufacturing_index():
 
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index()
 
+#print(df_at_a_glance.head())
+#print(df_new_orders.head())
+#print(df_production.head())
+#print(para_manufacturing)
+#print(para_new_orders)
+#print(para_production)
+
+#TODO: convert para text into ranking of industries
 import pdb; pdb.set_trace()
 
-
-#TODO: Get ISM data for the following tabs:
+#TODO: Update the the following tabs:
 #Sectors Trend
 #Details
 #ISM Manufacturing vs GDP
