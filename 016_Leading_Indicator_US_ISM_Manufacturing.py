@@ -19,14 +19,8 @@ from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, conver
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 sheet_name = 'DB Manufacturing ISM'
 
-def scrape_pmi_manufacturing_index():
+def scrape_pmi_manufacturing_index(pmi_month):
 
-    #get date range
-    todays_date = date.today()
-
-    #use todays date to get pmi month (last month) and use the month string to call the url
-    pmi_date = todays_date - relativedelta.relativedelta(months=2)
-    pmi_month = pmi_date.strftime("%B")
     url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
@@ -67,11 +61,19 @@ def scrape_pmi_manufacturing_index():
 
     return df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production
 
-def extract_rankings(industry_str):
+def extract_rankings(industry_str,pmi_month_prev):
 
     #TODO: convert para text into ranking of industries
-    substr = industry_str[industry_str.index(': ')+2:industry_str.index('.')]
-    arr_substr = substr.replace('and ', '').split(';')
+    substr_increase = industry_str[industry_str.index(': ')+2:industry_str.index('.')]
+    arr_increase = substr_increase.replace('and ', '').split(';')
+
+    substr_decrease = industry_str[industry_str.index('. ')+2:len(industry_str)]
+    substr_decrease = substr_decrease.replace('.','').replace('and ','')
+    substr_decrease = substr_decrease[substr_decrease.index(pmi_month_prev) + len(pmi_month_prev):len(substr_decrease)]
+    substr_decrease = substr_decrease.lstrip().replace('are ', '').replace('are: ', '').split(';')
+    arr_decrease = substr_decrease.split(';')
+
+    import pdb; pdb.set_trace()
 
     #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
     # Example - October 2021 - 
@@ -95,13 +97,22 @@ def extract_rankings(industry_str):
     # Wood Products; -2
     # Nonmetallic Mineral Products. -1
 
-    return arr_substr
+    return arr_increase, arr_decrease
 
-df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index()
+#get date range
+todays_date = date.today()
 
-arr_manufacturing = extract_rankings(para_manufacturing)
-arr_new_orders = extract_rankings(para_new_orders)
-arr_production = extract_rankings(para_production)
+#use todays date to get pmi month (last month) and use the month string to call the url
+pmi_date = todays_date - relativedelta.relativedelta(months=3)
+pmi_date_prev = todays_date - relativedelta.relativedelta(months=4)
+pmi_month = pmi_date.strftime("%B")
+pmi_month_prev = pmi_date_prev.strftime("%B")
+
+df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_month)
+
+arr_manufacturing = extract_rankings(para_manufacturing, pmi_month_prev)
+arr_new_orders = extract_rankings(para_new_orders, pmi_month_prev)
+arr_production = extract_rankings(para_production, pmi_month_prev)
 
 import pdb; pdb.set_trace()
 
