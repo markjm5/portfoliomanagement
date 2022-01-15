@@ -364,6 +364,37 @@ def combine_df_on_index(df1, df2, index_col):
 
   return df1.combine_first(df2).reset_index()
 
+def convert_table_to_df(table, contains_th):
+  
+  table_rows = table.find_all('tr')
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df = pd.DataFrame()
+
+  index = 0
+
+  for header in table_rows_header:
+    df.insert(index,str(header.text).strip(),[],True)
+    index+=1
+
+  #Insert New Row. Format the data to show percentage as float
+  for tr in table_rows:
+    temp_row = []
+
+    if(contains_th):
+      tr_th = tr.find('th')
+      text = str(tr_th.text).strip()
+      temp_row.append(text)        
+
+    td = tr.find_all('td')
+    for obs in td:
+      text = str(obs.text).strip()
+      temp_row.append(text)        
+    
+    if(len(temp_row) == len(df.columns)):
+      df.loc[len(df.index)] = temp_row
+  
+  return df
+
 #Util function for transforming ISM data on sheet 016
 def _transform_data(excel_file_path, sheet_name_original, sheet_name_new):
 

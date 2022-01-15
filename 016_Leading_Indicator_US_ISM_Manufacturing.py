@@ -14,7 +14,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, util_check_diff_list
-from common import combine_df_on_index, get_stlouisfed_data, get_yf_data
+from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, convert_table_to_df
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 sheet_name = 'DB Manufacturing ISM'
@@ -32,14 +32,20 @@ def scrape_pmi_manufacturing_index():
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    #TODO: Can we be more specific about which tables to get, rather than getting ALL tables?
-    tables = soup.find_all('table')
-    
-    table_manufacturing_at_a_glance = tables[0]
+    #Get all html tables on the page
+    tables = soup.find_all('table')    
+    table_at_a_glance = tables[0]
     table_last_12_months_a = tables[1] 
     table_last_12_months_b = tables[2] 
     table_new_orders = tables[3] 
     table_production = tables[4] 
+    
+    #Convert the tables into dataframes so that we can read the data
+    df_at_a_glance = convert_table_to_df(table_at_a_glance, True)
+    df_last_12_months_a = convert_table_to_df(table_last_12_months_a, True)
+    df_last_12_months_b = convert_table_to_df(table_last_12_months_b, True)
+    df_new_orders = convert_table_to_df(table_new_orders, True)
+    df_production = convert_table_to_df(table_production, True)
 
     #get all paragraphs
     paras = soup.find_all("p", attrs={'class': None})
