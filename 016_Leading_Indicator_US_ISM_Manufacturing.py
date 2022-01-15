@@ -97,8 +97,9 @@ def extract_rankings(industry_str,pmi_month_prev):
     # The two industries reporting a decrease in October compared to September are 
     # Wood Products; -2
     # Nonmetallic Mineral Products. -1
+    df_rankings = pd.DataFrame()
 
-    return arr_increase, arr_decrease
+    return df_rankings
 
 #get date range
 todays_date = date.today()
@@ -111,9 +112,9 @@ pmi_month_prev = pmi_date_prev.strftime("%B")
 
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_month)
 
-arr_manufacturing = extract_rankings(para_manufacturing, pmi_month_prev)
-arr_new_orders = extract_rankings(para_new_orders, pmi_month_prev)
-arr_production = extract_rankings(para_production, pmi_month_prev)
+df_manufacturing_rankings = extract_rankings(para_manufacturing, pmi_month_prev)
+df_new_orders_rankings = extract_rankings(para_new_orders, pmi_month_prev)
+df_production_rankings = extract_rankings(para_production, pmi_month_prev)
 
 import pdb; pdb.set_trace()
 
