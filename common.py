@@ -364,3 +364,22 @@ def combine_df_on_index(df1, df2, index_col):
 
   return df1.combine_first(df2).reset_index()
 
+#Util function for transforming ISM data on sheet 016
+def _transform_data(excel_file_path, sheet_name_original, sheet_name_new):
+
+  df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name_original, False)
+
+  df_original_transposed = df_original.transpose()
+
+  new_header = df_original_transposed.iloc[0] #grab the first row for the header
+  df1 = df_original_transposed[1:] #take the data less the header row
+  df1.columns = new_header #set the header row as the df header
+  df1 = df1.reset_index()
+  df1 = df1.rename(columns={"index": "DATE"})
+
+  for column in df1:
+    if(column != 'DATE'):
+      df1[column] = pd.to_numeric(df1[column])
+
+  # Write the updated df back to the excel sheet
+  write_dataframe_to_excel(excel_file_path, sheet_name_new, df1, False, 0)

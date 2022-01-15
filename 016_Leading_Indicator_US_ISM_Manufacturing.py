@@ -17,7 +17,7 @@ from common import get_oecd_data, get_invest_data, convert_excelsheet_to_datafra
 from common import combine_df_on_index, get_stlouisfed_data, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
-sheet_name = 'DB ISM'
+sheet_name = 'DB Manufacturing ISM'
 
 def scrape_pmi_manufacturing_index():
 
