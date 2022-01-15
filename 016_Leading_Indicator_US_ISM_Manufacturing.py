@@ -70,7 +70,7 @@ def extract_rankings(industry_str,pmi_month_prev):
     substr_decrease = industry_str[industry_str.index('. ')+2:len(industry_str)]
     substr_decrease = substr_decrease.replace('.','').replace('and ','')
     substr_decrease = substr_decrease[substr_decrease.index(pmi_month_prev) + len(pmi_month_prev):len(substr_decrease)]
-    substr_decrease = substr_decrease.lstrip().replace('are ', '').replace('are: ', '').split(';')
+    substr_decrease = substr_decrease.lstrip().replace('are ', '').replace('are: ', '')
     arr_decrease = substr_decrease.split(';')
 
     import pdb; pdb.set_trace()
