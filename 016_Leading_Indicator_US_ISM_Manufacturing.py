@@ -76,6 +76,7 @@ def extract_rankings(industry_str,pmi_month_prev):
     import pdb; pdb.set_trace()
 
     #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
+    # Algorithm should reverse order and assign ranking from 1 onwards for increase. Need to reverse order and assign ranking from -1 onwards for decrease.
     # Example - October 2021 - 
     # Apparel, Leather & Allied Products; 16
     # Furniture & Related Products; 15
@@ -104,7 +105,7 @@ todays_date = date.today()
 
 #use todays date to get pmi month (last month) and use the month string to call the url
 pmi_date = todays_date - relativedelta.relativedelta(months=3)
-pmi_date_prev = todays_date - relativedelta.relativedelta(months=4)
+pmi_date_prev = pmi_date - relativedelta.relativedelta(months=1)
 pmi_month = pmi_date.strftime("%B")
 pmi_month_prev = pmi_date_prev.strftime("%B")
 
