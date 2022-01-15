@@ -364,7 +364,7 @@ def combine_df_on_index(df1, df2, index_col):
 
   return df1.combine_first(df2).reset_index()
 
-def convert_table_to_df(table, contains_th):
+def convert_html_table_to_df(table, contains_th):
   
   table_rows = table.find_all('tr')
   table_rows_header = table.find_all('tr')[0].find_all('th')

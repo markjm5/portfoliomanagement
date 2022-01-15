@@ -65,12 +65,13 @@ def scrape_pmi_manufacturing_index():
         if('growth in production' in para.text and '%s' % (pmi_month) in para.text):
             para_production = para.text
 
-    import pdb; pdb.set_trace()
-
-    return df_manufacturing, df_new_orders, df_production
+    return df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production
 
 
-df_manufacturing, df_new_orders, df_production = scrape_pmi_manufacturing_index()
+df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index()
+
+import pdb; pdb.set_trace()
+
 
 #TODO: Get ISM data for the following tabs:
 #Sectors Trend
