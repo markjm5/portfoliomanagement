@@ -61,19 +61,22 @@ def scrape_pmi_manufacturing_index(pmi_month):
 
     return df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production
 
-def extract_rankings(industry_str,pmi_month_prev):
+def extract_rankings(industry_str):
 
-    #TODO: convert para text into ranking of industries
-    substr_increase = industry_str[industry_str.index(': ')+2:industry_str.index('.')]
-    arr_increase = substr_increase.replace('and ', '').split(';')
+    #Use regex to get substring that contains order of industries. It should return 2 matches - for increase and decrease   
+    pattern = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
+    matches = pattern.finditer(industry_str)
+    match_arr = []
+    for match in matches:
+        match_arr.append(match.group(0))
 
-    substr_decrease = industry_str[industry_str.index('. ')+2:len(industry_str)]
-    substr_decrease = substr_decrease.replace('.','').replace('and ','')
-    substr_decrease = substr_decrease[substr_decrease.index(pmi_month_prev) + len(pmi_month_prev):len(substr_decrease)]
-    substr_decrease = substr_decrease.lstrip().replace('are ', '').replace('are: ', '')
-    arr_decrease = substr_decrease.split(';')
+    #put increase and decrease items into arrays
+    increase_arr = match_arr[0].split(';')
+    decrease_arr = match_arr[1].split(';')
 
-    import pdb; pdb.set_trace()
+    df_rankings = pd.DataFrame()
+
+    #print(len(arr_increase) + len(arr_decrease))
 
     #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
     # Algorithm should reverse order and assign ranking from 1 onwards for increase. Need to reverse order and assign ranking from -1 onwards for decrease.
@@ -97,9 +100,9 @@ def extract_rankings(industry_str,pmi_month_prev):
     # The two industries reporting a decrease in October compared to September are 
     # Wood Products; -2
     # Nonmetallic Mineral Products. -1
-    df_rankings = pd.DataFrame()
 
     return df_rankings
+
 
 #get date range
 todays_date = date.today()
@@ -112,12 +115,11 @@ pmi_month_prev = pmi_date_prev.strftime("%B")
 
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_month)
 
-df_manufacturing_rankings = extract_rankings(para_manufacturing, pmi_month_prev)
-df_new_orders_rankings = extract_rankings(para_new_orders, pmi_month_prev)
-df_production_rankings = extract_rankings(para_production, pmi_month_prev)
+df_manufacturing_rankings = extract_rankings(para_manufacturing)
+df_new_orders_rankings = extract_rankings(para_new_orders)
+df_production_rankings = extract_rankings(para_production)
 
-import pdb; pdb.set_trace()
-
+#import pdb;pdb.set_trace()
 #print(df_at_a_glance.head())
 #print(df_new_orders.head())
 #print(df_production.head())
