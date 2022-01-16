@@ -1,5 +1,6 @@
 from json.decoder import JSONDecodeError
 import sys
+from idna import InvalidCodepointContext
 import requests
 import os.path
 import csv
@@ -14,7 +15,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df
-from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, convert_html_table_to_df
+from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, convert_html_table_to_df, _util_check_diff_list
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 sheet_name = 'DB Manufacturing ISM'
@@ -72,21 +73,36 @@ def extract_rankings(industry_str):
 
     #put increase and decrease items into arrays
     increase_arr = match_arr[0].split(';')
-    decrease_arr = match_arr[1].split(';')
-
-    df_columns_18_industries = ['Machinery','Computer & Electronic Products','Paper Products','Apparel, Leather & Allied Products','Printing & Related Support Activities',
-                        'Primary Metals','Nonmetallic Mineral Products','Petroleum & Coal Products','Plastics & Rubber Products','Miscellaneous Manufacturing',
-                        'Food, Beverage & Tobacco Products','Furniture & Related Products','Transportation Equipment','Chemical Products','Fabricated Metal Products',
-                        'Electrical Equipment, Appliances & Components','Textile Mills','Wood Products']
-    print('*********************************')
-    print(increase_arr)
-    print(decrease_arr)
-    print(len(increase_arr) + len(decrease_arr))
-    print('*********************************')
+    decrease_arr = match_arr[1].split(';')        
 
     df_rankings = pd.DataFrame()
 
-    #print(len(arr_increase) + len(arr_decrease))
+    #TODO: Add DATE column
+    ranking = len(increase_arr)
+    index = 0
+    for industry in increase_arr:
+        ind_stripped = industry.lstrip().replace('and ', '').replace('.','')
+        df_rankings[ind_stripped] = [ranking - index]      
+        index += 1
+
+    ranking = len(decrease_arr)
+    index = 0
+    for industry in decrease_arr:
+        ind_stripped = industry.lstrip().replace('and ', '').replace('.','')
+        df_rankings[ind_stripped] = [0 - (ranking - index)]      
+        index += 1
+
+    if(len(df_rankings.columns) < 18):
+        df_columns_18_industries = ['Machinery','Computer & Electronic Products','Paper Products','Apparel, Leather & Allied Products','Printing & Related Support Activities',
+                            'Primary Metals','Nonmetallic Mineral Products','Petroleum & Coal Products','Plastics & Rubber Products','Miscellaneous Manufacturing',
+                            'Food, Beverage & Tobacco Products','Furniture & Related Products','Transportation Equipment','Chemical Products','Fabricated Metal Products',
+                            'Electrical Equipment, Appliances & Components','Textile Mills','Wood Products']
+
+        #TODO: find out what columns are missing, and figure out a way to add numbers
+        pass
+
+    print(df_rankings.head())
+    import pdb; pdb.set_trace()
 
     #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
     # Algorithm should reverse order and assign ranking from 1 onwards for increase. Need to reverse order and assign ranking from -1 onwards for decrease.
@@ -118,7 +134,7 @@ def extract_rankings(industry_str):
 todays_date = date.today()
 
 #use todays date to get pmi month (last month) and use the month string to call the url
-pmi_date = todays_date - relativedelta.relativedelta(months=1)
+pmi_date = todays_date - relativedelta.relativedelta(months=3)
 pmi_date_prev = pmi_date - relativedelta.relativedelta(months=1)
 pmi_month = pmi_date.strftime("%B")
 pmi_month_prev = pmi_date_prev.strftime("%B")
