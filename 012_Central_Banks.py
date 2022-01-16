@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 from datetime import date
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df, write_to_directory, util_check_diff_list, get_yf_data, get_oecd_data
+from common import combine_df, write_to_directory, get_yf_data, get_oecd_data
 from common import append_two_df
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/012_Central_Banks.xlsm'

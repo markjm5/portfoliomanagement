@@ -13,7 +13,7 @@ from dateutil import parser, relativedelta
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, util_check_diff_list
+from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df
 from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, convert_html_table_to_df
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
@@ -63,7 +63,7 @@ def scrape_pmi_manufacturing_index(pmi_month):
 
 def extract_rankings(industry_str):
 
-    #Use regex to get substring that contains order of industries. It should return 2 matches - for increase and decrease   
+    #Use regex (https://pythex.org/) to get substring that contains order of industries. It should return 2 matches - for increase and decrease   
     pattern = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
     matches = pattern.finditer(industry_str)
     match_arr = []
@@ -73,6 +73,16 @@ def extract_rankings(industry_str):
     #put increase and decrease items into arrays
     increase_arr = match_arr[0].split(';')
     decrease_arr = match_arr[1].split(';')
+
+    df_columns_18_industries = ['Machinery','Computer & Electronic Products','Paper Products','Apparel, Leather & Allied Products','Printing & Related Support Activities',
+                        'Primary Metals','Nonmetallic Mineral Products','Petroleum & Coal Products','Plastics & Rubber Products','Miscellaneous Manufacturing',
+                        'Food, Beverage & Tobacco Products','Furniture & Related Products','Transportation Equipment','Chemical Products','Fabricated Metal Products',
+                        'Electrical Equipment, Appliances & Components','Textile Mills','Wood Products']
+    print('*********************************')
+    print(increase_arr)
+    print(decrease_arr)
+    print(len(increase_arr) + len(decrease_arr))
+    print('*********************************')
 
     df_rankings = pd.DataFrame()
 
@@ -108,7 +118,7 @@ def extract_rankings(industry_str):
 todays_date = date.today()
 
 #use todays date to get pmi month (last month) and use the month string to call the url
-pmi_date = todays_date - relativedelta.relativedelta(months=3)
+pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date_prev = pmi_date - relativedelta.relativedelta(months=1)
 pmi_month = pmi_date.strftime("%B")
 pmi_month_prev = pmi_date_prev.strftime("%B")

@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
 import investpy
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, util_check_diff_list, scrape_world_gdp_table
+from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, scrape_world_gdp_table
 from common import combine_df_on_index, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
