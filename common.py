@@ -412,6 +412,6 @@ def _transform_data(excel_file_path, sheet_name_original, sheet_name_new):
   write_dataframe_to_excel(excel_file_path, sheet_name_new, df1, False, 0)
 
 def _util_check_diff_list(li1, li2):
-  # Python code t get difference of two lists
+  # Python code to get difference of two lists
   return list(set(li1) - set(li2))
 

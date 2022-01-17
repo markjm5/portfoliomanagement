@@ -66,8 +66,8 @@ def scrape_pmi_manufacturing_index(pmi_date):
 def extract_rankings(industry_str,pmi_date):
 
     #Use regex (https://pythex.org/) to get substring that contains order of industries. It should return 2 matches - for increase and decrease   
-    pattern = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
-    matches = pattern.finditer(industry_str)
+    pattern_select = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
+    matches = pattern_select.finditer(industry_str)
     match_arr = []
     pattern_remove = r'and|\.'
     for match in matches:
