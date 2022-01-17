@@ -62,7 +62,7 @@ def scrape_pmi_manufacturing_index(pmi_month):
 
     return df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production
 
-def extract_rankings(industry_str):
+def extract_rankings(industry_str,pmi_date):
 
     #Use regex (https://pythex.org/) to get substring that contains order of industries. It should return 2 matches - for increase and decrease   
     pattern = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
@@ -77,7 +77,9 @@ def extract_rankings(industry_str):
 
     df_rankings = pd.DataFrame()
 
-    #TODO: Add DATE column
+    #Add DATE column to df
+    df_rankings["DATE"] = [pmi_date]
+    #Add Rankings columns to df
     ranking = len(increase_arr)
     index = 0
     for industry in increase_arr:
@@ -135,15 +137,17 @@ todays_date = date.today()
 
 #use todays date to get pmi month (last month) and use the month string to call the url
 pmi_date = todays_date - relativedelta.relativedelta(months=3)
+pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year)
+pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 pmi_date_prev = pmi_date - relativedelta.relativedelta(months=1)
 pmi_month = pmi_date.strftime("%B")
 pmi_month_prev = pmi_date_prev.strftime("%B")
 
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_month)
 
-df_manufacturing_rankings = extract_rankings(para_manufacturing)
-df_new_orders_rankings = extract_rankings(para_new_orders)
-df_production_rankings = extract_rankings(para_production)
+df_manufacturing_rankings = extract_rankings(para_manufacturing,pmi_date)
+df_new_orders_rankings = extract_rankings(para_new_orders,pmi_date)
+df_production_rankings = extract_rankings(para_production,pmi_date)
 
 #import pdb;pdb.set_trace()
 #print(df_at_a_glance.head())
