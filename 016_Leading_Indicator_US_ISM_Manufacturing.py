@@ -69,9 +69,10 @@ def extract_rankings(industry_str,pmi_date):
     pattern = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
     matches = pattern.finditer(industry_str)
     match_arr = []
+    pattern_remove = r'and|\.'
     for match in matches:
-        #TODO: Use regex to format each industry string here?
-        match_arr.append(match.group(0))
+        new_str = re.sub(pattern_remove, '',match.group(0))
+        match_arr.append(new_str)
 
     #put increase and decrease items into arrays
     increase_arr = match_arr[0].split(';')
@@ -79,21 +80,17 @@ def extract_rankings(industry_str,pmi_date):
 
     df_rankings = pd.DataFrame()
 
-    #Add DATE column to df
-    df_rankings["DATE"] = [pmi_date]
     #Add Rankings columns to df
     ranking = len(increase_arr)
     index = 0
     for industry in increase_arr:
-        ind_stripped = industry.lstrip().replace('and ', '').replace('.','')
-        df_rankings[ind_stripped] = [ranking - index]      
+        df_rankings[industry.lstrip()] = [ranking - index]      
         index += 1
 
     ranking = len(decrease_arr)
     index = 0
     for industry in decrease_arr:
-        ind_stripped = industry.lstrip().replace('and ', '').replace('.','')
-        df_rankings[ind_stripped] = [0 - (ranking - index)]      
+        df_rankings[industry.lstrip()] = [0 - (ranking - index)]      
         index += 1
 
     if(len(df_rankings.columns) < 18):
@@ -103,10 +100,16 @@ def extract_rankings(industry_str,pmi_date):
                             'Electrical Equipment, Appliances & Components','Textile Mills','Wood Products']
 
         #TODO: find out what columns are missing, and figure out a way to add numbers
-        pass
+        missing_columns = _util_check_diff_list(df_columns_18_industries,df_rankings.columns)
+
+        import pdb; pdb.set_trace()
+
+    #Add DATE column to df
+    df_rankings["DATE"] = [pmi_date]
+
+    #TODO: Reorder Columns
 
     print(df_rankings.head())
-    import pdb; pdb.set_trace()
 
     #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
     # Algorithm should reverse order and assign ranking from 1 onwards for increase. Need to reverse order and assign ranking from -1 onwards for decrease.
@@ -145,6 +148,7 @@ pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 
 df_manufacturing_rankings = extract_rankings(para_manufacturing,pmi_date)
+import pdb; pdb.set_trace()
 df_new_orders_rankings = extract_rankings(para_new_orders,pmi_date)
 df_production_rankings = extract_rankings(para_production,pmi_date)
 
