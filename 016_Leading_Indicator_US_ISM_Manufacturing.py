@@ -142,7 +142,7 @@ def extract_rankings(industry_str,pmi_date):
 todays_date = date.today()
 
 #use todays date to get pmi month (first day of last month) and use the date in scraping functions
-pmi_date = todays_date - relativedelta.relativedelta(months=3)
+pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 
@@ -201,8 +201,6 @@ df_updated = combine_df_on_index(df_original, df_production_rankings, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
-import pdb;pdb.set_trace()
 
 #TODO: Update the the following tabs:
 #Sectors Trend
