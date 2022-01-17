@@ -18,7 +18,6 @@ from common import get_oecd_data, get_invest_data, convert_excelsheet_to_datafra
 from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, convert_html_table_to_df, _util_check_diff_list
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
-sheet_name = 'DB Manufacturing ISM'
 
 def scrape_pmi_manufacturing_index(pmi_date):
 
@@ -99,40 +98,42 @@ def extract_rankings(industry_str,pmi_date):
                             'Food, Beverage & Tobacco Products','Furniture & Related Products','Transportation Equipment','Chemical Products','Fabricated Metal Products',
                             'Electrical Equipment, Appliances & Components','Textile Mills','Wood Products']
 
-        #TODO: find out what columns are missing, and figure out a way to add numbers
+        #Find out what columns are missing
         missing_columns = _util_check_diff_list(df_columns_18_industries,df_rankings.columns)
-
-        import pdb; pdb.set_trace()
+        
+        #Add missing columns to df_ranking with zero as the rank number
+        for col in missing_columns:
+            df_rankings[col] = [0]
 
     #Add DATE column to df
     df_rankings["DATE"] = [pmi_date]
 
-    #TODO: Reorder Columns
+    # Reorder Columns
+    # get a list of columns
+    cols = list(df_rankings)
+    # move the column to head of list using index, pop and insert
+    cols.insert(0, cols.pop(cols.index('DATE')))
+    cols.insert(1, cols.pop(cols.index('Apparel, Leather & Allied Products')))
+    cols.insert(2, cols.pop(cols.index('Machinery')))
+    cols.insert(3, cols.pop(cols.index('Paper Products')))
+    cols.insert(4, cols.pop(cols.index('Computer & Electronic Products')))
+    cols.insert(5, cols.pop(cols.index('Petroleum & Coal Products')))
+    cols.insert(6, cols.pop(cols.index('Primary Metals')))
+    cols.insert(7, cols.pop(cols.index('Printing & Related Support Activities')))
+    cols.insert(8, cols.pop(cols.index('Furniture & Related Products')))
+    cols.insert(9, cols.pop(cols.index('Transportation Equipment')))
+    cols.insert(10, cols.pop(cols.index('Chemical Products')))
+    cols.insert(11, cols.pop(cols.index('Food, Beverage & Tobacco Products')))
+    cols.insert(12, cols.pop(cols.index('Miscellaneous Manufacturing')))
+    cols.insert(13, cols.pop(cols.index('Electrical Equipment, Appliances & Components')))
+    cols.insert(14, cols.pop(cols.index('Plastics & Rubber Products')))
+    cols.insert(15, cols.pop(cols.index('Fabricated Metal Products')))
+    cols.insert(16, cols.pop(cols.index('Wood Products')))
+    cols.insert(17, cols.pop(cols.index('Textile Mills')))
+    cols.insert(18, cols.pop(cols.index('Nonmetallic Mineral Products')))
 
-    print(df_rankings.head())
-
-    #TODO: Turn into df with a column for DATE, and columns for each industry. And a single row for the ranking numbers
-    # Algorithm should reverse order and assign ranking from 1 onwards for increase. Need to reverse order and assign ranking from -1 onwards for decrease.
-    # Example - October 2021 - 
-    # Apparel, Leather & Allied Products; 16
-    # Furniture & Related Products; 15
-    # Textile Mills; 14
-    # Electrical Equipment, Appliances & Components; 13
-    # Machinery; 12
-    # Printing & Related Support Activities; 11
-    # Food, Beverage & Tobacco Products; 10
-    # Computer & Electronic Products; 9
-    # Chemical Products; 8
-    # Fabricated Metal Products; 7 
-    # Miscellaneous Manufacturing; 6 
-    # Petroleum & Coal Products; 5 
-    # Plastics & Rubber Products; 4
-    # Paper Products; 3
-    # Primary Metals; 2 
-    # Transportation Equipment. 1
-    # The two industries reporting a decrease in October compared to September are 
-    # Wood Products; -2
-    # Nonmetallic Mineral Products. -1
+    # reorder
+    df_rankings = df_rankings[cols]
 
     return df_rankings
 
@@ -147,18 +148,61 @@ pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 
 df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 
+##################################
+# Get Manufacturing ISM Rankings #
+##################################
+
+sheet_name = 'DB Manufacturing ISM'
+
+#Get rankings
 df_manufacturing_rankings = extract_rankings(para_manufacturing,pmi_date)
-import pdb; pdb.set_trace()
+
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_manufacturing_rankings, 'DATE')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+###########################
+# Get New Orders Rankings #
+###########################
+
+sheet_name = 'DB New Orders'
+
+#Get rankings
 df_new_orders_rankings = extract_rankings(para_new_orders,pmi_date)
+
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_new_orders_rankings, 'DATE')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+###########################
+# Get Production Rankings #
+###########################
+
+sheet_name = 'DB Production'
+
+#Get rankings
 df_production_rankings = extract_rankings(para_production,pmi_date)
 
-#import pdb;pdb.set_trace()
-#print(df_at_a_glance.head())
-#print(df_new_orders.head())
-#print(df_production.head())
-#print(para_manufacturing)
-#print(para_new_orders)
-#print(para_production)
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_production_rankings, 'DATE')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+import pdb;pdb.set_trace()
 
 #TODO: Update the the following tabs:
 #Sectors Trend
