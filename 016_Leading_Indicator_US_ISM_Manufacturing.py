@@ -20,8 +20,9 @@ from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, conver
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 sheet_name = 'DB Manufacturing ISM'
 
-def scrape_pmi_manufacturing_index(pmi_month):
+def scrape_pmi_manufacturing_index(pmi_date):
 
+    pmi_month = pmi_date.strftime("%B")
     url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
@@ -69,6 +70,7 @@ def extract_rankings(industry_str,pmi_date):
     matches = pattern.finditer(industry_str)
     match_arr = []
     for match in matches:
+        #TODO: Use regex to format each industry string here?
         match_arr.append(match.group(0))
 
     #put increase and decrease items into arrays
@@ -135,15 +137,12 @@ def extract_rankings(industry_str,pmi_date):
 #get date range
 todays_date = date.today()
 
-#use todays date to get pmi month (last month) and use the month string to call the url
+#use todays date to get pmi month (first day of last month) and use the date in scraping functions
 pmi_date = todays_date - relativedelta.relativedelta(months=3)
-pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year)
+pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-pmi_date_prev = pmi_date - relativedelta.relativedelta(months=1)
-pmi_month = pmi_date.strftime("%B")
-pmi_month_prev = pmi_date_prev.strftime("%B")
 
-df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_month)
+df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 
 df_manufacturing_rankings = extract_rankings(para_manufacturing,pmi_date)
 df_new_orders_rankings = extract_rankings(para_new_orders,pmi_date)
