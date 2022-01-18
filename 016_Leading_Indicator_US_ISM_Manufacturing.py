@@ -163,6 +163,8 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 #Combine new data with original data
 df_updated = combine_df_on_index(df_original, df_manufacturing_rankings, 'DATE')
 
+#TODO: Implement a 2-way V-Lookup: https://exceljet.net/formula/two-way-lookup-with-vlookup
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
