@@ -19,7 +19,36 @@ from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, conver
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 
-def scrape_pmi_manufacturing_index(pmi_date):
+def scrape_manufacturing_new_orders_production(pmi_date):
+
+    pmi_month = pmi_date.strftime("%B")
+    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
+
+    page = requests.get(url=url_pmi,verify=False)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    #get all paragraphs
+    paras = soup.find_all("p", attrs={'class': None})
+
+    para_manufacturing = "" 
+    para_new_orders = ""
+    para_production = ""
+
+    for para in paras:
+        #Get the specific paragraph
+        if('manufacturing industries reporting growth in %s' % (pmi_month) in para.text):
+            para_manufacturing = para.text
+
+        if('growth in new orders' in para.text and '%s' % (pmi_month) in para.text):
+            para_new_orders = para.text
+
+        if('growth in production' in para.text and '%s' % (pmi_month) in para.text):
+            para_production = para.text
+
+    return para_manufacturing, para_new_orders, para_production
+
+
+def scrape_pmi_headline_index(pmi_date):
 
     pmi_month = pmi_date.strftime("%B")
     url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
@@ -42,25 +71,21 @@ def scrape_pmi_manufacturing_index(pmi_date):
     df_new_orders = convert_html_table_to_df(table_new_orders, True)
     df_production = convert_html_table_to_df(table_production, True)
 
-    #get all paragraphs
-    paras = soup.find_all("p", attrs={'class': None})
+    df_pmi_headline_index = pd.DataFrame()
 
-    para_manufacturing = "" 
-    para_new_orders = ""
-    para_production = ""
+    #TODO: Get the following rows, put them into a df, and return the df
+    # New Orders, 
+    # Imports, 
+    # Backlog of Orders, 
+    # Prices, Production, 
+    # Customers Inentories, 
+    # Inventories, Deliveries, 
+    # Employment, 
+    # Exports, 
+    # ISM
 
-    for para in paras:
-        #Get the specific paragraph
-        if('manufacturing industries reporting growth in %s' % (pmi_month) in para.text):
-            para_manufacturing = para.text
+    return df_pmi_headline_index
 
-        if('growth in new orders' in para.text and '%s' % (pmi_month) in para.text):
-            para_new_orders = para.text
-
-        if('growth in production' in para.text and '%s' % (pmi_month) in para.text):
-            para_production = para.text
-
-    return df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production
 
 def extract_rankings(industry_str,pmi_date):
 
@@ -146,7 +171,8 @@ pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 
-df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
+#df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
+para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
 
 ##################################
 # Get Manufacturing ISM Rankings #
@@ -201,6 +227,14 @@ df_updated = combine_df_on_index(df_original, df_production_rankings, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+######################
+# Update Details Tab #
+######################
+
+sheet_name = 'Details'
+
+df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
 
 #TODO: Update the the following tabs:
 #Sectors Trend
