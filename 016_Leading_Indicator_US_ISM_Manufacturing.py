@@ -59,32 +59,66 @@ def scrape_pmi_headline_index(pmi_date):
     #Get all html tables on the page
     tables = soup.find_all('table')    
     table_at_a_glance = tables[0]
-    table_last_12_months_a = tables[1] 
-    table_last_12_months_b = tables[2] 
-    table_new_orders = tables[3] 
-    table_production = tables[4] 
+#    table_last_12_months_a = tables[1] 
+#    table_last_12_months_b = tables[2] 
+#    table_new_orders = tables[3] 
+#    table_production = tables[4] 
     
     #Convert the tables into dataframes so that we can read the data
     df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
-    df_last_12_months_a = convert_html_table_to_df(table_last_12_months_a, True)
-    df_last_12_months_b = convert_html_table_to_df(table_last_12_months_b, True)
-    df_new_orders = convert_html_table_to_df(table_new_orders, True)
-    df_production = convert_html_table_to_df(table_production, True)
+#    df_last_12_months_a = convert_html_table_to_df(table_last_12_months_a, True)
+#    df_last_12_months_b = convert_html_table_to_df(table_last_12_months_b, True)
+#    df_new_orders = convert_html_table_to_df(table_new_orders, True)
+#    df_production = convert_html_table_to_df(table_production, True)
 
-    df_pmi_headline_index = pd.DataFrame()
+    #Drop Unnecessary Columns
+    column_numbers = [x for x in range(df_at_a_glance.shape[1])]  # list of columns' integer indices
+    column_numbers .remove(2) #removing column integer index 0
+    column_numbers .remove(3)
+    column_numbers .remove(4)
+    column_numbers .remove(5)
+    column_numbers .remove(6)
+    df_at_a_glance = df_at_a_glance.iloc[:, column_numbers] #return all columns except the 0th column
 
-    #TODO: Get the following rows, put them into a df, and return the df
-    # New Orders, 
-    # Imports, 
-    # Backlog of Orders, 
-    # Prices, Production, 
-    # Customers Inentories, 
-    # Inventories, Deliveries, 
-    # Employment, 
-    # Exports, 
-    # ISM
+    #Flip df around
+    df_at_a_glance = df_at_a_glance.T
 
-    return df_pmi_headline_index
+    #Rename Columns
+    df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM", 1:"NEW_ORDERS",2:"PRODUCTION",3:"EMPLOYMENT",4:"DELIVERIES",
+                                                    5:"INVENTORIES",6:"CUSTOMERS_INVENTORIES",7:"PRICES",8:"BACKLOG_OF_ORDERS",9:"EXPORTS",10:"IMPORTS"})
+
+    #Drop the first row because it contains the old column names
+    df_at_a_glance = df_at_a_glance.iloc[1: , :]
+    df_at_a_glance = df_at_a_glance.reset_index()
+    df_at_a_glance = df_at_a_glance.drop('index', 1)
+
+    #Fix datatypes of df_at_a_glance
+    for column in df_at_a_glance:
+        df_at_a_glance[column] = pd.to_numeric(df_at_a_glance[column])
+
+    #Add DATE column to df
+    df_at_a_glance["DATE"] = [pmi_date]
+
+    # Reorder Columns
+    # get a list of columns
+    cols = list(df_at_a_glance)
+    cols.insert(0, cols.pop(cols.index('DATE')))
+    cols.insert(1, cols.pop(cols.index('NEW_ORDERS')))
+    cols.insert(2, cols.pop(cols.index('IMPORTS')))
+    cols.insert(3, cols.pop(cols.index('BACKLOG_OF_ORDERS')))
+    cols.insert(4, cols.pop(cols.index('PRICES')))
+    cols.insert(5, cols.pop(cols.index('PRODUCTION')))
+    cols.insert(6, cols.pop(cols.index('CUSTOMERS_INVENTORIES')))
+    cols.insert(7, cols.pop(cols.index('INVENTORIES')))
+    cols.insert(8, cols.pop(cols.index('DELIVERIES')))
+    cols.insert(9, cols.pop(cols.index('EMPLOYMENT')))
+    cols.insert(10, cols.pop(cols.index('EXPORTS')))
+    cols.insert(11, cols.pop(cols.index('ISM')))
+
+    # reorder
+    df_at_a_glance = df_at_a_glance[cols]
+
+    return df_at_a_glance
 
 
 def extract_rankings(industry_str,pmi_date):
@@ -170,7 +204,7 @@ todays_date = date.today()
 pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-
+"""
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
 
@@ -227,14 +261,23 @@ df_updated = combine_df_on_index(df_original, df_production_rankings, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
+"""
 ######################
 # Update Details Tab #
 ######################
 
-sheet_name = 'Details'
+sheet_name = 'DB Details'
 
 df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
+
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_pmi_headline_index, 'DATE')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 #TODO: Update the the following tabs:
 #Sectors Trend
