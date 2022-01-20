@@ -204,7 +204,7 @@ todays_date = date.today()
 pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-"""
+
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
 
@@ -261,10 +261,10 @@ df_updated = combine_df_on_index(df_original, df_production_rankings, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
-######################
-# Update Details Tab #
-######################
+
+#################################################
+# Update Details Tab Using ISM Headline Numbers #
+#################################################
 
 sheet_name = 'DB Details'
 
