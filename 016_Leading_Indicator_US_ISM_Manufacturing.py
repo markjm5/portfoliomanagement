@@ -279,12 +279,7 @@ df_updated = combine_df_on_index(df_original, df_pmi_headline_index, 'DATE')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-#TODO: Update the the following tabs:
-#Sectors Trend
-#Details
-#ISM Manufacturing vs GDP
-#ISM Manufacturing vs SPX
-#ISM Manufacturing
-#Industry Comments ?
+#TODO: Get GDP (QoQ, YoY), SPX, Industry Comments
+# Update appropriate tabs
 
 print("Done!")
