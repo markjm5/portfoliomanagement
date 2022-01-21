@@ -59,17 +59,9 @@ def scrape_pmi_headline_index(pmi_date):
     #Get all html tables on the page
     tables = soup.find_all('table')    
     table_at_a_glance = tables[0]
-#    table_last_12_months_a = tables[1] 
-#    table_last_12_months_b = tables[2] 
-#    table_new_orders = tables[3] 
-#    table_production = tables[4] 
     
     #Convert the tables into dataframes so that we can read the data
     df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
-#    df_last_12_months_a = convert_html_table_to_df(table_last_12_months_a, True)
-#    df_last_12_months_b = convert_html_table_to_df(table_last_12_months_b, True)
-#    df_new_orders = convert_html_table_to_df(table_new_orders, True)
-#    df_production = convert_html_table_to_df(table_production, True)
 
     #Drop Unnecessary Columns
     column_numbers = [x for x in range(df_at_a_glance.shape[1])]  # list of columns' integer indices
