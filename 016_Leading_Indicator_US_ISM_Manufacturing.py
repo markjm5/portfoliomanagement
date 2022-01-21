@@ -188,7 +188,6 @@ def extract_rankings(industry_str,pmi_date):
 
     return df_rankings
 
-
 #get date range
 todays_date = date.today()
 
@@ -262,13 +261,6 @@ sheet_name = 'DB Details'
 
 df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
 
-# Load original data from excel file into original df
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-#Combine new data with original data
-df_updated = combine_df_on_index(df_original, df_pmi_headline_index, 'DATE')
-
-
 #################################
 # Get US GDP from St Louis FRED #
 #################################
@@ -282,10 +274,44 @@ df_GDPC1 = get_us_gdp_fred()
 
 df_SP500 = get_sp500_monthly_prices()
 
+#TODO: Calculate GDP QoQ Annualized growth
+#TODO: Get Industry Comments
+#TODO: Update tabs in excel
+
+# Combine df_LEI, df_GDPC1, df_SP500 and df_UMCSI into original df
+df = combine_df_on_index(df_pmi_headline_index, df_GDPC1, 'DATE')
+df = combine_df_on_index(df_SP500, df, 'DATE')
+
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df, 'DATE')
+
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('NEW_ORDERS')))
+cols.insert(2, cols.pop(cols.index('IMPORTS')))
+cols.insert(3, cols.pop(cols.index('BACKLOG_OF_ORDERS')))
+cols.insert(4, cols.pop(cols.index('PRICES')))
+cols.insert(5, cols.pop(cols.index('PRODUCTION')))
+cols.insert(6, cols.pop(cols.index('CUSTOMERS_INVENTORIES')))
+cols.insert(7, cols.pop(cols.index('INVENTORIES')))
+cols.insert(8, cols.pop(cols.index('DELIVERIES')))
+cols.insert(9, cols.pop(cols.index('EMPLOYMENT')))
+cols.insert(10, cols.pop(cols.index('EXPORTS')))
+cols.insert(11, cols.pop(cols.index('ISM')))
+cols.insert(12, cols.pop(cols.index('SP500')))
+cols.insert(13, cols.pop(cols.index('GDPC1')))
+cols.insert(14, cols.pop(cols.index('GDPQoQ')))
+cols.insert(15, cols.pop(cols.index('GDPYoY')))
+
+# reorder
+df_updated = df_updated[cols]
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
-#TODO: Get GDP (QoQ, YoY), SPX, Industry Comments
-# Update appropriate tabs
 
 print("Done!")
