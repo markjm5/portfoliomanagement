@@ -13,7 +13,7 @@ from dateutil import parser, relativedelta
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df
+from common import get_us_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df
 from common import combine_df_on_index, get_stlouisfed_data, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_Consumer_Confidence.xlsm'
@@ -78,25 +78,29 @@ df_LEI = scrape_conference_board_lei()
 #################################
 
 #Get US GDP
-df_GDPC1 = get_stlouisfed_data('GDPC1')
+df_GDPC1 = get_us_gdp_fred()
 
-df_GDPC1['GDPQoQ'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift()) / df_GDPC1['GDPC1']
-df_GDPC1['GDPYoY'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift(periods=4)) / df_GDPC1['GDPC1']
+#df_GDPC1 = get_stlouisfed_data('GDPC1')
+
+#df_GDPC1['GDPQoQ'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift()) / df_GDPC1['GDPC1']
+#df_GDPC1['GDPYoY'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift(periods=4)) / df_GDPC1['GDPC1']
 
 ###########################################
 # Get S&P500 Monthly Close Prices from YF #
 ###########################################
 
+df_SP500 = get_sp500_monthly_prices()
+
 #get date range
-todays_date = date.today()
-date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, "01")
+#todays_date = date.today()
+#date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, "01")
 
 # Get S&P500 close month intervals using above date range
-df_SP500 = get_yf_data("^GSPC", "1mo", "1959-01-01", date_str)
+#df_SP500 = get_yf_data("^GSPC", "1mo", "1959-01-01", date_str)
 
 #Remove unnecessary columns from df_SP500 and rename columns
-df_SP500 = df_SP500.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
-df_SP500 = df_SP500.rename(columns={"Close": "SP500"})
+#df_SP500 = df_SP500.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+#df_SP500 = df_SP500.rename(columns={"Close": "SP500"})
 
 ########################
 # Get UMCSI Index Data #

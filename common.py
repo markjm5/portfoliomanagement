@@ -45,6 +45,16 @@ def get_stlouisfed_data(series_code):
 
   return df
 
+
+# Get US GDP from St Louis FRED #
+def get_us_gdp_fred():
+  df_GDPC1 = get_stlouisfed_data('GDPC1')
+
+  df_GDPC1['GDPQoQ'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift()) / df_GDPC1['GDPC1']
+  df_GDPC1['GDPYoY'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift(periods=4)) / df_GDPC1['GDPC1']
+
+  return df_GDPC1
+
 def get_oecd_data(dataset, dimensions, params):
 
   dim_args = ['+'.join(d) for d in dimensions]
@@ -200,6 +210,20 @@ def get_yf_data(ticker, interval, start, end):
   df_yf = df_yf.rename(columns={"Date": "DATE"})
 
   return df_yf
+
+# Get S&P500 Monthly Close Prices from YF #
+def get_sp500_monthly_prices():
+  todays_date = date.today()
+  date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, "01")
+
+  # Get S&P500 close month intervals using above date range
+  df_SP500 = get_yf_data("^GSPC", "1mo", "1959-01-01", date_str)
+
+  #Remove unnecessary columns from df_SP500 and rename columns
+  df_SP500 = df_SP500.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+  df_SP500 = df_SP500.rename(columns={"Close": "SP500"})
+
+  return df_SP500
 
 def get_invest_data(country_list, bond_year, from_date):
 

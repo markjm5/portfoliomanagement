@@ -14,7 +14,7 @@ from dateutil import parser, relativedelta
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df
+from common import get_us_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df
 from common import combine_df_on_index, get_stlouisfed_data, get_yf_data, convert_html_table_to_df, _util_check_diff_list
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
@@ -267,6 +267,20 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 
 #Combine new data with original data
 df_updated = combine_df_on_index(df_original, df_pmi_headline_index, 'DATE')
+
+
+#################################
+# Get US GDP from St Louis FRED #
+#################################
+
+#Get US GDP
+df_GDPC1 = get_us_gdp_fred()
+
+###########################################
+# Get S&P500 Monthly Close Prices from YF #
+###########################################
+
+df_SP500 = get_sp500_monthly_prices()
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
