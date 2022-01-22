@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/009_Lagging_Indicator_US_Industrial_Production.xlsm'
 sheet_name = 'database'
@@ -20,19 +20,19 @@ df_core_ppi = get_stlouisfed_data('WPSFD4131')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
-df = pd.merge(df_INDPRO,df_IPB54100S,"left")
-df = pd.merge(df,df_IPBUSEQ,"left")
-df = pd.merge(df,df_IPCONGD,"left")
-df = pd.merge(df,df_IPMAN,"left")
-df = pd.merge(df,df_IPMAT,"left")
-df = pd.merge(df,df_IPMINE,"left")
-df = pd.merge(df,df_IPUTIL,"left")
-df = pd.merge(df,df_TCU,"left")
-df = pd.merge(df, df_core_ppi, "left")
+df = combine_df_on_index(df_INDPRO,df_IPB54100S,"DATE")
+df = combine_df_on_index(df_IPBUSEQ,df,"DATE")
+df = combine_df_on_index(df_IPCONGD,df,"DATE")
+df = combine_df_on_index(df_IPMAN,df,"DATE")
+df = combine_df_on_index(df_IPMAT,df,"DATE")
+df = combine_df_on_index(df_IPMINE,df,"DATE")
+df = combine_df_on_index(df_IPUTIL,df,"DATE")
+df = combine_df_on_index(df_TCU,df,"DATE")
+df = combine_df_on_index(df_core_ppi,df,"DATE")
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df, "DATE")
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 

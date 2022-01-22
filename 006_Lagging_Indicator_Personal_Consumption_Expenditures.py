@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/006_Lagging_Indicator_Personal_Consumption_Expenditures.xlsm'
 sheet_name = 'Database'
@@ -14,12 +14,24 @@ df_CPILFESL = get_stlouisfed_data('CPILFESL')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
-df = pd.merge(df_PCEPI,df_PCEPILFE,"right")
-df = pd.merge(df,df_DFEDTARU,"left")
-df = pd.merge(df,df_CPILFESL,"left")
+df = combine_df_on_index(df_PCEPI,df_PCEPILFE,"DATE")
+df = combine_df_on_index(df_DFEDTARU,df,"DATE")
+df = combine_df_on_index(df_CPILFESL,df,"DATE")
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df, 'DATE')
+
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('PCEPI')))
+cols.insert(2, cols.pop(cols.index('PCEPILFE')))
+cols.insert(3, cols.pop(cols.index('DFEDTARU')))
+cols.insert(4, cols.pop(cols.index('CPILFESL')))
+
+# reorder
+df_updated = df_updated[cols]
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 

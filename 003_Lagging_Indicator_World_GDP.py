@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, scrape_world_gdp_table
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, combine_df_on_index, scrape_world_gdp_table
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
@@ -47,7 +47,7 @@ df_QoQ = df_QoQ.iloc[1: , :].reset_index(drop=True)
 # Check for difference between original and new lists
 print(Diff(df_QoQ.columns.tolist(), df_original.columns.tolist()))
 """
-df_updated_QoQ = combine_df(df_original_QoQ, df_QoQ)
+df_updated_QoQ = combine_df_on_index(df_original_QoQ, df_QoQ, 'DATE')
 
 # get a list of columns
 cols = list(df_updated_QoQ)
@@ -96,7 +96,7 @@ df_YoY = df_YoY.iloc[1: , :].reset_index(drop=True)
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_YoY.columns.tolist(), df_original.columns.tolist()))
 
-df_updated_YoY = combine_df(df_original_YoY, df_YoY)
+df_updated_YoY = combine_df_on_index(df_original_YoY, df_YoY, 'DATE')
 
 # get a list of columns
 cols = list(df_updated_YoY)
@@ -135,7 +135,7 @@ for column in df_world_gdp:
     df_world_gdp[column] = pd.to_numeric(df_world_gdp[column])
 
 #Combine df_original_world_gdp with df_world_gdp
-df_updated_world_gdp = combine_df(df_original_world_gdp, df_world_gdp)
+df_updated_world_gdp = combine_df_on_index(df_original_world_gdp, df_world_gdp,'Country')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_world_gdp, False, -1)

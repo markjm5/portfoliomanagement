@@ -5,7 +5,7 @@ import re
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import date
-from common import get_stlouisfed_data, get_oecd_data, write_to_directory, convert_excelsheet_to_dataframe, combine_df, write_dataframe_to_excel
+from common import get_stlouisfed_data, get_oecd_data, write_to_directory, convert_excelsheet_to_dataframe, combine_df_on_index, write_dataframe_to_excel
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/005_Lagging_Indicator_Job_Market_US_World.xlsm'
 
@@ -57,11 +57,11 @@ df_CIVPART = get_stlouisfed_data('CIVPART')
 df_PAYEMS = get_stlouisfed_data('PAYEMS')
 df_UNRATE = get_stlouisfed_data('UNRATE')
 
-df_1 = pd.merge(df_CIVPART,df_PAYEMS,"right")
-df_1 = pd.merge(df_1,df_UNRATE,"left")
+df_1 = combine_df_on_index(df_CIVPART,df_PAYEMS,"DATE")
+df_1 = combine_df_on_index(df_UNRATE,df_1,"DATE")
 
 df_original_1 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-df_updated_1 = combine_df(df_original_1, df_1)
+df_updated_1 = combine_df_on_index(df_original_1, df_1,'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_1, False, 0)
 
@@ -71,10 +71,10 @@ df_CCSA = get_stlouisfed_data('CCSA')
 df_ICSA = get_stlouisfed_data('ICSA')
 
 #Combine all these data frames into a single data frame
-df_2 = pd.merge(df_CCSA,df_ICSA,"right")
+df_2 = combine_df_on_index(df_CCSA,df_ICSA,"DATE")
 
 df_original_2 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-df_updated_2 = combine_df(df_original_2, df_2)
+df_updated_2 = combine_df_on_index(df_original_2, df_2,'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_2, False, 0)
 
@@ -103,7 +103,7 @@ df_original_unemployed_world = convert_excelsheet_to_dataframe(excel_file_path, 
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_unemployed_world.columns.tolist(), df_original_unemployed_world.columns.tolist()))
 
-df_updated_unemployed_world = combine_df(df_original_unemployed_world, df_unemployed_world)
+df_updated_unemployed_world = combine_df_on_index(df_original_unemployed_world, df_unemployed_world,'DATE')
 
 # get a list of columns
 cols = list(df_updated_unemployed_world)
@@ -127,7 +127,6 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_unemployed_worl
 
 sheet_name = 'Database ADP'
 
-df_original_adp = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 df_adp = scrape_world_gdp_table("https://tradingeconomics.com/united-states/adp-employment-change")
 
 #Drop unnecessary columns
@@ -144,6 +143,7 @@ df_adp = df_adp.rename(columns={"Actual": "ADP"})
 df_adp['DATE'] = pd.to_datetime(df_adp['DATE'],format='%Y-%m-%d')
 df_adp['ADP'] = df_adp['ADP'].str.slice(0,3)  #Remove the K from the end of the string, and convert it to an int
 
+df_original_adp = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 last_row_original_adp = df_original_adp.iloc[-1]
 
 # Loop through each row in df_adp and if it doesn't exist in df_original_adp add it to the end. 

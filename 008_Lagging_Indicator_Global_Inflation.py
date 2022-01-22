@@ -1,6 +1,6 @@
 from datetime import date
 import pandas as pd
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/008_Lagging_Indicator_Global_Inflation.xlsm'
 
@@ -39,7 +39,7 @@ for col in df_original_global_cpi.columns:
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_global_cpi.columns.tolist(), df_original_global_cpi.columns.tolist()))
 
-df_updated_global_cpi = combine_df(df_original_global_cpi, df_global_cpi)
+df_updated_global_cpi = combine_df_on_index(df_original_global_cpi, df_global_cpi,'DATE')
 
 # get a list of columns
 cols = list(df_updated_global_cpi)
@@ -83,7 +83,7 @@ df_original_global_core_cpi = convert_excelsheet_to_dataframe(excel_file_path, s
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_global_core_cpi.columns.tolist(), df_original_global_core_cpi.columns.tolist()))
 
-df_updated_global_core_cpi = combine_df(df_original_global_core_cpi, df_global_core_cpi)
+df_updated_global_core_cpi = combine_df_on_index(df_original_global_core_cpi, df_global_core_cpi,'DATE')
 
 # get a list of columns
 cols = list(df_updated_global_core_cpi)

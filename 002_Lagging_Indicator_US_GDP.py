@@ -2,7 +2,8 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, merge_two_df
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import combine_df_on_index, write_to_directory
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/002_Lagging_Indicator_US_GDP.xlsm'
 sheet_name = 'Database'
@@ -19,14 +20,14 @@ df_PCECC96 = get_stlouisfed_data('PCECC96')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
-df = pd.merge(df_DPCCRV1Q225SBEA,df_EXPGSC1,"right")
-df = pd.merge(df,df_GCEC1,"left")
-df = pd.merge(df,df_GDPC1,"left")
-df = pd.merge(df,df_GDPCTPI,"left")
-df = pd.merge(df,df_GPDIC1,"left")
-df = pd.merge(df,df_IMPGSC1,"left")
-df = pd.merge(df,df_JCXFE,"left")
-df = pd.merge(df,df_PCECC96,"left")
+df = combine_df_on_index(df_DPCCRV1Q225SBEA,df_EXPGSC1,"DATE")
+df = combine_df_on_index(df_GCEC1,df,"DATE")
+df = combine_df_on_index(df_GDPC1,df,"DATE")
+df = combine_df_on_index(df_GDPCTPI,df,"DATE")
+df = combine_df_on_index(df_GPDIC1,df,"DATE")
+df = combine_df_on_index(df_IMPGSC1,df,"DATE")
+df = combine_df_on_index(df_JCXFE,df,"DATE")
+df = combine_df_on_index(df_PCECC96,df,"DATE")
 
 #LEGACY: Write to a csv file in the correct directory
 #write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
@@ -36,7 +37,7 @@ df = pd.merge(df,df_PCECC96,"left")
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 #df_updated = append_new_rows_to_df(df_original, df, 'DATE')
 
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df, 'DATE')
 
 """
 df_updated = df_original

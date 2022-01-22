@@ -2,7 +2,8 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import combine_df_on_index, write_to_directory
 from datetime import datetime
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/007_Lagging_Indicator_US_Inflation.xlsm'
@@ -15,6 +16,7 @@ def get_newyorkfed_target_rate(type, dimensions):
   url = "https://markets.newyorkfed.org/api/rates/%s/%s/search.json?startDate=%s&endDate=%s" % (type,dimensions[0], dimensions[1], dimensions[2])
 
   resp = requests.get(url=url)
+
   json = resp.json() 
 
   df = pd.DataFrame(columns=["DATE",dimensions[0].upper()])
@@ -53,13 +55,13 @@ df_CPIFABSL = get_stlouisfed_data('CPIFABSL')
 df_CPILFESL = get_stlouisfed_data('CPILFESL')
 
 #Combine all these data frames into a single data frame based on the DATE field
-df = pd.merge(df_CPIAUCSL,df_CPIENGSL,"left")
-df = pd.merge(df,df_CPIFABSL,"left")
-df = pd.merge(df,df_CPILFESL,"left")
+df = combine_df_on_index(df_CPIAUCSL,df_CPIENGSL,"DATE")
+df = combine_df_on_index(df_CPIFABSL,df,"DATE")
+df = combine_df_on_index(df_CPILFESL,df,"DATE")
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df,'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
@@ -74,8 +76,8 @@ df_FEDFUNDS = get_stlouisfed_data('FEDFUNDS')
 #unsecured/effr/search.json?startDate=01/01/1971&endDate=11/01/2021
 dataset = 'effr'
 
-currentMonth = datetime.now().month
-currentYear = datetime.now().year
+currentMonth = datetime.now().strftime('%m')
+currentYear = datetime.now().strftime('%Y')
 
 startDate = '01/01/1971'
 endDate = '%s/01/%s' % (currentMonth, currentYear)
