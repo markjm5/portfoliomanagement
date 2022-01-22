@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, scrape_world_gdp_table
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory, scrape_world_gdp_table
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
@@ -194,7 +194,7 @@ sheet_name = 'World Production data'
 #Get World Production Data
 df_world_production = scrape_table_world_production("https://tradingeconomics.com/country-list/industrial-production?continent=world")
 
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False, 'Country')
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
 #Fix datatypes of df_world_gdp
 df_world_production['Last'] = pd.to_numeric(df_world_production['Last'])
@@ -202,9 +202,22 @@ df_world_production['Previous'] = pd.to_numeric(df_world_production['Previous'])
 
 #Make the Country col the index so that we can combine
 #df_original.set_index('Country', inplace=True)
-df_world_production.set_index('Country', inplace=True)
+#df_world_production.set_index('Country', inplace=True)
 
-df_updated = combine_df(df_original, df_world_production)
+df_updated = combine_df_on_index(df_original, df_world_production,'Country')
+
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('Country')))
+cols.insert(1, cols.pop(cols.index('Last')))
+cols.insert(2, cols.pop(cols.index('Month')))
+cols.insert(3, cols.pop(cols.index('Previous')))
+cols.insert(4, cols.pop(cols.index('Unit')))
+
+# reorder
+df_updated = df_updated[cols]
+
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
 
@@ -214,6 +227,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
+#TODO: Need to fix dates
 
 sheet_name = 'China Production data'
 
@@ -259,7 +273,7 @@ df_world_industrial_production = df_world_industrial_production.drop('MTH', 1)
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_world_industrial_production.columns.tolist(), df_original.columns.tolist()))
 
-df_updated_world_industrial_production = combine_df(df_original, df_world_industrial_production)
+df_updated_world_industrial_production = combine_df_on_index(df_original, df_world_industrial_production,'DATE')
 
 # get a list of columns
 cols = list(df_updated_world_industrial_production)
