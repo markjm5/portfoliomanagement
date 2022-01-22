@@ -161,6 +161,7 @@ cols.insert(5, cols.pop(cols.index('EXPECTED')))
 cols.insert(6, cols.pop(cols.index('GDPC1')))
 cols.insert(7, cols.pop(cols.index('GDPQoQ')))
 cols.insert(8, cols.pop(cols.index('GDPYoY')))
+cols.insert(9, cols.pop(cols.index('GDPQoQ_ANNUALIZED')))
 
 # reorder
 df_updated = df_updated[cols]

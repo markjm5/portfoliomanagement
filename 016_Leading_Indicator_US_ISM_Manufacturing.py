@@ -307,6 +307,7 @@ cols.insert(12, cols.pop(cols.index('SP500')))
 cols.insert(13, cols.pop(cols.index('GDPC1')))
 cols.insert(14, cols.pop(cols.index('GDPQoQ')))
 cols.insert(15, cols.pop(cols.index('GDPYoY')))
+cols.insert(16, cols.pop(cols.index('GDPQoQ_ANNUALIZED')))
 
 # reorder
 df_updated = df_updated[cols]
