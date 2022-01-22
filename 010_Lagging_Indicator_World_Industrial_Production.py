@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory, scrape_world_gdp_table
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, scrape_world_gdp_table
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 

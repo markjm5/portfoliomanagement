@@ -1,6 +1,6 @@
 from datetime import date
 import pandas as pd
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/008_Lagging_Indicator_Global_Inflation.xlsm'
 
