@@ -74,7 +74,8 @@ def get_oecd_data(dataset, dimensions, params):
   file_path = 'XML/%s' % params['filename'] 
   try:
     #resp = requests.get(url=url,params=params)
-    resp = requests.get(url=url,verify=False)
+    #resp = requests.get(url=url,verify=False)
+    resp = requests.get(url=url)
 
     if(resp.status_code == 400):
       #It didnt work with the original order of the params so lets try again
@@ -83,7 +84,8 @@ def get_oecd_data(dataset, dimensions, params):
       #clean up any situation where the format of the url is broken
       url = url.replace('..','.')
 
-      resp = requests.get(url=url,verify=False)
+      #resp = requests.get(url=url,verify=False)
+      resp = requests.get(url=url)
 
     resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
     # Write response to an XML File
@@ -161,6 +163,8 @@ def get_oecd_data(dataset, dimensions, params):
 
   #Set the date to the correct datatype, and ensure the format accounts for the correct positioning of day and month values
   df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
+
+  print("Retrieved Data for Series %s" % (dataset,))
 
   return df
 

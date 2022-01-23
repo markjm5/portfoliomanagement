@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
 import investpy
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory, scrape_world_gdp_table
+from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
@@ -76,7 +76,7 @@ df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name
 # Check for difference between original and new lists
 #print(Diff(df_db_10y.columns.tolist(), df_original_db_10y.columns.tolist()))
 
-df_updated_db_10y = combine_df(df_original_db_10y, df_db_10y)
+df_updated_db_10y = combine_df_on_index(df_original_db_10y, df_db_10y,'DATE')
 
 # get a list of columns
 cols = list(df_updated_db_10y)

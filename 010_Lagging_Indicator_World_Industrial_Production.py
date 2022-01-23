@@ -52,9 +52,21 @@ def scrape_table_world_production(url):
 
 def scrape_table_china_production():
 
+  url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
-  url_caixin_pmi = 'https://tradingeconomics.com/china/manufacturing-pmi'
+  
+  #TODO: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  page = requests.get(url=url_caixin_pmi)
+  soup = BeautifulSoup(page.content, 'html.parser')
 
+  table = soup.find('table',{"class": "common-table"}) # <table class="common-table medium js-table"
+  import pdb; pdb.set_trace()
+  table_rows = table.find_all('tr', recursive=False)
+  table_rows_header = table.find_all('tr')[0].find_all('th')
+  df_caixin_pmi = pd.DataFrame()
+
+
+  """
   page = requests.get(url=url_ip_yoy)
   soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -101,7 +113,7 @@ def scrape_table_china_production():
   for header in table_rows_header:
     df_caixin_pmi.insert(index,str(header.text).strip(),[],True)
     index += 1
-
+  import pdb; pdb.set_trace()
   for tr in table_rows:
     temp_row = []
     index = 0
@@ -120,6 +132,8 @@ def scrape_table_china_production():
   year = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year
   month = dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month
 
+  #TODO: Maybe remove this? Because it's causing the numbers and dates to not be lined up.
+  import pdb; pdb.set_trace()
   #get last day of month using the year and month
   day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
   date_str = "%s/%s/%s" % (day,month,year)
@@ -133,6 +147,7 @@ def scrape_table_china_production():
   df_final['Date'] = pd.to_datetime(df_final['Date'],format='%d/%m/%Y')
   df_final['HSBC China PMI'] = pd.to_numeric(df_final['HSBC China PMI'])
   df_final['YoY'] = float(df_final['YoY'].str.strip('%'))/100
+  """
 
   return df_final
 
@@ -218,8 +233,7 @@ cols.insert(4, cols.pop(cols.index('Unit')))
 # reorder
 df_updated = df_updated[cols]
 
-
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, True, -1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 #LEGACY Write to a csv file in the correct directory
 #write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
