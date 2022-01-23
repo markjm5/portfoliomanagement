@@ -54,17 +54,65 @@ def scrape_table_china_production():
 
   url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
-  
-  #TODO: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-  page = requests.get(url=url_caixin_pmi)
+
+  # When website blocks your request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url_caixin_pmi,headers=header)
   soup = BeautifulSoup(page.content, 'html.parser')
 
-  table = soup.find('table',{"class": "common-table"}) # <table class="common-table medium js-table"
-  import pdb; pdb.set_trace()
-  table_rows = table.find_all('tr', recursive=False)
+  table = soup.find('table') 
+  table_rows = table.find_all('tr', recursive=True)
   table_rows_header = table.find_all('tr')[0].find_all('th')
-  df_caixin_pmi = pd.DataFrame()
 
+  df_caixin_pmi = pd.DataFrame()
+  index = 0
+  for header in table_rows_header:
+    if(len(str(header.text).strip()) > 0):
+      df_caixin_pmi.insert(index,str(header.text).strip(),[],True)
+      index += 1
+
+  for tr in table_rows:
+    temp_row = []
+    index = 0
+    td = tr.find_all('td')
+    if(td):
+      for obs in td:
+        text = str(obs.text).strip()
+        if(len(text) > 0):
+          temp_row.append(text)        
+          index += 1
+
+      if(len(df_caixin_pmi.columns) == len(temp_row)):
+        df_caixin_pmi.loc[len(df_caixin_pmi.index)] = temp_row
+  
+  #Drop unnecessary columns
+  df_caixin_pmi = df_caixin_pmi.drop('Time', 1)
+  df_caixin_pmi = df_caixin_pmi.drop('Forecast', 1)
+  df_caixin_pmi = df_caixin_pmi.drop('Previous', 1)
+
+  #TODO: Transform columns and data types of df_caixin_pmi to format of excel file 
+  #df_caixin_manufacturing_pmi = df_caixin_pmi[df_caixin_pmi['Related'].isin(['Manufacturing PMI'])]
+  
+  page = requests.get(url=url_ip_yoy)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  #get the paragraph with the sentence about latest china percentage growth in month and year
+  paragraph = soup.find("h2", attrs={'id': 'description'})
+
+  # Use https://pythex.org/ to check that regex are selecting correctly
+  pattern_select = re.compile(r'([\-]?[0-9]\.[0-9]\s(?=percent\s)[A-Za-z,&;\s\-0-9]*,)')
+  matches = re.findall(pattern_select, paragraph.text)#pattern_select.finditer(paragraph.text)
+
+  #Use regex to extract percentage, month and year from string
+  pattern_percentage = re.compile(r'([\-]?[0-9]\.[0-9]\s(?=percent\s))')
+  pattern_month_year = re.compile(r'(\b(?:Jan(?:uary)?|Feb(?:ruary)?|...|Dec(?:ember)?) (?:19[7-9]\d|2\d{3})(?=\D|$))')
+  match_percentage = re.findall(pattern_percentage,matches[0])
+  match_month_year = re.findall(pattern_month_year,matches[0])
+
+  #TODO: Put match_percentage, match_month_year into df with correct data types
+  #TODO: Return relevant dfs so that they can be used to write to excel
+
+  import pdb; pdb.set_trace()
 
   """
   page = requests.get(url=url_ip_yoy)
@@ -99,6 +147,8 @@ def scrape_table_china_production():
     df_ip_yoy.loc[len(df_ip_yoy.index)] = temp_row
 
   df_ip_yoy_last = df_ip_yoy.query("Actual !=''").iloc[-1:]
+  
+  import pdb; pdb.set_trace()
 
   #TODO: Add additional column to df with China PMI Index
   page = requests.get(url=url_caixin_pmi)
@@ -149,7 +199,7 @@ def scrape_table_china_production():
   df_final['YoY'] = float(df_final['YoY'].str.strip('%'))/100
   """
 
-  return df_final
+  return df_caixin_pmi
 
 #####################################
 #   Get Capital Investment Data     #
