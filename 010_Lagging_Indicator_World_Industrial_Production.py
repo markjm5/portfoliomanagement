@@ -91,13 +91,22 @@ def scrape_table_china_production():
   df_caixin_pmi['Prev_Month'] = df_caixin_pmi['Prev_Month'].map(lambda x: x.rstrip(')'))
   df_caixin_pmi['Date'] = df_caixin_pmi['Month_Day'] + df_caixin_pmi['Year']
   df_caixin_pmi['Date'] = pd.to_datetime(df_caixin_pmi['Date'].str.strip(), format='%b %d %Y')
+  df_caixin_pmi['Prev_Month'] = pd.to_datetime(df_caixin_pmi['Prev_Month'].str.strip(), format='%b')
+
+  for index, row in df_caixin_pmi.iterrows():
+    if(row['Date'].month != row['Prev_Month'].month):
+      df_caixin_pmi.at[index,'Date'] = row['Prev_Month']
+      #TODO: Update Year and Month using calendar.monthrange function
+
+  #day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
+  #date_str = "%s/%s/%s" % (day,month,year)
 
   #Drop unnecessary columns
   df_caixin_pmi = df_caixin_pmi.drop(columns='Release Date', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Month_Day', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Year_Temp', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Year', axis=1)
-  df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
+  #df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Time', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Forecast', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Previous', axis=1)
@@ -112,11 +121,10 @@ def scrape_table_china_production():
   cols.insert(1, cols.pop(cols.index('HSBC China PMI')))
   df_caixin_pmi = df_caixin_pmi[cols]
 
-  import pdb; pdb.set_trace()
-
   #TODO: Transform columns and data types of df_caixin_pmi to format of excel file 
   #df_caixin_manufacturing_pmi = df_caixin_pmi[df_caixin_pmi['Related'].isin(['Manufacturing PMI'])]
-  
+  print(df_caixin_pmi)
+
   page = requests.get(url=url_ip_yoy)
   soup = BeautifulSoup(page.content, 'html.parser')
 
