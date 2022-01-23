@@ -55,7 +55,7 @@ def scrape_table_china_production():
   url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
 
-  # When website blocks your request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
   header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
   page = requests.get(url=url_caixin_pmi,headers=header)
   soup = BeautifulSoup(page.content, 'html.parser')
@@ -85,10 +85,34 @@ def scrape_table_china_production():
       if(len(df_caixin_pmi.columns) == len(temp_row)):
         df_caixin_pmi.loc[len(df_caixin_pmi.index)] = temp_row
   
+  #Date Transformations
+  df_caixin_pmi['Month_Day'], df_caixin_pmi['Year_Temp'] = df_caixin_pmi['Release Date'].str.split(',', n=1, expand=False).str
+  df_caixin_pmi['Year'],df_caixin_pmi['Prev_Month'] = df_caixin_pmi['Year_Temp'].str.split('(', n=1, expand=False).str
+  df_caixin_pmi['Prev_Month'] = df_caixin_pmi['Prev_Month'].map(lambda x: x.rstrip(')'))
+  df_caixin_pmi['Date'] = df_caixin_pmi['Month_Day'] + df_caixin_pmi['Year']
+  df_caixin_pmi['Date'] = pd.to_datetime(df_caixin_pmi['Date'].str.strip(), format='%b %d %Y')
+
   #Drop unnecessary columns
-  df_caixin_pmi = df_caixin_pmi.drop('Time', 1)
-  df_caixin_pmi = df_caixin_pmi.drop('Forecast', 1)
-  df_caixin_pmi = df_caixin_pmi.drop('Previous', 1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Release Date', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Month_Day', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Year_Temp', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Year', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Time', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Forecast', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Previous', axis=1)
+
+  #Rename and reformat column
+  df_caixin_pmi = df_caixin_pmi.rename(columns={"Actual": "HSBC China PMI"})
+  df_caixin_pmi['HSBC China PMI'] = pd.to_numeric(df_caixin_pmi['HSBC China PMI'])
+
+  # Reorder Columns
+  cols = list(df_caixin_pmi)
+  cols.insert(0, cols.pop(cols.index('Date')))
+  cols.insert(1, cols.pop(cols.index('HSBC China PMI')))
+  df_caixin_pmi = df_caixin_pmi[cols]
+
+  import pdb; pdb.set_trace()
 
   #TODO: Transform columns and data types of df_caixin_pmi to format of excel file 
   #df_caixin_manufacturing_pmi = df_caixin_pmi[df_caixin_pmi['Related'].isin(['Manufacturing PMI'])]
@@ -204,7 +228,7 @@ def scrape_table_china_production():
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-
+"""
 sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
@@ -287,7 +311,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 #LEGACY Write to a csv file in the correct directory
 #write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
-
+"""
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
