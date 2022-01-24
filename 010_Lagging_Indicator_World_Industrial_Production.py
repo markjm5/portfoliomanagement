@@ -51,7 +51,7 @@ def scrape_table_world_production(url):
   return df
 
 def scrape_table_china_production():
-
+  currentYear = dt.now().strftime('%Y')
   url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
 
@@ -93,23 +93,27 @@ def scrape_table_china_production():
   df_caixin_pmi['Date'] = pd.to_datetime(df_caixin_pmi['Date'].str.strip(), format='%b %d %Y')
   df_caixin_pmi['Prev_Month'] = pd.to_datetime(df_caixin_pmi['Prev_Month'].str.strip(), format='%b')
 
+  #Need to fix date if release date and month of data do not match
   for index, row in df_caixin_pmi.iterrows():
     if(row['Date'].month != row['Prev_Month'].month):
-      df_caixin_pmi.at[index,'Date'] = row['Prev_Month']
-      #TODO: Update Year and Month using calendar.monthrange function
+      year = dt.now().year
+      if(row['Prev_Month'].month == 12): #If the previous month is december, we need to go back 1 year from this year
+        year = year - 1    
 
-  #day = calendar.monthrange(dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').year,dt.strptime(df_combined.iloc[0]['Calendar'],'%Y-%m-%d').month)[1]
-  #date_str = "%s/%s/%s" % (day,month,year)
+      day = calendar.monthrange(year,row['Prev_Month'].month)[1]
+      new_date = dt.strptime("%s-%s-%s" % (year,row['Prev_Month'].month,day), "%Y-%m-%d") 
+      df_caixin_pmi.at[index,'Date'] = new_date
 
   #Drop unnecessary columns
   df_caixin_pmi = df_caixin_pmi.drop(columns='Release Date', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Month_Day', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Year_Temp', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Year', axis=1)
-  #df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Time', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Forecast', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Previous', axis=1)
+  print(df_caixin_pmi)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
 
   #Rename and reformat column
   df_caixin_pmi = df_caixin_pmi.rename(columns={"Actual": "HSBC China PMI"})
@@ -121,10 +125,7 @@ def scrape_table_china_production():
   cols.insert(1, cols.pop(cols.index('HSBC China PMI')))
   df_caixin_pmi = df_caixin_pmi[cols]
 
-  #TODO: Transform columns and data types of df_caixin_pmi to format of excel file 
-  #df_caixin_manufacturing_pmi = df_caixin_pmi[df_caixin_pmi['Related'].isin(['Manufacturing PMI'])]
-  print(df_caixin_pmi)
-
+  #Get IP YoY Percentage Growth
   page = requests.get(url=url_ip_yoy)
   soup = BeautifulSoup(page.content, 'html.parser')
 
