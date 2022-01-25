@@ -62,8 +62,8 @@ def scrape_table_china_production():
   soup = BeautifulSoup(page.content, 'html.parser')
 
   table = soup.find('table') 
-  table_rows = table.find_all('tr', recursive=True)
-  table_rows_header = table.find_all('tr')[0].find_all('th')
+  #table_rows = table.find_all('tr', recursive=True)
+  #table_rows_header = table.find_all('tr')[0].find_all('th')
 
   df_caixin_pmi = convert_html_table_to_df(table, False)
   
@@ -94,6 +94,7 @@ def scrape_table_china_production():
   df_caixin_pmi = df_caixin_pmi.drop(columns='Time', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Forecast', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Previous', axis=1)
+  df_caixin_pmi = df_caixin_pmi.drop(columns='', axis=1)
   print(df_caixin_pmi)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
 
@@ -144,7 +145,7 @@ def scrape_table_china_production():
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-"""
+
 sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
@@ -205,10 +206,6 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 df_world_production['Last'] = pd.to_numeric(df_world_production['Last'])
 df_world_production['Previous'] = pd.to_numeric(df_world_production['Previous'])
 
-#Make the Country col the index so that we can combine
-#df_original.set_index('Country', inplace=True)
-#df_world_production.set_index('Country', inplace=True)
-
 df_updated = combine_df_on_index(df_original, df_world_production,'Country')
 
 # get a list of columns
@@ -225,36 +222,30 @@ df_updated = df_updated[cols]
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
-#LEGACY Write to a csv file in the correct directory
-#write_to_directory(df_world_production,'010_Lagging_Indicator_World_Production.csv')
-"""
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
-#TODO: Need to fix dates
 
 sheet_name = 'China Production data'
 
 #Get China Production Data
 df_caixin_pmi, df_ip_yoy = scrape_table_china_production()
 
-import pdb; pdb.set_trace()
+#temporary field called period_month so that we can combine df_caixin_pmi and df_ip_yoy together on Month only
+df_caixin_pmi['period_month'] = pd.DatetimeIndex(df_caixin_pmi['Date']).month
+df_ip_yoy['period_month'] = pd.DatetimeIndex(df_ip_yoy['Date']).month
 
-#TODO: combine df_caixin_pmi and df_ip_yoy on Year and Month
-#TODO: combine with original
-#TODO: write to excel
+#Combine on temp field period_month
+df_china_pmi = combine_df_on_index(df_caixin_pmi, df_ip_yoy,'period_month')
+
+#Combine finished, so we dont need period_month anymore
+df_china_pmi = df_china_pmi.drop(columns='period_month', axis=1)
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-"""
-# check if row does not already exist, and if it doesnt append it to the end. 
-if(not df_china_production['Date'].values in df_original['Date'].values):
-  df_updated = df_original.append(df_china_production, ignore_index=True)
-else:
-  df_updated = df_original
-"""
+df_updated = combine_df_on_index(df_original, df_china_pmi,'Date')
 
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 #####################################
 #   Get World IP Data from OECD     #
