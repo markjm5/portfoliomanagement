@@ -2,7 +2,7 @@ import requests
 import os.path
 import csv
 import pandas as pd
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df, write_to_directory
+from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, write_to_directory
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/011_Lagging_Indicator_Retail_Sales.xlsm'
 sheet_name = 'Database'
@@ -26,21 +26,21 @@ df_RSEAS = get_stlouisfed_data('RSEAS')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
-df = pd.merge(df_RSAFS,df_RSFSXMV,"right")
-df = pd.merge(df,df_MARTSSM44W72USS,"left")
-df = pd.merge(df,df_RSDBS,"left")
-df = pd.merge(df,df_RSNSR,"left")
-df = pd.merge(df,df_RSHPCS,"left")
-df = pd.merge(df,df_RSSGHBMS,"left")
-df = pd.merge(df,df_RSGMS,"left")
-df = pd.merge(df,df_RSFSDP,"left")
-df = pd.merge(df,df_RSGASS,"left")
-df = pd.merge(df,df_RSMVPD,"left")
-df = pd.merge(df,df_RSBMGESD,"left")
-df = pd.merge(df,df_RSFHFS,"left")
-df = pd.merge(df,df_RSCCAS,"left")
-df = pd.merge(df,df_RSMSR,"left")
-df = pd.merge(df,df_RSEAS,"left")
+df = combine_df_on_index(df_RSAFS,df_RSFSXMV,"DATE")
+df = combine_df_on_index(df_MARTSSM44W72USS,df,"DATE")
+df = combine_df_on_index(df_RSDBS,df,"DATE")
+df = combine_df_on_index(df_RSNSR,df,"DATE")
+df = combine_df_on_index(df_RSHPCS,df,"DATE")
+df = combine_df_on_index(df_RSSGHBMS,df,"DATE")
+df = combine_df_on_index(df_RSGMS,df,"DATE")
+df = combine_df_on_index(df_RSFSDP,df,"DATE")
+df = combine_df_on_index(df_RSGASS,df,"DATE")
+df = combine_df_on_index(df_RSMVPD,df,"DATE")
+df = combine_df_on_index(df_RSBMGESD,df,"DATE")
+df = combine_df_on_index(df_RSFHFS,df,"DATE")
+df = combine_df_on_index(df_RSCCAS,df,"DATE")
+df = combine_df_on_index(df_RSMSR,df,"DATE")
+df = combine_df_on_index(df_RSEAS,df,"DATE")
 
 #Make all column names uppercase
 df.columns = map(str.upper, df.columns)
@@ -50,12 +50,9 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_original.columns.tolist(), df.columns.tolist()))
 
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
-#LEGACY Write to a csv file in the correct directory
-#write_to_directory(df,'011_Lagging_Indicator_Retail_Sales.csv')
 
 print("Done!")
