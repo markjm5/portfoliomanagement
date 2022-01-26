@@ -150,7 +150,7 @@ todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
 df_money_supply = get_oecd_data('MEI_FIN', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '014_US_Global_Money_Supply.xml'})
-df_money_supply = df_money_supply.drop('MTH', 1)
+df_money_supply = df_money_supply.drop(columns='MTH', axis=1)
 
 sheet_name = 'Data'
 df_original_money_supply = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
