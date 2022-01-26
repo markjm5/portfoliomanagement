@@ -315,4 +315,8 @@ df_updated = df_updated[cols]
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
+#TODO: 014 fix tables 'yoy', 'mom annualized' so that they show NA when missing data
+#TODO: 016 fix 'ISM Manufacturing vs GDP' tab to include vlookup for GDP data
+#TODO: 016 Industry Comments
+
 print("Done!")
