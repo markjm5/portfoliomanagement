@@ -4,7 +4,7 @@ import csv
 import pandas as pd
 from datetime import date
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df, write_to_directory, get_yf_data, get_oecd_data
+from common import combine_df_on_index, get_yf_data
 from common import append_two_df
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/012_Central_Banks.xlsm'
@@ -35,7 +35,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_original.columns.tolist(), df.columns.tolist()))
 
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
@@ -50,7 +50,7 @@ df_WALCL = get_stlouisfed_data('WALCL')
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-df_updated = combine_df(df_original, df_WALCL)
+df_updated = combine_df_on_index(df_original, df_WALCL,'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
@@ -79,9 +79,11 @@ df_JPNNGDP['JPNNGDP'] = df_JPNNGDP['JPNNGDP'] * 10
 df_JPNNGDP.set_index('DATE', inplace=True)
 df_JPNNGDP = df_JPNNGDP.asfreq('MS', method='bfill').reset_index() #.to_period('M').reset_index()
 
+
+
 # Combine df_JPNNGDP with df_JPNASSETS and df_NIKKEI
-df = pd.merge(df_JPNASSETS,df_JPNNGDP,"left")
-df = pd.merge(df,df_NIKKEI,"left")
+df = combine_df_on_index(df_JPNASSETS,df_JPNNGDP,"DATE")
+df = combine_df_on_index(df_NIKKEI,df,"DATE")
 
 # Clean up columns
 df = df.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
@@ -90,7 +92,7 @@ df = df.rename(columns={"Close": "N225"})
 #Get Original Dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-df_updated = combine_df(df_original, df)
+df_updated = combine_df_on_index(df_original, df, "DATE")
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
@@ -105,7 +107,7 @@ df_ECBASSETSW = get_stlouisfed_data('ECBASSETSW')
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
-df_updated = combine_df(df_original, df_ECBASSETSW)
+df_updated = combine_df_on_index(df_original, df_ECBASSETSW,"DATE")
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
