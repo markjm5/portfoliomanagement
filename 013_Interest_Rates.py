@@ -68,7 +68,8 @@ todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
 df_db_10y = get_oecd_data('KEI', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '013_Interest_Rates.xml'})
-df_db_10y = df_db_10y.drop('MTH', 1)
+#df_db_10y = df_db_10y.drop('MTH', 1)
+df_db_10y = df_db_10y.drop(columns='MTH', axis=1)
 
 sheet_name = 'Database 10y'
 df_original_db_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
