@@ -139,11 +139,8 @@ def return_df_comments(arr_comments, pmi_date):
     pattern_industry = re.compile(r'((?<=\[)[A-Za-z,&;\s]*(?<!\]))')
 
     for comment in arr_comments:
-        try:
-            matches_comment = re.search(pattern_comment,comment).group(0)
-            matches_industry = re.search(pattern_industry,comment).group(0)
-        except AttributeError as e:
-            import pdb; pdb.set_trace()
+        matches_comment = re.search(pattern_comment,comment).group(0)
+        matches_industry = re.search(pattern_industry,comment).group(0)
         df_comments = df_comments.append({'Date': pmi_date, 'Sector': matches_industry, 'Comments': matches_comment}, ignore_index=True)
 
     return df_comments
