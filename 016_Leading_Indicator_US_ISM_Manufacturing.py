@@ -312,6 +312,11 @@ cols.insert(16, cols.pop(cols.index('GDPQoQ_ANNUALIZED')))
 # reorder
 df_updated = df_updated[cols]
 
+#Fill in blank values with previous
+df_updated['GDPYoY'].fillna(method='ffill', inplace=True)
+df_updated['GDPQoQ'].fillna(method='ffill', inplace=True)
+df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
