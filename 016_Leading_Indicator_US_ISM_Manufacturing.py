@@ -321,7 +321,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Get Respondents Comments #
 ############################
 
-sheet_name = 'Industry Comments New'
+sheet_name = 'Industry Comments'
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
