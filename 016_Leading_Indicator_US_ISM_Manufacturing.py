@@ -125,6 +125,7 @@ def scrape_industry_comments(pmi_date):
     lis = soup.find_all('li')   
     arr_comments = []
 
+    #The regex pattern for industry comments
     pattern = re.compile("“[()’A-Za-z,&;\s\.0-9\-]*”\s(\[)[A-Za-z,&;\s]*(\])")
 
     for li in lis:
@@ -366,13 +367,14 @@ df_comments = return_df_comments(arr_comments, pmi_date)
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-# TODO: Append to df_original with new comments
+# Append to df_original with new comments
+df_updated = df_original.append(df_comments, ignore_index=True)
 
-import pdb; pdb.set_trace()
-
-#TODO: Order by Sector, then by Date in Decending Order
+# Order by Sector, then by Date in Decending Order
+df_updated = df_updated.sort_values(by=['Sector','Date'], ascending=(True,False))
+df_updated = df_updated.reset_index(drop=True)
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_original, False, 1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 1)
 
 print("Done!")
