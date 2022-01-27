@@ -112,6 +112,35 @@ def scrape_pmi_headline_index(pmi_date):
 
     return df_at_a_glance
 
+def scrape_industry_comments(pmi_date):
+
+    pmi_month = pmi_date.strftime("%B")
+    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
+
+    page = requests.get(url=url_pmi,verify=False)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    #Get all html tables on the page
+    lis = soup.find_all('li')   
+    arr_comments = []
+
+    for li in lis:
+        if(li.text.endswith(']')):
+            arr_comments.append(li.text)
+
+    return arr_comments
+
+def return_df_comments(arr_comments, pmi_date):
+    df_comments = pd.DataFrame()
+    
+    #TODO: Use regex to extract comment and industry name
+    pattern_select_comment = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
+    pattern_select_industry = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
+
+    for comment in arr_comments:
+        import pdb; pdb.set_trace()
+
+    return df_comments
 
 def extract_rankings(industry_str,pmi_date):
 
@@ -328,11 +357,17 @@ sheet_name = 'Industry Comments'
 # Update df_original with new comments to create df_updated
 # Write to excel file
 
+arr_comments = scrape_industry_comments(pmi_date)
+
+df_comments = return_df_comments(arr_comments, pmi_date)
+
+import pdb; pdb.set_trace()
+
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
 #Fill in blank values with previous
-df_original['Sector'].fillna(method='ffill', inplace=True)
+#df_original['Sector'].fillna(method='ffill', inplace=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_original, False, 1)
