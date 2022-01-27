@@ -132,10 +132,10 @@ def scrape_industry_comments(pmi_date):
 
 def return_df_comments(arr_comments, pmi_date):
     df_comments = pd.DataFrame()
-    
+
     #TODO: Use regex to extract comment and industry name
-    pattern_select_comment = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
-    pattern_select_industry = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
+    pattern_select_comment = re.compile(r'“[()’A-Za-z,&;\s\.]*”')
+    pattern_select_industry = re.compile(r'\[[A-Za-z,&;\s]*]')
 
     for comment in arr_comments:
         import pdb; pdb.set_trace()
