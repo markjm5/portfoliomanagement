@@ -323,6 +323,11 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 sheet_name = 'Industry Comments'
 
+# TODO: Scrape 'What Respondents Are Saying 'comments from:
+# https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/december
+# Update df_original with new comments to create df_updated
+# Write to excel file
+
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
