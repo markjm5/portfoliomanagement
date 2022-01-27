@@ -195,7 +195,7 @@ todays_date = date.today()
 pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-
+"""
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
 
@@ -274,10 +274,6 @@ df_GDPC1 = get_us_gdp_fred()
 
 df_SP500 = get_sp500_monthly_prices()
 
-#TODO: Calculate GDP QoQ Annualized growth
-#TODO: Get Industry Comments
-#TODO: Update tabs in excel
-
 # Combine df_LEI, df_GDPC1, df_SP500 and df_UMCSI into original df
 df = combine_df_on_index(df_pmi_headline_index, df_GDPC1, 'DATE')
 df = combine_df_on_index(df_SP500, df, 'DATE')
@@ -319,8 +315,21 @@ df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+"""
 
-#TODO: 016 fix 'ISM Manufacturing vs GDP' tab to include vlookup for GDP data
-#TODO: 016 Industry Comments
+############################
+# Get Respondents Comments #
+############################
+
+sheet_name = 'Industry Comments New'
+
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Fill in blank values with previous
+df_original['Sector'].fillna(method='ffill', inplace=True)
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_original, False, 1)
 
 print("Done!")
