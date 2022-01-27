@@ -1,5 +1,6 @@
 from json.decoder import JSONDecodeError
 import sys
+from xml.dom.minidom import Attr
 from idna import InvalidCodepointContext
 import requests
 import os.path
@@ -131,14 +132,19 @@ def scrape_industry_comments(pmi_date):
     return arr_comments
 
 def return_df_comments(arr_comments, pmi_date):
-    df_comments = pd.DataFrame()
+    df_comments = pd.DataFrame(columns=['Date','Sector','Comments'])
 
-    #TODO: Use regex to extract comment and industry name
-    pattern_select_comment = re.compile(r'“[()’A-Za-z,&;\s\.]*”')
-    pattern_select_industry = re.compile(r'(?<=\[)[A-Za-z,&;\s]*(?<!\])')
+    #TODO: Use regex to extract comment and industry name. Regex Cheat Sheet: https://www.rexegg.com/regex-quickstart.html
+    pattern_comment = re.compile(r'“[()’A-Za-z,&;\s\.0-9\-]*”')
+    pattern_industry = re.compile(r'((?<=\[)[A-Za-z,&;\s]*(?<!\]))')
 
     for comment in arr_comments:
-        import pdb; pdb.set_trace()
+        try:
+            matches_comment = re.search(pattern_comment,comment).group(0)
+            matches_industry = re.search(pattern_industry,comment).group(0)
+        except AttributeError as e:
+            import pdb; pdb.set_trace()
+        df_comments = df_comments.append({'Date': pmi_date, 'Sector': matches_industry, 'Comments': matches_comment}, ignore_index=True)
 
     return df_comments
 
@@ -352,22 +358,19 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 sheet_name = 'Industry Comments'
 
-# TODO: Scrape 'What Respondents Are Saying 'comments from:
+# Scrape 'What Respondents Are Saying 'comments from:
 # https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/december
-# Update df_original with new comments to create df_updated
-# Write to excel file
-
 arr_comments = scrape_industry_comments(pmi_date)
-
 df_comments = return_df_comments(arr_comments, pmi_date)
-
-import pdb; pdb.set_trace()
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-#Fill in blank values with previous
-#df_original['Sector'].fillna(method='ffill', inplace=True)
+# TODO: Append to df_original with new comments
+
+import pdb; pdb.set_trace()
+
+#TODO: Order by Sector, then by Date in Decending Order
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_original, False, 1)
