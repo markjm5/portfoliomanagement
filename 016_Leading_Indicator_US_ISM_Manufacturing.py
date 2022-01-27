@@ -83,7 +83,7 @@ def scrape_pmi_headline_index(pmi_date):
     #Drop the first row because it contains the old column names
     df_at_a_glance = df_at_a_glance.iloc[1: , :]
     df_at_a_glance = df_at_a_glance.reset_index()
-    df_at_a_glance = df_at_a_glance.drop('index', 1)
+    df_at_a_glance = df_at_a_glance.drop(columns='index', axis=1)
 
     #Fix datatypes of df_at_a_glance
     for column in df_at_a_glance:
@@ -231,7 +231,7 @@ todays_date = date.today()
 pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-"""
+
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
 
@@ -351,7 +351,6 @@ df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
 
 ############################
 # Get Respondents Comments #
