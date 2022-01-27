@@ -125,8 +125,11 @@ def scrape_industry_comments(pmi_date):
     lis = soup.find_all('li')   
     arr_comments = []
 
+    pattern = re.compile("“[()’A-Za-z,&;\s\.0-9\-]*”\s(\[)[A-Za-z,&;\s]*(\])")
+
     for li in lis:
-        if(li.text.endswith(']')):
+        matched = pattern.match(li.text)
+        if(matched):
             arr_comments.append(li.text)
 
     return arr_comments
