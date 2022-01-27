@@ -358,8 +358,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 sheet_name = 'Industry Comments'
 
-# Scrape 'What Respondents Are Saying 'comments from:
-# https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/december
+# Scrape 'What Respondents Are Saying 'comments:
 arr_comments = scrape_industry_comments(pmi_date)
 df_comments = return_df_comments(arr_comments, pmi_date)
 
