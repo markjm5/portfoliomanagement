@@ -16,37 +16,39 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_us_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, convert_html_table_to_df, _util_check_diff_list
+from common import combine_df_on_index, convert_html_table_to_df, _util_check_diff_list, _transform_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/017_Leading_Indicator_US_ISM_Services.xlsm'
 
 def scrape_manufacturing_new_orders_production(pmi_date):
 
     pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
+    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
 
     #get all paragraphs
-    paras = soup.find_all("p", attrs={'class': None})
+    #paras = soup.find_all("p", attrs={'class': None})
+    paras = soup.find_all("p")
 
-    para_manufacturing = "" 
+    para_services = "" 
     para_new_orders = ""
-    para_production = ""
+    para_business = ""
+    pattern_select = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.)')
 
     for para in paras:
         #Get the specific paragraph
-        if('manufacturing industries reporting growth in %s' % (pmi_month) in para.text):
-            para_manufacturing = para.text
+        if('services industries' in para.text and '%s' % (pmi_month) in para.text and len(pattern_select.findall(para.text)) > 0):
+            para_services = para.text
 
-        if('growth in new orders' in para.text and '%s' % (pmi_month) in para.text):
+        if('new orders' in para.text and '%s' % (pmi_month) in para.text and len(pattern_select.findall(para.text)) > 0):
             para_new_orders = para.text
 
-        if('growth in production' in para.text and '%s' % (pmi_month) in para.text):
-            para_production = para.text
+        if('business activity' in para.text and '%s' % (pmi_month) in para.text and len(pattern_select.findall(para.text)) > 0):
+            para_business = para.text
 
-    return para_manufacturing, para_new_orders, para_production
+    return para_services, para_new_orders, para_business
 
 
 def scrape_pmi_headline_index(pmi_date):
@@ -161,8 +163,14 @@ def extract_rankings(industry_str,pmi_date):
         match_arr.append(new_str)
 
     #put increase and decrease items into arrays
-    increase_arr = match_arr[0].split(';')
-    decrease_arr = match_arr[1].split(';')        
+    try:
+        increase_arr = match_arr[0].split(';')
+    except IndexError as e:
+        increase_arr = []
+    try:
+        decrease_arr = match_arr[1].split(';')        
+    except IndexError as e:
+        decrease_arr = []
 
     df_rankings = pd.DataFrame()
 
@@ -179,7 +187,10 @@ def extract_rankings(industry_str,pmi_date):
         df_rankings[industry.lstrip()] = [0 - (ranking - index)]      
         index += 1
 
+    import pdb; pdb.set_trace()
     if(len(df_rankings.columns) < 18):
+
+        #TODO: Make these the 18 industries from Services
         df_columns_18_industries = ['Machinery','Computer & Electronic Products','Paper Products','Apparel, Leather & Allied Products','Printing & Related Support Activities',
                             'Primary Metals','Nonmetallic Mineral Products','Petroleum & Coal Products','Plastics & Rubber Products','Miscellaneous Manufacturing',
                             'Food, Beverage & Tobacco Products','Furniture & Related Products','Transportation Equipment','Chemical Products','Fabricated Metal Products',
@@ -233,22 +244,22 @@ pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the f
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
-para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
+para_services, para_new_orders, para_business = scrape_manufacturing_new_orders_production(pmi_date)
 
 ##################################
 # Get Manufacturing ISM Rankings #
 ##################################
 
-sheet_name = 'DB Manufacturing ISM'
+sheet_name = 'DB Business'
 
 #Get rankings
-df_manufacturing_rankings = extract_rankings(para_manufacturing,pmi_date)
+df_services_rankings = extract_rankings(para_services,pmi_date)
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
 #Combine new data with original data
-df_updated = combine_df_on_index(df_original, df_manufacturing_rankings, 'DATE')
+df_updated = combine_df_on_index(df_original, df_services_rankings, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
@@ -256,7 +267,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 ###########################
 # Get New Orders Rankings #
 ###########################
-
+"""
 sheet_name = 'DB New Orders'
 
 #Get rankings
@@ -275,7 +286,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Get Production Rankings #
 ###########################
 
-sheet_name = 'DB Production'
+sheet_name = 'DB Business'
 
 #Get rankings
 df_production_rankings = extract_rankings(para_production,pmi_date)
@@ -374,5 +385,5 @@ df_updated = df_updated.reset_index(drop=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 1)
-
+"""
 print("Done!")

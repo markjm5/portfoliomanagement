@@ -53,8 +53,6 @@ def get_us_gdp_fred():
   df_GDPC1['GDPQoQ'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift()) / df_GDPC1['GDPC1'].shift()
   df_GDPC1['GDPYoY'] = (df_GDPC1['GDPC1'] - df_GDPC1['GDPC1'].shift(periods=4)) / df_GDPC1['GDPC1'].shift(periods=4)
 
-
-
   #Calculate QoQ Annualized growth rate =((1 + df_GDPC1['GDPQoQ'])^4)-1
   df_GDPC1['GDPQoQ_ANNUALIZED'] = ((1 + df_GDPC1['GDPQoQ']) ** 4) - 1
 
