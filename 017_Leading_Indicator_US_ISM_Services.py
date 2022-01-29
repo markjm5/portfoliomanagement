@@ -100,10 +100,10 @@ def scrape_pmi_headline_index(pmi_date):
 
     df_at_a_glance = df_at_a_glance.iloc[:, column_numbers] #return all columns except the 0th column
 
-    import pdb;pdb.set_trace()
-
     #Flip df around
     df_at_a_glance = df_at_a_glance.T
+
+    import pdb;pdb.set_trace()
 
     #TODO: Rename Columns as per requirements of excel file 017
     df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM", 1:"NEW_ORDERS",2:"PRODUCTION",3:"EMPLOYMENT",4:"DELIVERIES",
