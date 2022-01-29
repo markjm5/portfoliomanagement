@@ -222,7 +222,6 @@ para_services, para_new_orders, para_business = scrape_manufacturing_new_orders_
 
 sheet_name = 'DB Services ISM'
 
-#TODO: Need to fix
 #_transform_data(excel_file_path, sheet_name, sheet_name)
 
 #Get rankings
