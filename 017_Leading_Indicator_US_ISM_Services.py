@@ -222,6 +222,9 @@ para_services, para_new_orders, para_business = scrape_manufacturing_new_orders_
 
 sheet_name = 'DB Services ISM'
 
+#TODO: Need to fix
+#_transform_data(excel_file_path, sheet_name, sheet_name)
+
 #Get rankings
 df_services_rankings = extract_rankings(para_services,pmi_date)
 
@@ -260,10 +263,55 @@ df_updated = df_updated[cols]
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 ###########################
+# Get Business Rankings #
+###########################
+
+sheet_name = 'DB Business'
+#_transform_data(excel_file_path, sheet_name, sheet_name)
+
+#Get rankings
+df_business_rankings = extract_rankings(para_business,pmi_date)
+
+# Load original data from excel file into original df
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_business_rankings, 'DATE')
+
+# Reorder Columns
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('Arts, Entertainment & Recreation')))
+cols.insert(2, cols.pop(cols.index('Other Services')))
+cols.insert(3, cols.pop(cols.index('Health Care & Social Assistance')))
+cols.insert(4, cols.pop(cols.index('Accommodation & Food Services')))
+cols.insert(5, cols.pop(cols.index('Finance & Insurance')))
+cols.insert(6, cols.pop(cols.index('Real Estate, Rental & Leasing')))
+cols.insert(7, cols.pop(cols.index('Transportation & Warehousing')))
+cols.insert(8, cols.pop(cols.index('Mining')))
+cols.insert(9, cols.pop(cols.index('Construction')))
+cols.insert(10, cols.pop(cols.index('Wholesale Trade')))
+cols.insert(11, cols.pop(cols.index('Public Administration')))
+cols.insert(12, cols.pop(cols.index('Professional, Scientific & Technical Services')))
+cols.insert(13, cols.pop(cols.index('Agriculture, Forestry, Fishing & Hunting')))
+cols.insert(14, cols.pop(cols.index('Information')))
+cols.insert(15, cols.pop(cols.index('Educational Services')))
+cols.insert(16, cols.pop(cols.index('Management of Companies & Support Services')))
+
+# reorder
+df_updated = df_updated[cols]
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+###########################
 # Get New Orders Rankings #
 ###########################
 
 sheet_name = 'DB New Orders'
+#_transform_data(excel_file_path, sheet_name, sheet_name)
 
 #Get rankings
 df_new_orders_rankings = extract_rankings(para_new_orders,pmi_date)
@@ -302,53 +350,11 @@ df_updated = df_updated[cols]
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-###########################
-# Get Business Rankings #
-###########################
 
-sheet_name = 'DB Business'
-
-#Get rankings
-df_business_rankings = extract_rankings(para_business,pmi_date)
-
-# Load original data from excel file into original df
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-#Combine new data with original data
-df_updated = combine_df_on_index(df_original, df_business_rankings, 'DATE')
-
-# Reorder Columns
-# get a list of columns
-cols = list(df_updated)
-# move the column to head of list using index, pop and insert
-cols.insert(0, cols.pop(cols.index('DATE')))
-cols.insert(1, cols.pop(cols.index('Arts, Entertainment & Recreation')))
-cols.insert(2, cols.pop(cols.index('Other Services')))
-cols.insert(3, cols.pop(cols.index('Health Care & Social Assistance')))
-cols.insert(4, cols.pop(cols.index('Accommodation & Food Services')))
-cols.insert(5, cols.pop(cols.index('Finance & Insurance')))
-cols.insert(6, cols.pop(cols.index('Real Estate, Rental & Leasing')))
-cols.insert(7, cols.pop(cols.index('Transportation & Warehousing')))
-cols.insert(8, cols.pop(cols.index('Mining')))
-cols.insert(9, cols.pop(cols.index('Construction')))
-cols.insert(10, cols.pop(cols.index('Wholesale Trade')))
-cols.insert(11, cols.pop(cols.index('Public Administration')))
-cols.insert(12, cols.pop(cols.index('Professional, Scientific & Technical Services')))
-cols.insert(13, cols.pop(cols.index('Agriculture, Forestry, Fishing & Hunting')))
-cols.insert(14, cols.pop(cols.index('Information')))
-cols.insert(15, cols.pop(cols.index('Educational Services')))
-cols.insert(16, cols.pop(cols.index('Management of Companies & Support Services')))
-
-# reorder
-df_updated = df_updated[cols]
-
-# Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
 #################################################
 # Update Details Tab Using ISM Headline Numbers #
 #################################################
-
+"""
 sheet_name = 'DB Details'
 
 df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
