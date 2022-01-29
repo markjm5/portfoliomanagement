@@ -54,7 +54,7 @@ def scrape_manufacturing_new_orders_production(pmi_date):
 def scrape_pmi_headline_index(pmi_date):
 
     pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
+    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -64,21 +64,48 @@ def scrape_pmi_headline_index(pmi_date):
     table_at_a_glance = tables[0]
     
     #Convert the tables into dataframes so that we can read the data
-    df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
+    #df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
 
+    table_rows = table_at_a_glance.find_all('tbody')[0].find_all('tr')
+    table_rows_header = table_at_a_glance.find_all('tr')[1].find_all('th')
+    df_at_a_glance = pd.DataFrame()
+
+    index = 0
+
+    for header in table_rows_header:
+        df_at_a_glance.insert(index,str(header.text).strip(),[],True)
+        index+=1
+
+    #Insert New Row. Format the data to show percentage as float
+    for tr in table_rows:
+        temp_row = []
+
+        tr_th = tr.find('th')
+        text = str(tr_th.text).strip()
+        temp_row.append(text)        
+
+        td = tr.find_all('td')
+        for obs in td:
+            text = str(obs.text).strip()
+            temp_row.append(text)        
+        
+        if(len(temp_row) == len(df_at_a_glance.columns)):
+            df_at_a_glance.loc[len(df_at_a_glance.index)] = temp_row
+    
     #Drop Unnecessary Columns
     column_numbers = [x for x in range(df_at_a_glance.shape[1])]  # list of columns' integer indices
-    column_numbers .remove(2) #removing column integer index 0
-    column_numbers .remove(3)
-    column_numbers .remove(4)
-    column_numbers .remove(5)
-    column_numbers .remove(6)
+    column_numbers .remove(7)
+    column_numbers .remove(8)
+    column_numbers .remove(9)
+
     df_at_a_glance = df_at_a_glance.iloc[:, column_numbers] #return all columns except the 0th column
+
+    import pdb;pdb.set_trace()
 
     #Flip df around
     df_at_a_glance = df_at_a_glance.T
 
-    #Rename Columns
+    #TODO: Rename Columns as per requirements of excel file 017
     df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM", 1:"NEW_ORDERS",2:"PRODUCTION",3:"EMPLOYMENT",4:"DELIVERIES",
                                                     5:"INVENTORIES",6:"CUSTOMERS_INVENTORIES",7:"PRICES",8:"BACKLOG_OF_ORDERS",9:"EXPORTS",10:"IMPORTS"})
 
@@ -212,7 +239,7 @@ todays_date = date.today()
 pmi_date = todays_date - relativedelta.relativedelta(months=1)
 pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-
+"""
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_services, para_new_orders, para_business = scrape_manufacturing_new_orders_production(pmi_date)
 
@@ -348,16 +375,16 @@ df_updated = df_updated[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
+"""
 
 #################################################
 # Update Details Tab Using ISM Headline Numbers #
 #################################################
-"""
+
 sheet_name = 'DB Details'
 
 df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
-
+"""
 #################################
 # Get US GDP from St Louis FRED #
 #################################
