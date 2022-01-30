@@ -427,7 +427,6 @@ df_updated['GDPQoQ'].fillna(method='ffill', inplace=True)
 df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
 
 #TODO: Need to copy data from existing excel into DB Details
-import pdb; pdb.set_trace()
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
