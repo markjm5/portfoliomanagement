@@ -221,7 +221,7 @@ def extract_rankings(industry_str,pmi_date):
 
     return df_rankings
 
-"""
+
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_services, para_new_orders, para_business = scrape_manufacturing_new_orders_production(pmi_date)
 
@@ -421,7 +421,7 @@ df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
+
 ############################
 # Get Respondents Comments #
 ############################
