@@ -103,16 +103,16 @@ def scrape_pmi_headline_index(pmi_date):
     #Flip df around
     df_at_a_glance = df_at_a_glance.T
 
-    import pdb;pdb.set_trace()
-
-    #TODO: Rename Columns as per requirements of excel file 017
-    df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM", 1:"NEW_ORDERS",2:"PRODUCTION",3:"EMPLOYMENT",4:"DELIVERIES",
-                                                    5:"INVENTORIES",6:"CUSTOMERS_INVENTORIES",7:"PRICES",8:"BACKLOG_OF_ORDERS",9:"EXPORTS",10:"IMPORTS"})
+    # Rename Columns as per requirements of excel file 017
+    df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM_SERVICES", 1:"BUSINESS_ACTIVITY",2:"NEW_ORDERS",3:"EMPLOYMENT",4:"DELIVERIES",
+                                                    5:"INVENTORIES",6:"PRICES",7:"BACKLOG_OF_ORDERS",8:"EXPORTS",9:"IMPORTS",10:"INVENTORY_SENTIMENT",11:"CUSTOMER_INVENTORIES"})
 
     #Drop the first row because it contains the old column names
     df_at_a_glance = df_at_a_glance.iloc[1: , :]
+    df_at_a_glance = df_at_a_glance.head(1)
     df_at_a_glance = df_at_a_glance.reset_index()
     df_at_a_glance = df_at_a_glance.drop(columns='index', axis=1)
+    df_at_a_glance = df_at_a_glance.drop(columns='CUSTOMER_INVENTORIES', axis=1)
 
     #Fix datatypes of df_at_a_glance
     for column in df_at_a_glance:
@@ -121,21 +121,10 @@ def scrape_pmi_headline_index(pmi_date):
     #Add DATE column to df
     df_at_a_glance["DATE"] = [pmi_date]
 
-    # Reorder Columns
+    # Put DATE as the first column
     # get a list of columns
     cols = list(df_at_a_glance)
     cols.insert(0, cols.pop(cols.index('DATE')))
-    cols.insert(1, cols.pop(cols.index('NEW_ORDERS')))
-    cols.insert(2, cols.pop(cols.index('IMPORTS')))
-    cols.insert(3, cols.pop(cols.index('BACKLOG_OF_ORDERS')))
-    cols.insert(4, cols.pop(cols.index('PRICES')))
-    cols.insert(5, cols.pop(cols.index('PRODUCTION')))
-    cols.insert(6, cols.pop(cols.index('CUSTOMERS_INVENTORIES')))
-    cols.insert(7, cols.pop(cols.index('INVENTORIES')))
-    cols.insert(8, cols.pop(cols.index('DELIVERIES')))
-    cols.insert(9, cols.pop(cols.index('EMPLOYMENT')))
-    cols.insert(10, cols.pop(cols.index('EXPORTS')))
-    cols.insert(11, cols.pop(cols.index('ISM')))
 
     # reorder
     df_at_a_glance = df_at_a_glance[cols]
@@ -384,7 +373,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 sheet_name = 'DB Details'
 
 df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
-"""
+
 #################################
 # Get US GDP from St Louis FRED #
 #################################
@@ -416,13 +405,13 @@ cols.insert(1, cols.pop(cols.index('NEW_ORDERS')))
 cols.insert(2, cols.pop(cols.index('IMPORTS')))
 cols.insert(3, cols.pop(cols.index('BACKLOG_OF_ORDERS')))
 cols.insert(4, cols.pop(cols.index('PRICES')))
-cols.insert(5, cols.pop(cols.index('PRODUCTION')))
-cols.insert(6, cols.pop(cols.index('CUSTOMERS_INVENTORIES')))
+cols.insert(5, cols.pop(cols.index('BUSINESS_ACTIVITY')))
+cols.insert(6, cols.pop(cols.index('INVENTORY_SENTIMENT')))
 cols.insert(7, cols.pop(cols.index('INVENTORIES')))
 cols.insert(8, cols.pop(cols.index('DELIVERIES')))
 cols.insert(9, cols.pop(cols.index('EMPLOYMENT')))
 cols.insert(10, cols.pop(cols.index('EXPORTS')))
-cols.insert(11, cols.pop(cols.index('ISM')))
+cols.insert(11, cols.pop(cols.index('ISM_SERVICES')))
 cols.insert(12, cols.pop(cols.index('SP500')))
 cols.insert(13, cols.pop(cols.index('GDPC1')))
 cols.insert(14, cols.pop(cols.index('GDPQoQ')))
@@ -437,13 +426,16 @@ df_updated['GDPYoY'].fillna(method='ffill', inplace=True)
 df_updated['GDPQoQ'].fillna(method='ffill', inplace=True)
 df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
 
+#TODO: Need to copy data from existing excel into DB Details
+import pdb; pdb.set_trace()
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 ############################
 # Get Respondents Comments #
 ############################
-
+"""
 sheet_name = 'Industry Comments'
 
 # Scrape 'What Respondents Are Saying' comments:
