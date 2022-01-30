@@ -20,16 +20,22 @@ from common import combine_df_on_index, convert_html_table_to_df, _util_check_di
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/017_Leading_Indicator_US_ISM_Services.xlsm'
 
-def scrape_manufacturing_new_orders_production(pmi_date):
+#get date range
+todays_date = date.today()
 
-    pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (pmi_month.lower(),)
+#use todays date to get pmi month (first day of last month) and use the date in scraping functions
+pmi_date = todays_date - relativedelta.relativedelta(months=1)
+pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
+pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
+pmi_month = pmi_date.strftime("%B")
+
+url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (pmi_month.lower(),)
+
+def scrape_manufacturing_new_orders_production(pmi_date):
 
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    #get all paragraphs
-    #paras = soup.find_all("p", attrs={'class': None})
     paras = soup.find_all("p")
 
     para_services = "" 
@@ -52,9 +58,6 @@ def scrape_manufacturing_new_orders_production(pmi_date):
 
 
 def scrape_pmi_headline_index(pmi_date):
-
-    pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -132,9 +135,6 @@ def scrape_pmi_headline_index(pmi_date):
     return df_at_a_glance
 
 def scrape_industry_comments(pmi_date):
-
-    pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
 
     page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -221,13 +221,6 @@ def extract_rankings(industry_str,pmi_date):
 
     return df_rankings
 
-#get date range
-todays_date = date.today()
-
-#use todays date to get pmi month (first day of last month) and use the date in scraping functions
-pmi_date = todays_date - relativedelta.relativedelta(months=1)
-pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
-pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 """
 #df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
 para_services, para_new_orders, para_business = scrape_manufacturing_new_orders_production(pmi_date)
@@ -364,7 +357,7 @@ df_updated = df_updated[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
+
 
 #################################################
 # Update Details Tab Using ISM Headline Numbers #
@@ -426,15 +419,13 @@ df_updated['GDPYoY'].fillna(method='ffill', inplace=True)
 df_updated['GDPQoQ'].fillna(method='ffill', inplace=True)
 df_updated['GDPQoQ_ANNUALIZED'].fillna(method='ffill', inplace=True)
 
-#TODO: Need to copy data from existing excel into DB Details
-
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-
+"""
 ############################
 # Get Respondents Comments #
 ############################
-"""
+
 sheet_name = 'Industry Comments'
 
 # Scrape 'What Respondents Are Saying' comments:
@@ -453,5 +444,5 @@ df_updated = df_updated.reset_index(drop=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 1)
-"""
+
 print("Done!")
