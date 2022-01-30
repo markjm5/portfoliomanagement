@@ -358,7 +358,6 @@ df_updated = df_updated[cols]
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-
 #################################################
 # Update Details Tab Using ISM Headline Numbers #
 #################################################
