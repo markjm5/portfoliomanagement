@@ -30,8 +30,6 @@ pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the f
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 pmi_month = pmi_date.strftime("%B")
 
-#url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (pmi_month.lower(),)
-
 def extract_countries_pmi(pmi_date):
 
     data = {'Date': []}
@@ -59,11 +57,17 @@ def extract_countries_pmi(pmi_date):
         table_rows = table_country_pmi.find_all('tbody')[0].find_all('tr')
         #table_rows_header = table_country_pmi.find_all('tr')[1].find_all('th')
         df_country_pmi = pd.DataFrame()
+        temp_row = []
 
         #Insert New Row. Format the data to show percentage as float
         for tr in table_rows:
-            temp_row = []
-            import pdb; pdb.set_trace()
+            if(tr.find('td').text.strip() == 'Manufacturing PMI'):
+                td = tr.find_all('td')
+                for obs in td:
+                    text = str(obs.text).strip()
+                    temp_row.append(text)        
+
+        import pdb; pdb.set_trace()
 
         #TODO: Extract Date and PMI
         #TODO: Add Date and PMI to df_countries_pmi
