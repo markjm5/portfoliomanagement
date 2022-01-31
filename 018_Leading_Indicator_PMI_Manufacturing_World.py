@@ -39,47 +39,36 @@ def extract_countries_pmi(pmi_date):
     # Convert the dictionary into DataFrame
     df_countries_pmi = pd.DataFrame(data)
 
-    countries = ['Global','US','EuroArea','Japan','Germany','France','UK','Italy','Spain','Brazil'
-                ,'Mexico','Russia','India','Canada','Australia','Indonesia','SouthKorea','Taiwan','Greece','Ireland',
-                'Turkey','CzechRepublic','Poland','Denmark','Vietnam','Thailand','SouthAfrica','HongKong','SaudiArabia','NewZealand']
+    countries = ['united-states','euro-area','japan','germany','france','united-kingdom','italy','spain','brazil'
+                ,'mexico','russia','india','canada','australia','indonesia','south-korea','taiwan','greece','ireland',
+                'turkey','czech-republic','poland','denmark','vietnam','thailand','south-africa','hong-kong','saudi-arabia','new-zealand']
 
     for country in countries:
-        url_pmi = "https://tradingeconomics.com/%s/business-confidence" % (country)
+        #TODO: Scrape The Following:
+        #https://tradingeconomics.com/china/business-confidence
+
+        url_pmi = "https://tradingeconomics.com/%s/indicators" % (country)
 
         page = requests.get(url=url_pmi,verify=False)
+        soup = BeautifulSoup(page.content, 'html.parser')
+
+        #Get all html tables on the page
+        tables = soup.find_all('table')    
+        table_country_pmi = tables[0]
+
+        table_rows = table_country_pmi.find_all('tbody')[0].find_all('tr')
+        #table_rows_header = table_country_pmi.find_all('tr')[1].find_all('th')
+        df_country_pmi = pd.DataFrame()
+
+        #Insert New Row. Format the data to show percentage as float
+        for tr in table_rows:
+            temp_row = []
+            import pdb; pdb.set_trace()
 
         #TODO: Extract Date and PMI
         #TODO: Add Date and PMI to df_countries_pmi
 
-
         print(country)
-
-
-    #TODO: Scrape The FOllowing:
-    #https://tradingeconomics.com/china/business-confidence
-    #https://tradingeconomics.com/australia/indicators
-    #https://tradingeconomics.com/china/indicators
-    #https://tradingeconomics.com/japan/indicators
-    #https://tradingeconomics.com/germany/indicators
-    #https://tradingeconomics.com/france/indicators
-    #https://tradingeconomics.com/united-kingdom/indicators
-    #https://tradingeconomics.com/italy/indicators
-    #https://tradingeconomics.com/spain/indicators
-    #https://tradingeconomics.com/brazil/indicators
-    #https://tradingeconomics.com/mexico/indicators
-    #https://tradingeconomics.com/russia/indicators
-    #https://tradingeconomics.com/india/indicators
-    #https://tradingeconomics.com/canada/indicators
-    #https://tradingeconomics.com/indonesia/indicators
-    #https://tradingeconomics.com/south-korea/indicators
-    #https://tradingeconomics.com/taiwan/indicators
-    #https://tradingeconomics.com/greece/indicators
-    #https://tradingeconomics.com/ireland/indicators
-    #https://tradingeconomics.com/turkey/indicators
-    #https://tradingeconomics.com/czech-republic/indicators
-    #https://tradingeconomics.com/poland/indicators
-    #https://tradingeconomics.com/denmark/indicators
-
 
     return df_countries_pmi
 
@@ -97,9 +86,6 @@ df_updated = combine_df_on_index(df_original, df_countries_pmi, 'Date')
 
 """
 #TODO: Preparation: Load data from each country tab from Cell A5 into dataframe, merge based on date, and write to new excel sheet
-countries = ['Global','US','EuroArea','Japan','Germany','France','UK','Italy','Spain','Brazil'
-                ,'Mexico','Russia','India','Canada','Australia','Indonesia','SouthKorea','Taiwan','Greece','Ireland',
-                'Turkey','CzechRepublic','Poland','Denmark','Vietnam','Thailand','SouthAfrica','HongKong','SaudiArabia','NewZealand']
 
 for country in countries:
 
