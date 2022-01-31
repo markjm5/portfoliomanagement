@@ -55,24 +55,34 @@ def extract_countries_pmi(pmi_date):
         table_country_pmi = tables[0]
 
         table_rows = table_country_pmi.find_all('tbody')[0].find_all('tr')
-        #table_rows_header = table_country_pmi.find_all('tr')[1].find_all('th')
-        df_country_pmi = pd.DataFrame()
+
+        data2 = {country: [], "Date": []}
+        df_country_pmi = pd.DataFrame(data2)
+
         temp_row = []
 
         #Insert New Row. Format the data to show percentage as float
         for tr in table_rows:
             if(tr.find('td').text.strip() == 'Manufacturing PMI'):
                 td = tr.find_all('td')
+                index = 0
                 for obs in td:
                     text = str(obs.text).strip()
-                    temp_row.append(text)        
+                    if(index == 1):
+                        temp_row.append(text)        
+                    if(index == 4):
+                        #TODO: Format Date before inserting into temp_row
+                        temp_row.append(text)
+                    index += 1
 
+        df_country_pmi.loc[len(df_country_pmi.index)] = temp_row
         import pdb; pdb.set_trace()
 
-        #TODO: Extract Date and PMI
-        #TODO: Add Date and PMI to df_countries_pmi
+        #TODO: Format columns as date and numeric types
 
         print(country)
+        
+    #TODO: Add Date and PMI to df_countries_pmi
 
     return df_countries_pmi
 
