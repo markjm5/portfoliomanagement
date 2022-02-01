@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, convert_html_table_to_df, _util_check_diff_list, _transform_data
+from common import combine_df_on_index, get_yf_data, _util_check_diff_list, _transform_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 sheet_name = 'DB Country PMI'
@@ -33,7 +33,7 @@ def extract_countries_pmi():
 
     countries = ['united-states','euro-area','japan','germany','france','united-kingdom','italy','spain','brazil'
                 ,'mexico','russia','india','canada','australia','indonesia','south-korea','taiwan','greece','ireland',
-                'turkey','czech-republic','poland','denmark','vietnam','thailand','south-africa','hong-kong','saudi-arabia','new-zealand']
+                'turkey','czech-republic','poland','denmark','vietnam','thailand','south-africa','hong-kong','saudi-arabia','new-zealand','china']
 
     for country in countries:
         #TODO: Scrape The Following:
@@ -43,8 +43,6 @@ def extract_countries_pmi():
         data2 = {country: [], "Date": []}
         df_country_pmi = pd.DataFrame(data2)
 
-        #if(not temp_row):
-        #For Denmark and Thailand Manufacturing PMI
         df_country_pmi = scrape_table_country_pmi("https://tradingeconomics.com/%s/manufacturing-pmi" % (country,),country)
 
         #df_country_pmi.loc[len(df_country_pmi.index)] = temp_row
@@ -98,6 +96,9 @@ def scrape_table_country_pmi(url, country):
             df.loc[len(df.index)] = temp_row
     return df
 
+#####################################################
+# Get PMI Index for Countries from TradingEconomics #
+#####################################################
 
 #Get Country Rankings
 df_countries_pmi = extract_countries_pmi()
@@ -111,11 +112,46 @@ df_updated = combine_df_on_index(df_original, df_countries_pmi, 'Date')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-#TODO: Get Global PMI
-#TODO: Get Global ACWI
+##########################
+# Get ACWI Index from YF #
+##########################
+
+sheet_name = 'DB Global PMI'
+df_original_ACWI = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#get date range
+todays_date = date.today()
+date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
+
+# Get EUR/USD close day intervals using above date range
+df_ACWI = get_yf_data("ACWI", "1mo", "2010-10-01", date_str)
+
+#Remove unnecessary columns from df_ACWI and rename columns
+df_ACWI = df_ACWI.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+df_ACWI = df_ACWI.rename(columns={"Close": "ACWI"})
+df_ACWI = df_ACWI.dropna()
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original_ACWI, df_ACWI, 'DATE')
+
+# Reorder Columns
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('Global')))
+cols.insert(2, cols.pop(cols.index('ACWI')))
+
+# reorder
+df_updated = df_updated[cols]
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
 #TODO: Get US ISM Manufacturing
-#TODO: Get China Caixin PMI
+#TODO: Get China Caixin PMI - https://tradingeconomics.com/china/manufacturing-pmi
 #TODO: Get China Official PMI
 #TODO: Get Euro Area EZU
 #TODO: Get Euro Area GDP QoQ
 #TODO: Get UK EWU
+
+print("Done!")
