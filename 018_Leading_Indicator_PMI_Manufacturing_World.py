@@ -1,10 +1,4 @@
-from json.decoder import JSONDecodeError
-import sys
-from xml.dom.minidom import Attr
-from idna import InvalidCodepointContext
 import requests
-import os.path
-import csv
 import calendar
 import re
 import pandas as pd
@@ -116,3 +110,12 @@ df_updated = combine_df_on_index(df_original, df_countries_pmi, 'Date')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+#TODO: Get Global PMI
+#TODO: Get Global ACWI
+#TODO: Get US ISM Manufacturing
+#TODO: Get China Caixin PMI
+#TODO: Get China Official PMI
+#TODO: Get Euro Area EZU
+#TODO: Get Euro Area GDP QoQ
+#TODO: Get UK EWU
