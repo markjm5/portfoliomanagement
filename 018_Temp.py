@@ -22,7 +22,7 @@ from common import combine_df_on_index, convert_html_table_to_df, _util_check_di
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Temp.xlsm'
 sheet_name_original = 'DB Temp'
 
-df_countries_pmi = convert_excelsheet_to_dataframe(excel_file_path, sheet_name_original, False)
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name_original, False)
 
 #get date range
 todays_date = date.today()
@@ -45,9 +45,10 @@ for country in countries:
     df_country_data = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
     #Combine new data with original data
-    df_countries_pmi = combine_df_on_index(df_country_data, df_countries_pmi, 'Date')
+    df_original = combine_df_on_index(df_country_data, df_original, 'Date')
 
     print(country)
 
+import pdb; pdb.set_trace()
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name_original, df_countries_pmi, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name_original, df_original, False, 0)
