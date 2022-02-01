@@ -18,7 +18,7 @@ from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, convert_html_table_to_df, _util_check_diff_list, _transform_data
 
-excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Temp.xlsm'
+excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 sheet_name = 'DB Country PMI'
 
 #get date range
@@ -30,7 +30,7 @@ pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the f
 pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
 pmi_month = pmi_date.strftime("%B")
 
-def extract_countries_pmi(pmi_date):
+def extract_countries_pmi():
 
     data = {'Date': []}
     
@@ -44,75 +44,75 @@ def extract_countries_pmi(pmi_date):
     for country in countries:
         #TODO: Scrape The Following:
         #https://tradingeconomics.com/china/business-confidence
-
-        url_pmi = "https://tradingeconomics.com/%s/indicators" % (country)
-
-        page = requests.get(url=url_pmi,verify=False)
-        soup = BeautifulSoup(page.content, 'html.parser')
-
-        #Get all html tables on the page
-        tables = soup.find_all('table')    
-        table_country_pmi = tables[0]
-
-        table_rows = table_country_pmi.find_all('tbody')[0].find_all('tr')
+        #url_pmi = "https://tradingeconomics.com/%s/indicators" % (country)
 
         data2 = {country: [], "Date": []}
         df_country_pmi = pd.DataFrame(data2)
 
-        temp_row = []
+        #if(not temp_row):
+        #For Denmark and Thailand Manufacturing PMI
+        df_country_pmi = scrape_table_country_pmi("https://tradingeconomics.com/%s/manufacturing-pmi" % (country,),country)
 
-        #Insert New Row. Format the data to show percentage as float
-        for tr in table_rows:
-            if(tr.find('td').text.strip() == 'Manufacturing PMI'):
-                td = tr.find_all('td')
-                index = 0
-                for obs in td:
-                    text = str(obs.text).strip()
-                    if(index == 1):
-                        temp_row.append(text)        
-                    if(index == 4):
-                        #TODO: Format Date before inserting into temp_row
-                        temp_row.append(text)
-                    index += 1
+        #df_country_pmi.loc[len(df_country_pmi.index)] = temp_row
 
-        df_country_pmi.loc[len(df_country_pmi.index)] = temp_row
-        import pdb; pdb.set_trace()
+        # Format columns as date and numeric types
+        df_country_pmi["Date"] = pd.to_datetime(df_country_pmi["Date"], format='%b-%y')
+        df_country_pmi[country] = pd.to_numeric(df_country_pmi[country])
 
-        #TODO: Format columns as date and numeric types
-
-        print(country)
-        
-    #TODO: Add Date and PMI to df_countries_pmi
+        # Combine Date and PMI with existing df_countries_pmi
+        df_countries_pmi = combine_df_on_index(df_countries_pmi, df_country_pmi,'Date')
 
     return df_countries_pmi
 
 
+def scrape_table_country_pmi(url, country):
+
+    page = requests.get(url=url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    #TODO: Need to scrape table for world production countries and numbers.
+    table = soup.find_all('table')
+
+    table_rows = table[1].find_all('tr', recursive=False)
+
+    data = {country: [], "Date": []}
+    df = pd.DataFrame(data)
+    index = 0
+
+    #Get rows of data.
+    for tr in table_rows:
+        temp_row = []
+
+        if(tr.find('td').text.strip() == 'Manufacturing PMI'):
+            #first_col = True
+            index = 0
+            td = tr.find_all('td')
+
+            for obs in td:
+                text = str(obs.text).strip()
+                if(index == 1):
+                    temp_row.append(text)        
+                if(index == 4):
+                    #TODO: Format Date before inserting into temp_row
+                    dt_date = dt.strptime(text,'%b/%y')
+                    text = dt_date.strftime('%b-%y')
+                    temp_row.append(text)
+                index += 1
+
+        if(temp_row):
+            print("Retrieved Data For: %s - %s" % (country, temp_row))
+            df.loc[len(df.index)] = temp_row
+    return df
+
+
 #Get Country Rankings
-df_countries_pmi = extract_countries_pmi(pmi_date)
+df_countries_pmi = extract_countries_pmi()
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-import pdb; pdb.set_trace()
-
 #Combine new data with original data
 df_updated = combine_df_on_index(df_original, df_countries_pmi, 'Date')
 
-"""
-#TODO: Preparation: Load data from each country tab from Cell A5 into dataframe, merge based on date, and write to new excel sheet
-
-for country in countries:
-
-    sheet_name = country
-
-    # Load original data from excel file into original df
-    df_country_data = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-    #Combine new data with original data
-    df_countries_pmi = combine_df_on_index(df_country_data, df_countries_pmi, 'Date')
-
-    print(country)
-"""
-
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_countries_pmi, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
