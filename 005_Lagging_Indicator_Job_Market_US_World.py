@@ -96,7 +96,7 @@ endDate = '%s-Q4' % (todays_date.year)
 
 df_unemployed_world = get_oecd_data('STLABOUR', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '005_Job_Market_World.xml'})
 
-df_unemployed_world = df_unemployed_world.drop('MTH', 1)
+df_unemployed_world = df_unemployed_world.drop(columns='MTH', axis=1)
 
 df_original_unemployed_world = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
@@ -130,11 +130,11 @@ sheet_name = 'Database ADP'
 df_adp = scrape_world_gdp_table("https://tradingeconomics.com/united-states/adp-employment-change")
 
 #Drop unnecessary columns
-df_adp = df_adp.drop('GMT', 1)
-df_adp = df_adp.drop('Reference', 1)
-df_adp = df_adp.drop('Previous', 1)
-df_adp = df_adp.drop('Consensus', 1)
-df_adp = df_adp.drop('TEForecast', 1)
+df_adp = df_adp.drop(columns='GMT', axis=1)
+df_adp = df_adp.drop(columns='Reference', axis=1)
+df_adp = df_adp.drop(columns='Previous', axis=1)
+df_adp = df_adp.drop(columns='Consensus', axis=1)
+df_adp = df_adp.drop(columns='TEForecast', axis=1)
 
 #Rename column
 df_adp = df_adp.rename(columns={"Actual": "ADP"})

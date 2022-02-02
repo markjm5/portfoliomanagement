@@ -182,7 +182,7 @@ df_world_gdp['GDP'] = pd.to_numeric(df_world_gdp['GDP'])
 df_updated = pd.merge(df_updated,df_world_gdp,"right", on='Country')
 
 #Drop unnecessary columns
-df_updated_1 = df_updated.drop('GDP_x', axis=1)
+df_updated_1 = df_updated.drop(columns='GDP_x', axis=1)
 df_updated_2 = df_updated_1.rename(columns={'GDP_y': 'GDP'})
 
 column_names = ["Country", "GDP", "Investment_Percentage", "Code"]
@@ -268,7 +268,7 @@ endDate = '%s-Q4' % (todays_date.year)
 df_world_industrial_production = get_oecd_data('KEI', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '010_World_Industrial_Production.xml'})
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-df_world_industrial_production = df_world_industrial_production.drop('MTH', 1)
+df_world_industrial_production = df_world_industrial_production.drop(columns='MTH', axis=1)
 
 # Check for difference between original and new lists
 #print(util_check_diff_list(df_world_industrial_production.columns.tolist(), df_original.columns.tolist()))
