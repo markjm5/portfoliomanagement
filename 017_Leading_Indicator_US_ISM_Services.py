@@ -441,8 +441,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 
 # Append to df_original with new comments
 df_updated = df_original.append(df_comments, ignore_index=True)
-#df_updated = df_updated.groupby(['Sector','Date']).first()
-#import pdb; pdb.set_trace()
+
 # Order by Sector in Ascending Order, then by Date in Decending Order
 df_updated = df_updated.sort_values(by=['Sector','Date'], ascending=(True,False))
 df_updated = df_updated.drop_duplicates(subset=['Sector','Date'])

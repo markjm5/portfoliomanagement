@@ -154,7 +154,7 @@ df_updated = combine_df_on_index(df_original, df_ism_headline_index, 'DATE')
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 #TODO: Get China Caixin PMI - https://tradingeconomics.com/china/manufacturing-pmi
-#TODO: Get China Official PMI
+#TODO: Get China Official PMI - https://tradingeconomics.com/china/business-confidence
 #TODO: Get Euro Area EZU
 #TODO: Get Euro Area GDP QoQ
 #TODO: Get UK EWU

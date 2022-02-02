@@ -79,8 +79,6 @@ df_JPNNGDP['JPNNGDP'] = df_JPNNGDP['JPNNGDP'] * 10
 df_JPNNGDP.set_index('DATE', inplace=True)
 df_JPNNGDP = df_JPNNGDP.asfreq('MS', method='bfill').reset_index() #.to_period('M').reset_index()
 
-
-
 # Combine df_JPNNGDP with df_JPNASSETS and df_NIKKEI
 df = combine_df_on_index(df_JPNASSETS,df_JPNNGDP,"DATE")
 df = combine_df_on_index(df_NIKKEI,df,"DATE")
