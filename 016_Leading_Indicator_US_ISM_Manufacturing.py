@@ -1,3 +1,4 @@
+from ast import Index
 from json.decoder import JSONDecodeError
 import sys
 from xml.dom.minidom import Attr
@@ -16,16 +17,14 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_us_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, convert_html_table_to_df, _util_check_diff_list
+from common import combine_df_on_index, convert_html_table_to_df, get_ism_date, get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index, _util_check_diff_list
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 
-def scrape_manufacturing_new_orders_production(pmi_date):
+def scrape_manufacturing_new_orders_production():
 
-    pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
+    ism_date, ism_month, page = get_ism_manufacturing_content()
 
-    page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
 
     #get all paragraphs
@@ -37,88 +36,21 @@ def scrape_manufacturing_new_orders_production(pmi_date):
 
     for para in paras:
         #Get the specific paragraph
-        if('manufacturing industries reporting growth in %s' % (pmi_month) in para.text):
+        if('manufacturing industries reporting growth in %s' % (ism_month) in para.text):
             para_manufacturing = para.text
 
-        if('growth in new orders' in para.text and '%s' % (pmi_month) in para.text):
+        if('growth in new orders' in para.text and '%s' % (ism_month) in para.text):
             para_new_orders = para.text
 
-        if('growth in production' in para.text and '%s' % (pmi_month) in para.text):
+        if('growth in production' in para.text and '%s' % (ism_month) in para.text):
             para_production = para.text
 
-    return para_manufacturing, para_new_orders, para_production
+    return para_manufacturing, para_new_orders, para_production, ism_date, ism_month
 
+def scrape_industry_comments():
 
-def scrape_pmi_headline_index(pmi_date):
+    ism_date, ism_month, page = get_ism_manufacturing_content()
 
-    pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
-
-    page = requests.get(url=url_pmi,verify=False)
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    #Get all html tables on the page
-    tables = soup.find_all('table')    
-    table_at_a_glance = tables[0]
-    
-    #Convert the tables into dataframes so that we can read the data
-    df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
-
-    #Drop Unnecessary Columns
-    column_numbers = [x for x in range(df_at_a_glance.shape[1])]  # list of columns' integer indices
-    column_numbers .remove(2) #removing column integer index 0
-    column_numbers .remove(3)
-    column_numbers .remove(4)
-    column_numbers .remove(5)
-    column_numbers .remove(6)
-    df_at_a_glance = df_at_a_glance.iloc[:, column_numbers] #return all columns except the 0th column
-
-    #Flip df around
-    df_at_a_glance = df_at_a_glance.T
-
-    #Rename Columns
-    df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM", 1:"NEW_ORDERS",2:"PRODUCTION",3:"EMPLOYMENT",4:"DELIVERIES",
-                                                    5:"INVENTORIES",6:"CUSTOMERS_INVENTORIES",7:"PRICES",8:"BACKLOG_OF_ORDERS",9:"EXPORTS",10:"IMPORTS"})
-
-    #Drop the first row because it contains the old column names
-    df_at_a_glance = df_at_a_glance.iloc[1: , :]
-    df_at_a_glance = df_at_a_glance.reset_index()
-    df_at_a_glance = df_at_a_glance.drop(columns='index', axis=1)
-
-    #Fix datatypes of df_at_a_glance
-    for column in df_at_a_glance:
-        df_at_a_glance[column] = pd.to_numeric(df_at_a_glance[column])
-
-    #Add DATE column to df
-    df_at_a_glance["DATE"] = [pmi_date]
-
-    # Reorder Columns
-    # get a list of columns
-    cols = list(df_at_a_glance)
-    cols.insert(0, cols.pop(cols.index('DATE')))
-    cols.insert(1, cols.pop(cols.index('NEW_ORDERS')))
-    cols.insert(2, cols.pop(cols.index('IMPORTS')))
-    cols.insert(3, cols.pop(cols.index('BACKLOG_OF_ORDERS')))
-    cols.insert(4, cols.pop(cols.index('PRICES')))
-    cols.insert(5, cols.pop(cols.index('PRODUCTION')))
-    cols.insert(6, cols.pop(cols.index('CUSTOMERS_INVENTORIES')))
-    cols.insert(7, cols.pop(cols.index('INVENTORIES')))
-    cols.insert(8, cols.pop(cols.index('DELIVERIES')))
-    cols.insert(9, cols.pop(cols.index('EMPLOYMENT')))
-    cols.insert(10, cols.pop(cols.index('EXPORTS')))
-    cols.insert(11, cols.pop(cols.index('ISM')))
-
-    # reorder
-    df_at_a_glance = df_at_a_glance[cols]
-
-    return df_at_a_glance
-
-def scrape_industry_comments(pmi_date):
-
-    pmi_month = pmi_date.strftime("%B")
-    url_pmi = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (pmi_month.lower(),)
-
-    page = requests.get(url=url_pmi,verify=False)
     soup = BeautifulSoup(page.content, 'html.parser')
 
     #Get all html tables on the page
@@ -135,7 +67,9 @@ def scrape_industry_comments(pmi_date):
 
     return arr_comments
 
-def return_df_comments(arr_comments, pmi_date):
+def return_df_comments(arr_comments):
+    ism_date, ism_month, page = get_ism_manufacturing_content()
+
     df_comments = pd.DataFrame(columns=['Date','Sector','Comments'])
 
     #TODO: Use regex to extract comment and industry name. Regex Cheat Sheet: https://www.rexegg.com/regex-quickstart.html
@@ -145,11 +79,13 @@ def return_df_comments(arr_comments, pmi_date):
     for comment in arr_comments:
         matches_comment = re.search(pattern_comment,comment).group(0)
         matches_industry = re.search(pattern_industry,comment).group(0)
-        df_comments = df_comments.append({'Date': pmi_date, 'Sector': matches_industry, 'Comments': matches_comment}, ignore_index=True)
+        df_comments = df_comments.append({'Date': ism_date, 'Sector': matches_industry, 'Comments': matches_comment}, ignore_index=True)
 
     return df_comments
 
-def extract_rankings(industry_str,pmi_date):
+def extract_rankings(industry_str):
+
+    ism_date, ism_month, page = get_ism_manufacturing_content()
 
     #Use regex (https://pythex.org/) to get substring that contains order of industries. It should return 2 matches - for increase and decrease   
     pattern_select = re.compile(r'((?<=following order:\s)[A-Za-z,&;\s]*.|(?<=are:\s)[A-Za-z,&;\s]*.|(?<=are\s)[A-Za-z,&;\s]*.)')
@@ -162,7 +98,19 @@ def extract_rankings(industry_str,pmi_date):
 
     #put increase and decrease items into arrays
     increase_arr = match_arr[0].split(';')
-    decrease_arr = match_arr[1].split(';')        
+    try:
+        decrease_arr = []
+        decrease_arr = match_arr[1].split(';')        
+    except IndexError as e:
+        #There must only be one industry reporting decrease, so extract that one.
+        pattern_select_decrease = re.compile(r'(only\sindustry[A-Za-z,&;\s]*)')        
+        match = pattern_select_decrease.search(industry_str)
+
+        if(match):
+            pattern_remove = r'only\sindustry[A-Za-z,&;\s]*is\s'
+            new_str = re.sub(pattern_remove, '',match.group(0))
+            if(new_str):
+                decrease_arr.append(new_str)
 
     df_rankings = pd.DataFrame()
 
@@ -193,7 +141,7 @@ def extract_rankings(industry_str,pmi_date):
             df_rankings[col] = [0]
 
     #Add DATE column to df
-    df_rankings["DATE"] = [pmi_date]
+    df_rankings["DATE"] = [ism_date]
 
     # Reorder Columns
     # get a list of columns
@@ -224,16 +172,9 @@ def extract_rankings(industry_str,pmi_date):
 
     return df_rankings
 
-#get date range
-todays_date = date.today()
 
-#use todays date to get pmi month (first day of last month) and use the date in scraping functions
-pmi_date = todays_date - relativedelta.relativedelta(months=1)
-pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
-pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-
-#df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_pmi_manufacturing_index(pmi_date)
-para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_orders_production(pmi_date)
+#df_at_a_glance, df_new_orders, df_production, para_manufacturing, para_new_orders, para_production = scrape_ism_manufacturing_index(ism_date)
+para_manufacturing, para_new_orders, para_production, ism_date, ism_month = scrape_manufacturing_new_orders_production()
 
 ##################################
 # Get Manufacturing ISM Rankings #
@@ -242,7 +183,7 @@ para_manufacturing, para_new_orders, para_production = scrape_manufacturing_new_
 sheet_name = 'DB Manufacturing ISM'
 
 #Get rankings
-df_manufacturing_rankings = extract_rankings(para_manufacturing,pmi_date)
+df_manufacturing_rankings = extract_rankings(para_manufacturing)
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
@@ -260,7 +201,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 sheet_name = 'DB New Orders'
 
 #Get rankings
-df_new_orders_rankings = extract_rankings(para_new_orders,pmi_date)
+df_new_orders_rankings = extract_rankings(para_new_orders)
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
@@ -278,7 +219,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 sheet_name = 'DB Production'
 
 #Get rankings
-df_production_rankings = extract_rankings(para_production,pmi_date)
+df_production_rankings = extract_rankings(para_production)
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
@@ -295,7 +236,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 sheet_name = 'DB Details'
 
-df_pmi_headline_index = scrape_pmi_headline_index(pmi_date)
+df_ism_headline_index = scrape_ism_manufacturing_headline_index(ism_date, ism_month)
 
 #################################
 # Get US GDP from St Louis FRED #
@@ -311,7 +252,7 @@ df_GDPC1 = get_us_gdp_fred()
 df_SP500 = get_sp500_monthly_prices()
 
 # Combine df_LEI, df_GDPC1, df_SP500 and df_UMCSI into original df
-df = combine_df_on_index(df_pmi_headline_index, df_GDPC1, 'DATE')
+df = combine_df_on_index(df_ism_headline_index, df_GDPC1, 'DATE')
 df = combine_df_on_index(df_SP500, df, 'DATE')
 
 # Load original data from excel file into original df
@@ -359,17 +300,17 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 sheet_name = 'Industry Comments'
 
 # Scrape 'What Respondents Are Saying' comments:
-arr_comments = scrape_industry_comments(pmi_date)
-df_comments = return_df_comments(arr_comments, pmi_date)
+arr_comments = scrape_industry_comments()
+df_comments = return_df_comments(arr_comments)
 
 # Load original data from excel file into original df
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-# Append to df_original with new comments
 df_updated = df_original.append(df_comments, ignore_index=True)
 
 # Order by Sector in Ascending Order, then by Date in Decending Order
 df_updated = df_updated.sort_values(by=['Sector','Date'], ascending=(True,False))
+df_updated = df_updated.drop_duplicates(subset=['Sector','Date'])
 df_updated = df_updated.reset_index(drop=True)
 
 # Write the updated df back to the excel sheet

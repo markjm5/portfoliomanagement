@@ -9,6 +9,8 @@ import openpyxl
 from openpyxl.utils.dataframe import dataframe_to_rows
 from itertools import islice
 from datetime import date
+from datetime import datetime as dt
+from dateutil import parser, relativedelta
 import time
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
@@ -314,6 +316,205 @@ def scrape_world_gdp_table(url):
     df.loc[len(df.index)] = temp_row
 
   return df
+
+def get_ism_manufacturing_content():
+
+    ism_date, ism_month = get_ism_date(1)
+    url_ism = get_ism_manufacturing_url(ism_month)
+
+    page = requests.get(url=url_ism,verify=False)
+
+    if(page.status_code == 404):
+        # Use previous month to get ISM data
+        ism_date, ism_prev_month = get_ism_date(2)
+        url_ism = get_ism_manufacturing_url(ism_prev_month)
+
+        page = requests.get(url=url_ism,verify=False)
+
+    return ism_date, ism_month, page
+
+def get_ism_services_content():
+
+    ism_date, ism_month = get_ism_date(1)
+    url_ism = get_ism_services_url(ism_month)
+    #import pdb; pdb.set_trace()
+    page = requests.get(url=url_ism,verify=False)
+
+    if(page.status_code == 404):
+        # Use previous month to get ISM data
+        ism_date, ism_month = get_ism_date(2)
+        url_ism = get_ism_services_url(ism_month)
+
+        page = requests.get(url=url_ism,verify=False)
+
+    return ism_date, ism_month, page
+
+
+def get_ism_manufacturing_url(ism_month):
+  url_ism = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/pmi/%s' % (ism_month.lower(),)
+
+  return url_ism
+
+def get_ism_services_url(ism_month):
+    url_ism = 'https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/services/%s' % (ism_month.lower(),)
+
+    return url_ism
+
+def get_ism_date(delta):
+    #get date range
+    todays_date = date.today()
+
+    #use todays date to get ism month (first day of last month) and use the date in scraping functions
+    ism_date = todays_date - relativedelta.relativedelta(months=delta)
+    ism_date = "01-%s-%s" % (ism_date.month, ism_date.year) #make the ism date the first day of ism month
+    ism_date = dt.strptime(ism_date, "%d-%m-%Y")
+    ism_month = ism_date.strftime("%B")
+
+    return ism_date, ism_month
+
+
+def scrape_ism_manufacturing_headline_index(ism_date, ism_month):
+
+    url_ism = get_ism_manufacturing_url(ism_month)
+
+    page = requests.get(url=url_ism,verify=False)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    #Get all html tables on the page
+    tables = soup.find_all('table')    
+    table_at_a_glance = tables[0]
+    
+    #Convert the tables into dataframes so that we can read the data
+    df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
+
+    #Drop Unnecessary Columns
+    column_numbers = [x for x in range(df_at_a_glance.shape[1])]  # list of columns' integer indices
+    column_numbers .remove(2) #removing column integer index 0
+    column_numbers .remove(3)
+    column_numbers .remove(4)
+    column_numbers .remove(5)
+    column_numbers .remove(6)
+    df_at_a_glance = df_at_a_glance.iloc[:, column_numbers] #return all columns except the 0th column
+
+    #Flip df around
+    df_at_a_glance = df_at_a_glance.T
+
+    #Rename Columns
+    df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM", 1:"NEW_ORDERS",2:"PRODUCTION",3:"EMPLOYMENT",4:"DELIVERIES",
+                                                    5:"INVENTORIES",6:"CUSTOMERS_INVENTORIES",7:"PRICES",8:"BACKLOG_OF_ORDERS",9:"EXPORTS",10:"IMPORTS"})
+
+    #Drop the first row because it contains the old column names
+    df_at_a_glance = df_at_a_glance.iloc[1: , :]
+    df_at_a_glance = df_at_a_glance.reset_index()
+    df_at_a_glance = df_at_a_glance.drop(columns='index', axis=1)
+
+    #Fix datatypes of df_at_a_glance
+    for column in df_at_a_glance:
+        df_at_a_glance[column] = pd.to_numeric(df_at_a_glance[column])
+
+    #Add DATE column to df
+    df_at_a_glance["DATE"] = [ism_date]
+
+    # Reorder Columns
+    # get a list of columns
+    cols = list(df_at_a_glance)
+    cols.insert(0, cols.pop(cols.index('DATE')))
+    cols.insert(1, cols.pop(cols.index('NEW_ORDERS')))
+    cols.insert(2, cols.pop(cols.index('IMPORTS')))
+    cols.insert(3, cols.pop(cols.index('BACKLOG_OF_ORDERS')))
+    cols.insert(4, cols.pop(cols.index('PRICES')))
+    cols.insert(5, cols.pop(cols.index('PRODUCTION')))
+    cols.insert(6, cols.pop(cols.index('CUSTOMERS_INVENTORIES')))
+    cols.insert(7, cols.pop(cols.index('INVENTORIES')))
+    cols.insert(8, cols.pop(cols.index('DELIVERIES')))
+    cols.insert(9, cols.pop(cols.index('EMPLOYMENT')))
+    cols.insert(10, cols.pop(cols.index('EXPORTS')))
+    cols.insert(11, cols.pop(cols.index('ISM')))
+
+    # reorder
+    df_at_a_glance = df_at_a_glance[cols]
+
+    return df_at_a_glance
+
+def scrape_ism_services_headline_index(ism_date, ism_month):
+
+    url_ism = get_ism_services_url(ism_month)
+
+    page = requests.get(url=url_ism,verify=False)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    #Get all html tables on the page
+    tables = soup.find_all('table')    
+    table_at_a_glance = tables[0]
+    
+    #Convert the tables into dataframes so that we can read the data
+    #df_at_a_glance = convert_html_table_to_df(table_at_a_glance, True)
+
+    table_rows = table_at_a_glance.find_all('tbody')[0].find_all('tr')
+    table_rows_header = table_at_a_glance.find_all('tr')[1].find_all('th')
+    df_at_a_glance = pd.DataFrame()
+
+    index = 0
+
+    for header in table_rows_header:
+        df_at_a_glance.insert(index,str(header.text).strip(),[],True)
+        index+=1
+
+    #Insert New Row. Format the data to show percentage as float
+    for tr in table_rows:
+        temp_row = []
+
+        tr_th = tr.find('th')
+        text = str(tr_th.text).strip()
+        temp_row.append(text)        
+
+        td = tr.find_all('td')
+        for obs in td:
+            text = str(obs.text).strip()
+            temp_row.append(text)        
+        
+        if(len(temp_row) == len(df_at_a_glance.columns)):
+            df_at_a_glance.loc[len(df_at_a_glance.index)] = temp_row
+    
+    #Drop Unnecessary Columns
+    column_numbers = [x for x in range(df_at_a_glance.shape[1])]  # list of columns' integer indices
+    column_numbers .remove(7)
+    column_numbers .remove(8)
+    column_numbers .remove(9)
+
+    df_at_a_glance = df_at_a_glance.iloc[:, column_numbers] #return all columns except the 0th column
+
+    #Flip df around
+    df_at_a_glance = df_at_a_glance.T
+
+    # Rename Columns as per requirements of excel file 017
+    df_at_a_glance = df_at_a_glance.rename(columns={0: "ISM_SERVICES", 1:"BUSINESS_ACTIVITY",2:"NEW_ORDERS",3:"EMPLOYMENT",4:"DELIVERIES",
+                                                    5:"INVENTORIES",6:"PRICES",7:"BACKLOG_OF_ORDERS",8:"EXPORTS",9:"IMPORTS",10:"INVENTORY_SENTIMENT",11:"CUSTOMER_INVENTORIES"})
+
+    #Drop the first row because it contains the old column names
+    df_at_a_glance = df_at_a_glance.iloc[1: , :]
+    df_at_a_glance = df_at_a_glance.head(1)
+    df_at_a_glance = df_at_a_glance.reset_index()
+    df_at_a_glance = df_at_a_glance.drop(columns='index', axis=1)
+    df_at_a_glance = df_at_a_glance.drop(columns='CUSTOMER_INVENTORIES', axis=1)
+
+    #Fix datatypes of df_at_a_glance
+    for column in df_at_a_glance:
+        df_at_a_glance[column] = pd.to_numeric(df_at_a_glance[column])
+
+    #Add DATE column to df
+    df_at_a_glance["DATE"] = [ism_date]
+
+    # Put DATE as the first column
+    # get a list of columns
+    cols = list(df_at_a_glance)
+    cols.insert(0, cols.pop(cols.index('DATE')))
+
+    # reorder
+    df_at_a_glance = df_at_a_glance[cols]
+
+    return df_at_a_glance
+
 
 ####################
 # Output Functions #
