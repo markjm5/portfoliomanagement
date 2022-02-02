@@ -326,8 +326,8 @@ def get_ism_manufacturing_content():
 
     if(page.status_code == 404):
         # Use previous month to get ISM data
-        ism_date, ism_prev_month = get_ism_date(2)
-        url_ism = get_ism_manufacturing_url(ism_prev_month)
+        ism_date, ism_month = get_ism_date(2)
+        url_ism = get_ism_manufacturing_url(ism_month)
 
         page = requests.get(url=url_ism,verify=False)
 

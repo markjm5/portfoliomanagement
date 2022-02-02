@@ -11,18 +11,9 @@ from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data, _util_check_diff_list, _transform_data
+from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
-sheet_name = 'DB Country PMI'
-
-#get date range
-todays_date = date.today()
-
-#use todays date to get pmi month (first day of last month) and use the date in scraping functions
-pmi_date = todays_date - relativedelta.relativedelta(months=1)
-pmi_date = "01-%s-%s" % (pmi_date.month, pmi_date.year) #make the pmi date the first day of pmi month
-pmi_date = dt.strptime(pmi_date, "%d-%m-%Y")
-pmi_month = pmi_date.strftime("%B")
 
 def extract_countries_pmi():
 
@@ -99,6 +90,7 @@ def scrape_table_country_pmi(url, country):
 #####################################################
 # Get PMI Index for Countries from TradingEconomics #
 #####################################################
+sheet_name = 'DB Country PMI'
 
 #Get Country Rankings
 df_countries_pmi = extract_countries_pmi()
@@ -147,7 +139,29 @@ df_updated = df_updated[cols]
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-#TODO: Get US ISM Manufacturing
+############################
+# Get US ISM Manufacturing #
+############################
+sheet_name = 'DB US ISM Manufacturing'
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+ism_date, ism_month, page = get_ism_manufacturing_content()
+df_ism_headline_index = scrape_ism_manufacturing_headline_index(ism_date, ism_month)
+
+#Drop unnecessary columns
+df_ism_headline_index = df_ism_headline_index.drop('NEW_ORDERS', 1)
+df_ism_headline_index = df_ism_headline_index.drop('IMPORTS', 1)
+df_ism_headline_index = df_ism_headline_index.drop('BACKLOG_OF_ORDERS', 1)
+df_ism_headline_index = df_ism_headline_index.drop('PRICES', 1)
+df_ism_headline_index = df_ism_headline_index.drop('PRODUCTION', 1)
+df_ism_headline_index = df_ism_headline_index.drop('CUSTOMERS_INVENTORIES', 1)
+df_ism_headline_index = df_ism_headline_index.drop('INVENTORIES', 1)
+df_ism_headline_index = df_ism_headline_index.drop('DELIVERIES', 1)
+df_ism_headline_index = df_ism_headline_index.drop('EMPLOYMENT', 1)
+df_ism_headline_index = df_ism_headline_index.drop('EXPORTS', 1)
+
+import pdb; pdb.set_trace()
+
 #TODO: Get China Caixin PMI - https://tradingeconomics.com/china/manufacturing-pmi
 #TODO: Get China Official PMI
 #TODO: Get Euro Area EZU
