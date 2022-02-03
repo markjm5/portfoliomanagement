@@ -49,6 +49,7 @@ def get_stlouisfed_data(series_code):
 
 
 # Get US GDP from St Louis FRED #
+"""
 def get_us_gdp_fred():
   df_GDPC1 = get_stlouisfed_data('GDPC1')
 
@@ -59,6 +60,20 @@ def get_us_gdp_fred():
   df_GDPC1['GDPQoQ_ANNUALIZED'] = ((1 + df_GDPC1['GDPQoQ']) ** 4) - 1
 
   return df_GDPC1
+"""
+
+# Get GDP Data from St Louis FRED #
+def get_gdp_fred(series_name):
+
+  df_GDP = get_stlouisfed_data(series_name)
+
+  df_GDP['GDPQoQ'] = (df_GDP[series_name] - df_GDP[series_name].shift()) / df_GDP[series_name].shift()
+  df_GDP['GDPYoY'] = (df_GDP[series_name] - df_GDP[series_name].shift(periods=4)) / df_GDP[series_name].shift(periods=4)
+
+  #Calculate QoQ Annualized growth rate =((1 + df_GDPC1['GDPQoQ'])^4)-1
+  df_GDP['GDPQoQ_ANNUALIZED'] = ((1 + df_GDP['GDPQoQ']) ** 4) - 1
+
+  return df_GDP
 
 def get_oecd_data(dataset, dimensions, params):
 

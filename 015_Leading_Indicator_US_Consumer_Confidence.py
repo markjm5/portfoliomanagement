@@ -13,7 +13,7 @@ from dateutil import parser, relativedelta
 from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_us_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import get_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_Consumer_Confidence.xlsm'
@@ -78,7 +78,7 @@ df_LEI = scrape_conference_board_lei()
 #################################
 
 #Get US GDP
-df_GDPC1 = get_us_gdp_fred()
+df_GDPC1 = get_gdp_fred('GDPC1')
 
 #df_GDPC1 = get_stlouisfed_data('GDPC1')
 

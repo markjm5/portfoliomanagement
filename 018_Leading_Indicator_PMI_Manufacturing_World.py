@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, _util_check_diff_list, _transform_data
+from common import combine_df_on_index, get_yf_data, get_gdp_fred
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
@@ -232,6 +232,43 @@ df_updated = combine_df_on_index(df_original, df_china_official_pmi, 'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-#TODO: Get Euro Area GDP QoQ
+#########################
+# Get Euro Area GDP QoQ #
+#########################
+
+sheet_name = 'DB Global PMI'
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+series_name = 'CLVMEURSCAB1GQEA19'
+
+df_EuroAreaGDP = get_gdp_fred(series_name)
+
+#Drop unnecessary columns
+df_EuroAreaGDP = df_EuroAreaGDP.drop(columns=series_name, axis=1)
+df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDPYoY', axis=1)
+df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDPQoQ_ANNUALIZED', axis=1)
+
+#Rename column
+df_EuroAreaGDP = df_EuroAreaGDP.rename(columns={"GDPQoQ": "EuroGDPQoQ"})
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_EuroAreaGDP, 'DATE')
+
+# Reorder Columns
+# get a list of columns
+cols = list(df_updated)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('Global')))
+cols.insert(2, cols.pop(cols.index('ACWI')))
+cols.insert(3, cols.pop(cols.index('EZU')))
+cols.insert(4, cols.pop(cols.index('EWU')))
+cols.insert(5, cols.pop(cols.index('EuroGDPQoQ')))
+
+# reorder
+df_updated = df_updated[cols]
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 print("Done!")
