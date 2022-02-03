@@ -15,10 +15,6 @@ from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headl
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 
-#get date range
-todays_date = date.today()
-date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
-
 def scrape_table_country_pmi():
 
     url = "https://tradingeconomics.com/country-list/manufacturing-pmi"
@@ -119,7 +115,7 @@ def scrape_china_official_pmi():
 #####################################################
 # Get PMI Index for Countries from TradingEconomics #
 #####################################################
-"""
+
 sheet_name = 'DB Country PMI'
 
 #Get Country Rankings
@@ -134,12 +130,17 @@ df_updated = combine_df_on_index(df_original, df_countries_pmi, 'Date')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-##########################
-# Get ACWI Index from YF #
-##########################
+####################################
+# Get ACWI, EWU, EZU Index from YF #
+####################################
 
 sheet_name = 'DB Global PMI'
-df_original_ACWI = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#get date range
+todays_date = date.today()
+date_str = "%s-%s-01" % (todays_date.year, todays_date.month)
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
 # Get EUR/USD close day intervals using above date range
 df_ACWI = get_yf_data("ACWI", "1mo", "2010-10-01", date_str)
@@ -150,7 +151,27 @@ df_ACWI = df_ACWI.rename(columns={"Close": "ACWI"})
 df_ACWI = df_ACWI.dropna()
 
 #Combine new data with original data
-df_updated = combine_df_on_index(df_original_ACWI, df_ACWI, 'DATE')
+df_updated = combine_df_on_index(df_original, df_ACWI, 'DATE')
+
+# Get EZU close monthly intervals
+df_EZU = get_yf_data("EZU", "1mo", "2004-12-01", date_str)
+#Remove unnecessary columns from df_EZU and rename columns
+df_EZU = df_EZU.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+df_EZU = df_EZU.rename(columns={"Close": "EZU"})
+df_EZU = df_EZU.dropna()
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_updated, df_EZU, 'DATE')
+
+# Get EWU close monthly intervals
+df_EWU = get_yf_data("EWU", "1mo", "2004-12-01", date_str)
+#Remove unnecessary columns from df_EWU and rename columns
+df_EWU = df_EWU.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+df_EWU = df_EWU.rename(columns={"Close": "EWU"})
+df_EWU = df_EWU.dropna()
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_updated, df_EWU, 'DATE')
 
 # Reorder Columns
 # get a list of columns
@@ -159,6 +180,8 @@ cols = list(df_updated)
 cols.insert(0, cols.pop(cols.index('DATE')))
 cols.insert(1, cols.pop(cols.index('Global')))
 cols.insert(2, cols.pop(cols.index('ACWI')))
+cols.insert(3, cols.pop(cols.index('EZU')))
+cols.insert(4, cols.pop(cols.index('EWU')))
 
 # reorder
 df_updated = df_updated[cols]
@@ -208,29 +231,6 @@ df_china_official_pmi = scrape_china_official_pmi()
 df_updated = combine_df_on_index(df_original, df_china_official_pmi, 'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
-"""
-###########################
-# Get EZU and EWU from YF #
-###########################
-
-todays_date = date.today()
-date_str = "%s-%s-01" % (todays_date.year, todays_date.month)
-
-# Get EZU close monthly intervals
-df_EZU = get_yf_data("EZU", "1mo", "2004-12-01", date_str)
-#Remove unnecessary columns from df_ACWI and rename columns
-df_EZU = df_EZU.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
-df_EZU = df_EZU.rename(columns={"Close": "EZU"})
-df_EZU = df_EZU.dropna()
-
-# Get EWU close monthly intervals
-df_EWU = get_yf_data("EWU", "1mo", "2004-12-01", date_str)
-#Remove unnecessary columns from df_ACWI and rename columns
-df_EWU = df_EWU.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
-df_EWU = df_EWU.rename(columns={"Close": "EWU"})
-df_EWU = df_EWU.dropna()
-
-import pdb; pdb.set_trace()
 
 #TODO: Get Euro Area GDP QoQ
 
