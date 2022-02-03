@@ -661,4 +661,47 @@ def _transform_data(excel_file_path, sheet_name_original, sheet_name_new):
 def _util_check_diff_list(li1, li2):
   # Python code to get difference of two lists
   return list(set(li1) - set(li2))
+"""
+def display_chart(excel_file_path,sheet_name):
+  from openpyxl import Workbook
+  from openpyxl.chart import (
+      AreaChart,
+      Reference,
+      Series,
+  )
 
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  wb = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
+  ws = wb[sheet_name]
+
+  rows = [
+      ['Number', 'Batch 1', 'Batch 2'],
+      [2, 40, 30],
+      [3, 40, 25],
+      [4, 50, 30],
+      [5, 30, 10],
+      [6, 25, 5],
+      [7, 50, 10],
+  ]
+
+  for row in rows:
+      ws.append(row)
+
+  chart = AreaChart()
+  chart.title = "Area Chart"
+  chart.style = 13
+  chart.x_axis.title = 'Test'
+  chart.y_axis.title = 'Percentage'
+
+  cats = Reference(ws, min_col=1, min_row=1, max_row=7)
+  data = Reference(ws, min_col=2, min_row=1, max_col=3, max_row=7)
+  chart.add_data(data, titles_from_data=True)
+  chart.set_categories(cats)
+
+  ws.add_chart(chart, "E1")
+
+  wb.save(excel_file_path)
+  wb.close()
+"""
