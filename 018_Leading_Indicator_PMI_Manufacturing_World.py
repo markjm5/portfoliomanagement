@@ -10,7 +10,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, get_gdp_fred
+from common import combine_df_on_index, get_yf_data, get_gdp_fred,get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
@@ -218,9 +218,9 @@ df_updated = combine_df_on_index(df_original, df_ism_headline_index, 'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-##########################
-# Get China Official PMI #
-##########################
+#########################################
+# Get China Official PMI and GDP Growth #
+#########################################
 
 sheet_name = 'DB China Official PMI'
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
@@ -229,6 +229,26 @@ df_china_official_pmi = scrape_china_official_pmi()
 
 #Combine new data with original data
 df_updated = combine_df_on_index(df_original, df_china_official_pmi, 'DATE')
+
+# Get China QoQ Data from OECD #
+
+country = ['CHN']
+
+subject = ['B1_GE']
+measure = ['GYSA']
+frequency = 'Q'
+startDate = '2005-Q1'
+
+todays_date = date.today()
+endDate = '%s-Q4' % (todays_date.year)
+
+df_YoY = get_oecd_data('QNA', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '018_YoY.xml'})
+df_YoY = df_YoY.drop(columns='QTR', axis=1)
+df_YoY = df_YoY.rename(columns={"CHN": "China GDP"})
+df_YoY["China GDP"] = df_YoY["China GDP"] / 100
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_updated, df_YoY, 'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
