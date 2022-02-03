@@ -71,9 +71,51 @@ def scrape_table_country_pmi():
 
     return df_countries_pmi
 
+def scrape_china_official_pmi():
+    url = "https://tradingeconomics.com/china/business-confidence"
+
+    page = requests.get(url=url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    data = {'China Business Confidence': [],'DATE': []}
+    
+    # Convert the dictionary into DataFrame
+    df_china_official_pmi = pd.DataFrame(data)
+
+    table = soup.find_all('table')
+    table_rows = table[1].find_all('tr', recursive=False)
+    temp_row = []
+
+    #Get rows of data.
+    for tr in table_rows:
+        td = tr.find_all('td')
+
+        if(td[0].text.strip() == 'Business Confidence'):        
+            index = 0
+    
+            for obs in td:
+                text = str(obs.text).strip()
+                if(index == 1):
+                    value = text
+                    temp_row.append(text)
+                if(index == 4):
+                    dt_date = dt.strptime(text,'%b %Y')
+                    text = dt_date.strftime('%b-%y')
+                    temp_row.append(text)
+                index += 1
+
+    if(temp_row):
+        df_china_official_pmi.loc[len(df_china_official_pmi.index)] = temp_row
+
+        df_china_official_pmi["DATE"] = pd.to_datetime(df_china_official_pmi["DATE"], format='%b-%y')
+        df_china_official_pmi["China Business Confidence"] = pd.to_numeric(df_china_official_pmi["China Business Confidence"])
+
+    return df_china_official_pmi
+
 #####################################################
 # Get PMI Index for Countries from TradingEconomics #
 #####################################################
+
 sheet_name = 'DB Country PMI'
 
 #Get Country Rankings
@@ -153,8 +195,20 @@ df_updated = combine_df_on_index(df_original, df_ism_headline_index, 'DATE')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
-#TODO: Get China Caixin PMI - https://tradingeconomics.com/china/manufacturing-pmi
-#TODO: Get China Official PMI - https://tradingeconomics.com/china/business-confidence
+##########################
+# Get China Official PMI #
+##########################
+
+sheet_name = 'DB China Official PMI'
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+df_china_official_pmi = scrape_china_official_pmi()
+
+#Combine new data with original data
+df_updated = combine_df_on_index(df_original, df_china_official_pmi, 'DATE')
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
 #TODO: Get Euro Area EZU
 #TODO: Get Euro Area GDP QoQ
 #TODO: Get UK EWU
