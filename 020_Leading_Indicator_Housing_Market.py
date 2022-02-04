@@ -17,13 +17,8 @@ df_COMPUTSA = get_stlouisfed_data('COMPUTSA')
 df = combine_df_on_index(df_PERMIT,df_HOUST,"DATE")
 df = combine_df_on_index(df_COMPUTSA,df,"DATE")
 
-#LEGACY: Write to a csv file in the correct directory
-#write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
-
-# Rather than writing to directory, update and save the sheet
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-#df_updated = append_new_rows_to_df(df_original, df, 'DATE')
 
 df_updated = combine_df_on_index(df_original, df, 'DATE')
 
