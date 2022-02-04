@@ -47,12 +47,12 @@ for etf in etfs:
     df_etf_data = combine_df_on_index(df_etf_data, df_etf, 'DATE')
 
 
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+
+df_updated = combine_df_on_index(df_original, df_etf_data, 'DATE')
 
 #TODO: Calculate Annual Returns on each asset class. Look at 007, 013 for calculation examples
-import pdb; pdb.set_trace()
 
-
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_EURUSD, False, 0)
-
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 print("Done!")
