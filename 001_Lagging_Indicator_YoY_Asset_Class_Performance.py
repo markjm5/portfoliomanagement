@@ -1,16 +1,6 @@
-from json.decoder import JSONDecodeError
-import sys
-import requests
-import os.path
-import csv
 import pandas as pd
-import xml.etree.ElementTree as ET
-from inspect import getmembers, isclass, isfunction
 from datetime import date
-from bs4 import BeautifulSoup
-from requests.models import parse_header_links
-import re
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/001_Lagging_Indicator_YoY_Asset_Class_Performance.xlsm'
