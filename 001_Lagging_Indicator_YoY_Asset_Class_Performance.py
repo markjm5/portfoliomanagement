@@ -51,9 +51,8 @@ df_updated = combine_df_on_index(df_original, df_etf_data, 'DATE')
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 
-#TODO: Calculate Annual Returns on each asset class. Look at 007, 013 for calculation examples
+#Calculate Annual Returns on each asset class. https://stackoverflow.com/questions/64096220/how-to-calculate-the-yearly-percent-return-in-pandas
 sheet_name = 'DB Annual Returns'
-
 
 data = {'DATE': []}
 
