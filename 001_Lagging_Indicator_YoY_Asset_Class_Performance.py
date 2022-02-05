@@ -68,10 +68,10 @@ for etf in etfs:
     df_etf_data = df_etf_data.drop(columns=etf, axis=1)
 
     # groupby year and aggregate sum of pct_ch to get the yearly return
-    df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year)['%s_pct_ch' % (etf,)].sum().mul(100).reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
+    #df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year)['%s_pct_ch' % (etf,)].sum().mul(100).reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
+    df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year)['%s_pct_ch' % (etf,)].sum().reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
 
     df_percentage_change = combine_df_on_index(df_percentage_change, df_yearly_pct_ch, 'DATE')
-
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
