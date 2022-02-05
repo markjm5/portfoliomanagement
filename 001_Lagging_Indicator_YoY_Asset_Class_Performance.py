@@ -64,7 +64,6 @@ df_percentage_change = pd.DataFrame(data)
 for etf in etfs:
 
     #groupby year and determine the daily percent change by year, and add it as a column to df
-    #df_etf_data[etf] = df_etf_data.groupby(df_etf_data.DATE.dt.year)[etf].apply(pd.Series.pct_change)
     df_etf_data['%s_pct_ch' % (etf,)] = df_etf_data.groupby(df_etf_data.DATE.dt.year)[etf].apply(pd.Series.pct_change)
 
     #Drop unnecessary columns
