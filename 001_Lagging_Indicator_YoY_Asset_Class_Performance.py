@@ -10,7 +10,6 @@ from datetime import date
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 import re
-import investpy
 from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data
 
@@ -32,13 +31,13 @@ df_etf_data = pd.DataFrame(data)
 todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
-etfs = [ 'RXI','XLP','XLY','XLE','XLF','XLV','XLI','XLK','XLB','XLRE','XTL','XLU','SPY','USO','QQQ','IWM','IBB','EEM','HYG','VNQ','MDY','SLY','EFA','TIP','AGG','DJP','BIL','GC=F','DX-Y.NYB']
+etfs = [ 'RXI','XLP','XLY','XLE','XLF','XLV','XLI','XLK','XLB','XLRE','XLC','XLU','SPY','USO','QQQ','IWM','IBB','EEM','HYG','VNQ','MDY','SLY','EFA','TIP','AGG','DJP','BIL','GC=F','DX-Y.NYB']
 
 #TODO: Get the following data from YF
 
 for etf in etfs:
     print("Getting Data For: %s" % (etf,))
-    df_etf = get_yf_data(etf, "1d", "2000-12-28", date_str)
+    df_etf = get_yf_data(etf, "1d", "2007-01-01", date_str)
 
     #Remove unnecessary columns and rename columns
     df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
@@ -52,7 +51,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 df_updated = combine_df_on_index(df_original, df_etf_data, 'DATE')
 
 #TODO: Calculate Annual Returns on each asset class. Look at 007, 013 for calculation examples
-
+# Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 print("Done!")
