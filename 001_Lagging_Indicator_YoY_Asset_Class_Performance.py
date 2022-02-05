@@ -33,8 +33,6 @@ date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
 etfs = [ 'RXI','XLP','XLY','XLE','XLF','XLV','XLI','XLK','XLB','XLRE','XLC','XLU','SPY','USO','QQQ','IWM','IBB','EEM','HYG','VNQ','MDY','SLY','EFA','TIP','AGG','DJP','BIL','GC=F','DX-Y.NYB']
 
-#TODO: Get the following data from YF
-
 for etf in etfs:
     print("Getting Data For: %s" % (etf,))
     df_etf = get_yf_data(etf, "1d", "2007-01-01", date_str)
@@ -45,13 +43,45 @@ for etf in etfs:
 
     df_etf_data = combine_df_on_index(df_etf_data, df_etf, 'DATE')
 
-
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 df_updated = combine_df_on_index(df_original, df_etf_data, 'DATE')
 
-#TODO: Calculate Annual Returns on each asset class. Look at 007, 013 for calculation examples
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+
+#TODO: Calculate Annual Returns on each asset class. Look at 007, 013 for calculation examples
+sheet_name = 'DB Annual Returns'
+
+
+data = {'DATE': []}
+
+# Convert the dictionary into DataFrame
+df_percentage_change = pd.DataFrame(data)
+
+#etfs = [ 'RXI','XLP','XLY','XLE','XLF','XLV','XLI','XLK','XLB','XLRE','XLC','XLU','SPY','USO','QQQ','IWM','IBB','EEM','HYG','VNQ','MDY','SLY','EFA','TIP','AGG','DJP','BIL','GC=F','DX-Y.NYB']
+
+for etf in etfs:
+
+    #groupby year and determine the daily percent change by year, and add it as a column to df
+    #df_etf_data[etf] = df_etf_data.groupby(df_etf_data.DATE.dt.year)[etf].apply(pd.Series.pct_change)
+    df_etf_data['%s_pct_ch' % (etf,)] = df_etf_data.groupby(df_etf_data.DATE.dt.year)[etf].apply(pd.Series.pct_change)
+
+    #Drop unnecessary columns
+    df_etf_data = df_etf_data.drop(columns=etf, axis=1)
+
+    # groupby year and aggregate sum of pct_ch to get the yearly return
+    df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year)['%s_pct_ch' % (etf,)].sum().mul(100).reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
+
+    df_percentage_change = combine_df_on_index(df_percentage_change, df_yearly_pct_ch, 'DATE')
+
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+
+df_updated = combine_df_on_index(df_original, df_percentage_change, 'DATE')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 print("Done!")
