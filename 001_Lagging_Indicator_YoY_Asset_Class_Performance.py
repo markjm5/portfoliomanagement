@@ -70,4 +70,6 @@ df_updated = combine_df_on_index(df_original, df_percentage_change, 'DATE')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
+#TODO: Calculate Annualized Rates
+
 print("Done!")
