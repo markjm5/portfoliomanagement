@@ -73,7 +73,7 @@ for etf in etfs:
     df_percentage_change = combine_df_on_index(df_percentage_change, df_yearly_pct_ch, 'DATE')
 
 
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
 df_updated = combine_df_on_index(df_original, df_percentage_change, 'DATE')
 
