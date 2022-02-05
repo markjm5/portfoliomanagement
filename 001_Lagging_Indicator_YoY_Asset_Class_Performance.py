@@ -59,8 +59,6 @@ data = {'DATE': []}
 # Convert the dictionary into DataFrame
 df_percentage_change = pd.DataFrame(data)
 
-#etfs = [ 'RXI','XLP','XLY','XLE','XLF','XLV','XLI','XLK','XLB','XLRE','XLC','XLU','SPY','USO','QQQ','IWM','IBB','EEM','HYG','VNQ','MDY','SLY','EFA','TIP','AGG','DJP','BIL','GC=F','DX-Y.NYB']
-
 for etf in etfs:
 
     #groupby year and determine the daily percent change by year, and add it as a column to df
