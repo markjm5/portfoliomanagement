@@ -20,7 +20,7 @@ excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indica
 # Get US Lagging and Coincident Indicators #
 ############################################
 
-sheet_name = 'DB Lagging and Coincident'
+sheet_name = 'DB US Lagging Indicators'
 
 #US GDP
 df_GDPC1 = get_gdp_fred('GDPC1')
@@ -50,7 +50,7 @@ df_INDPRO = get_stlouisfed_data('INDPRO')
 ##################################
 # Get US Rates and Currency Data #
 ##################################
-
+sheet_name = 'DB US Rates and Currency'
 
 
 
