@@ -15,19 +15,51 @@ from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headl
 from common import get_stlouisfed_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
-sheet_name = 'DB Big Picture'
 
-#Get GDP
+############################################
+# Get US Lagging and Coincident Indicators #
+############################################
+
+sheet_name = 'DB Lagging and Coincident'
+
+#US GDP
 df_GDPC1 = get_gdp_fred('GDPC1')
 #TODO: Get last GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
 
-#Get Core CPI
+#US  Core CPI
 df_CPILFESL = get_stlouisfed_data('CPILFESL')
 
-#Get Core PCE
+#US  Core PCE
 df_PCEPILFE = get_stlouisfed_data('PCEPILFE')
 
-#Retail Sales Ex Auto and Gas
+#US Retail Sales Ex Auto and Gas
 df_MARTSSM44W72USS = get_stlouisfed_data('MARTSSM44W72USS')
+
+#US Unemployment Rate
+df_UNRATE = get_stlouisfed_data('UNRATE')
+
+#US NFP
+df_PAYEMS = get_stlouisfed_data('PAYEMS')
+
+#US Weekly Claims
+df_ICSA = get_stlouisfed_data('ICSA')
+
+#US Industrial Production
+df_INDPRO = get_stlouisfed_data('INDPRO')
+
+##################################
+# Get US Rates and Currency Data #
+##################################
+
+
+
+
+#############################
+# Get US Leading Indicators #
+#############################
+
+
+
+
 
 print("Done!")
