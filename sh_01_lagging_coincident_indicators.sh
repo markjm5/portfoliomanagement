@@ -9,8 +9,4 @@ python 008_Lagging_Indicator_Global_Inflation.py
 python 009_Lagging_Indicator_US_Industrial_Production.py
 python 010_Lagging_Indicator_World_Industrial_Production.py
 python 011_Lagging_Indicator_Retail_Sales.py
-python 012_Central_Banks.py
-python 013_Interest_Rates.py
-python 014_US_Global_Money_Supply.py
-python 015_Leading_Indicator_US_Consumer_Confidence.py
-python 016_Leading_Indicator_US_ISM_Manufacturing.py
+python 011_Lagging_Indicator_Durable_Goods.py

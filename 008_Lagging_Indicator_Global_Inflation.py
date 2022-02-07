@@ -24,7 +24,7 @@ todays_date = date.today()
 endDate = '%s-Q4' % (todays_date.year)
 
 df_global_cpi = get_oecd_data('PRICES_CPI', [country, subject, measure, [frequency]], {'startTime': startDate, 'endTime': endDate, 'dimensionAtObservation': 'AllDimensions','filename': '008_Global_CPI.xml'})
-df_global_cpi = df_global_cpi.drop('MTH', 1)
+df_global_cpi = df_global_cpi.drop(columns='MTH', axis=1)
 
 df_original_global_cpi = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 

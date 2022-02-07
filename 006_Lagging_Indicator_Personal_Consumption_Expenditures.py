@@ -15,8 +15,10 @@ df_CPILFESL = get_stlouisfed_data('CPILFESL')
 #Combine all these data frames into a single data frame based on the DATE field
 
 df = combine_df_on_index(df_PCEPI,df_PCEPILFE,"DATE")
-df = combine_df_on_index(df_DFEDTARU,df,"DATE")
 df = combine_df_on_index(df_CPILFESL,df,"DATE")
+
+#df = combine_df_on_index(df_DFEDTARU,df,"DATE")
+df = pd.merge(df,df_DFEDTARU,"left", on='DATE')
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 df_updated = combine_df_on_index(df_original, df, 'DATE')
