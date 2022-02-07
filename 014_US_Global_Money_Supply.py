@@ -1,11 +1,5 @@
-from json.decoder import JSONDecodeError
-import sys
 import requests
-import os.path
-import csv
 import pandas as pd
-import xml.etree.ElementTree as ET
-from inspect import getmembers, isclass, isfunction
 from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup

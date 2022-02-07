@@ -1,18 +1,7 @@
-from json.decoder import JSONDecodeError
-import certifi
-from cif import cif
-import sys
-import requests
-import os.path
-import csv
 import pandas as pd
-import xml.etree.ElementTree as ET
-from inspect import getmembers, isclass, isfunction
 from datetime import date
-from bs4 import BeautifulSoup
-from requests.models import parse_header_links
-import re
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, scrape_world_gdp_table
+from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import combine_df_on_index, scrape_world_gdp_table
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/003_Lagging_Indicator_World_GDP.xlsm'
 

@@ -1,7 +1,3 @@
-import requests
-import os.path
-import csv
-import pandas as pd
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index
 

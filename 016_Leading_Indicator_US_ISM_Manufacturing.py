@@ -1,23 +1,8 @@
-from ast import Index
-from json.decoder import JSONDecodeError
-import sys
-from xml.dom.minidom import Attr
-from idna import InvalidCodepointContext
-import requests
-import os.path
-import csv
-import calendar
 import re
 import pandas as pd
-import xml.etree.ElementTree as ET
-from inspect import getmembers, isclass, isfunction
-from datetime import datetime as dt
-from dateutil import parser, relativedelta
-from datetime import date
 from bs4 import BeautifulSoup
-from requests.models import parse_header_links
 from common import get_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, convert_html_table_to_df, get_ism_date, get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index, _util_check_diff_list
+from common import combine_df_on_index, get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index, _util_check_diff_list
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
 

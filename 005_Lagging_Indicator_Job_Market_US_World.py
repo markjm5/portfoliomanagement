@@ -1,11 +1,9 @@
 import requests
-import os.path
-import csv
-import re
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import date
-from common import get_stlouisfed_data, get_oecd_data, convert_excelsheet_to_dataframe, combine_df_on_index, write_dataframe_to_excel
+from common import get_stlouisfed_data, get_oecd_data, convert_excelsheet_to_dataframe
+from common import combine_df_on_index, write_dataframe_to_excel
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/005_Lagging_Indicator_Job_Market_US_World.xlsm'
 
