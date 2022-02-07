@@ -1,9 +1,8 @@
 #!/bin/bash
 
-python 015_Leading_Indicator_US_Consumer_Confidence.py
+python 015_Leading_Indicator_US_LEI_Consumer_Confidence.py
 python 016_Leading_Indicator_US_ISM_Manufacturing.py
 python 017_Leading_Indicator_US_ISM_Services.py
 python 018_Leading_Indicator_PMI_Manufacturing_World.py
-python 018_Leading_Indicator_PMI_Manufacturing_World.py
 python 019_Leading_Indicator_PMI_Services_World.py
-python 019_Leading_Indicator_US_Housing_Market.py
+python 020_Leading_Indicator_Housing_Market.py
