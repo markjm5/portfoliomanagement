@@ -52,7 +52,14 @@ df_INDPRO = get_stlouisfed_data('INDPRO')
 ##################################
 sheet_name = 'DB US Rates and Currency'
 
+#TODO: Get Fed Funds Current Target Rate From: https://www.bankrate.com/rates/interest-rates/federal-funds-rate.aspx
 
+#TODO: Calculate Eurodollar Futures quotes for 1m, 6m, 12m
+# https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html
+
+#TODO: Get Bond Yiends for 30y, 10y, 2y, 3m, and yield curve (ie. 10y - 2y)
+
+#TODO get DXY for Last, 6m, 12m
 
 #############################
 # Get US Leading Indicators #

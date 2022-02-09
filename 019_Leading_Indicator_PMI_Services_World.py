@@ -2,7 +2,6 @@ import requests
 import pandas as pd
 from datetime import datetime as dt
 from bs4 import BeautifulSoup
-from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index
 

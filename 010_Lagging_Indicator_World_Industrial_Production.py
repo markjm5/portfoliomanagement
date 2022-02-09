@@ -6,7 +6,6 @@ import calendar
 from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
-from requests.models import parse_header_links
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, scrape_world_gdp_table
 from common import convert_html_table_to_df
 
