@@ -74,7 +74,6 @@ def get_eurodollar_futures():
 
         td = tr.find_all('td')
         if(td):
-
             for obs in td:
                 text = obs.text
                 temp_row.append(text)        
@@ -90,7 +89,7 @@ def get_eurodollar_futures():
     df['Month'] = pd.to_datetime(df['Month'],format='%b %Y')
 
     current_value = None
-    three_month_value = None
+    one_month_value = None
     six_month_value = None
     twelve_month_value = None
 
@@ -103,7 +102,7 @@ def get_eurodollar_futures():
                 pass        
         elif(index==2):
             try:
-                three_month_value = current_value - float(row['Last'])
+                one_month_value = current_value - float(row['Last'])
             except ValueError as e:
                 pass        
 
@@ -121,10 +120,13 @@ def get_eurodollar_futures():
 
         print("%s-%s" % (row['Month'], row['Last']))
 
-    import pdb; pdb.set_trace()
+    # initialize list of lists
+    data = [['Euro Futures 1m', one_month_value], ['Euro Futures 6m', six_month_value], ['Euro Futures 12m', twelve_month_value]]
     
-    return df    
+    # Create the pandas DataFrame
+    df_eurodollar_futures = pd.DataFrame(columns=['COL1', 'LAST'], data=data)
 
+    return df_eurodollar_futures    
 
 ############################################
 # Get US Lagging and Coincident Indicators #
@@ -163,26 +165,20 @@ df_INDPRO = get_stlouisfed_data('INDPRO')
 sheet_name = 'DB US Rates and Currency'
 
 #Get Current Fed Funds Current Target Rate
-
 current_ffr_target = get_current_ffr_target()
 
-#TODO: Calculate Eurodollar Futures quotes for 1m, 6m, 12m
-# https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html
-
+# Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
 
-import pdb; pdb.set_trace()
-
 #TODO: Get Bond Yiends for 30y, 10y, 2y, 3m, and yield curve (ie. 10y - 2y)
+
+import pdb; pdb.set_trace()
 
 #TODO get DXY for Last, 6m, 12m
 
 #############################
 # Get US Leading Indicators #
 #############################
-
-
-
 
 
 print("Done!")
