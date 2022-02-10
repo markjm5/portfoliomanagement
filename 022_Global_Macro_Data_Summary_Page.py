@@ -7,7 +7,6 @@ from inspect import getmembers, isclass, isfunction
 from datetime import datetime as dt
 from dateutil import parser, relativedelta
 from datetime import date
-from helium import start_chrome
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
@@ -77,7 +76,6 @@ def get_eurodollar_futures():
     #Insert New Row. Format the data to show percentage as float
     for tr in table_rows:
         temp_row = []
-        first_col = True
 
         td = tr.find_all('td')
         if(td):
@@ -89,10 +87,13 @@ def get_eurodollar_futures():
             df.loc[len(df.index)] = temp_row
 
     df = df.drop(columns=['Change','Options','Chart','Open', 'High', 'Low', 'Volume', 'Updated', 'PriorSettle'], axis=1)
+    pattern_select = re.compile(r'((?!=[0-9])GE[A-Z][0-9])')
 
-    #TODO: Remove rows with '-'
-    #TODO: Format 'Last' as Numeric
-    #TODO: Format Month as Date
+    df['Month'] = df['Month'].str.replace(pattern_select,'')
+
+    # format date
+    df['Month'] = pd.to_datetime(df['Month'],format='%b %Y')
+
     #TODO: Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 
     import pdb; pdb.set_trace()
