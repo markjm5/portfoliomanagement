@@ -1,3 +1,4 @@
+from multiprocessing.sharedctypes import Value
 import requests
 import calendar
 import re
@@ -88,9 +89,40 @@ def get_eurodollar_futures():
     # format date
     df['Month'] = pd.to_datetime(df['Month'],format='%b %Y')
 
-    #TODO: Calculate Eurodollar Futures quotes for 1m, 6m, 12m
+    current_value = None
+    three_month_value = None
+    six_month_value = None
+    twelve_month_value = None
+
+    # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
+    for index, row in df.iterrows():
+        if(index==0):
+            try:
+                current_value = float(row['Last'])
+            except ValueError as e:
+                pass        
+        elif(index==2):
+            try:
+                three_month_value = current_value - float(row['Last'])
+            except ValueError as e:
+                pass        
+
+        elif(index==5):
+            try:
+                six_month_value = current_value - float(row['Last'])
+            except ValueError as e:
+                pass        
+
+        elif(index==11):
+            try:
+                twelve_month_value = current_value - float(row['Last'])
+            except ValueError as e:
+                pass        
+
+        print("%s-%s" % (row['Month'], row['Last']))
 
     import pdb; pdb.set_trace()
+    
     return df    
 
 
