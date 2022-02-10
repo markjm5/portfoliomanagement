@@ -8,6 +8,8 @@ from datetime import datetime as dt
 from dateutil import parser, relativedelta
 from datetime import date
 from helium import start_chrome
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
@@ -48,36 +50,25 @@ def get_eurodollar_futures():
 
     url = "https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html"
 
-    browser = start_chrome(url, headless=True)
+    from selenium.webdriver.chrome.options import Options
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
 
-    html = browser.page_source
+    driver = webdriver.Chrome(ChromeDriverManager().install())
+    #driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
 
-    print(html)
-    #TODO: Fix error here: https://www.tutorialfor.com/questions-117998.htm
-    #TODO: Follow youtube instructions: https://www.youtube.com/watch?v=onlQ7fL4ey8
-
-    import pdb; pdb.set_trace()
-
-    driver = webdriver.PhantomJS()
-    driver.get(url)
-    p_element = driver.find_element_by_id(id_='intro-text')
-    print(p_element.text)
+    #driver = webdriver.Chrome()
     
-    import pdb; pdb.set_trace()
+    driver.get(url)
+    html = driver.page_source
+    driver.close()
 
-    agent = (
-        "Mozilla/5.0 (X11; Linux x86_64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/85.0.4183.102 Safari/537.36"
-    )
-
-    url = "https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html"
-    page = requests.get(url, headers={'user-agent': agent})
-    soup = BeautifulSoup(page.content, 'html.parser')
-
-    table = soup.find_all('div')
+    soup = BeautifulSoup(html, 'html.parser')
+    table = soup.find_all('table')
 
     import pdb; pdb.set_trace()
+
+    #TODO: Iterate through table elements and get eurodollar futures quotes
     #table_rows = table.find_all('tr', attrs={'align':'center'})
     #table_rows_header = table.find_all('tr')[0].find_all('th')
     df = pd.DataFrame()
