@@ -191,6 +191,35 @@ def get_oecd_data(dataset, dimensions, params):
   #  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   #  print(exc_type, fname, exc_tb.tb_lineno)
 
+def get_us_treasury_yields(filename):
+    # https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202202
+
+    #TODO: Dynamically Load Todays Year and Month
+    todays_date = date.today()
+    date_str = "%s%s" % (todays_date.year, todays_date.month)
+    import pdb; pdb.set_trace()
+    url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=202202"
+
+    file_path = 'XML/%s' % filename 
+    try:
+        resp = requests.get(url=url)
+
+        resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
+        # Write response to an XML File
+        with open(file_path, 'w') as f:
+            f.write(resp_formatted)
+
+    except requests.exceptions.ConnectionError:
+        print("Connection refused, Opening from File...")
+
+    # Load in the XML file into ElementTree
+    tree = ET.parse(file_path)
+
+    #Load into a dataframe and return the data frame
+    root = tree.getroot()
+
+    import pdb; pdb.set_trace()
+
 def get_yf_data(ticker, interval, start, end):
   data = yf.download(  # or pdr.get_data_yahoo(...
     # tickers list or string as well

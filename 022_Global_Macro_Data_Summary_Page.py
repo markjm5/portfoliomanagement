@@ -16,7 +16,7 @@ from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data, get_gdp_fred,get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
-from common import get_stlouisfed_data
+from common import get_stlouisfed_data, get_us_treasury_yields
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 
@@ -158,19 +158,21 @@ df_ICSA = get_stlouisfed_data('ICSA')
 
 #US Industrial Production
 df_INDPRO = get_stlouisfed_data('INDPRO')
-"""
+
 ##################################
 # Get US Rates and Currency Data #
 ##################################
 sheet_name = 'DB US Rates and Currency'
 
-#Get Current Fed Funds Current Target Rate
+# Get Current Fed Funds Current Target Rate
 current_ffr_target = get_current_ffr_target()
 
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
+"""
 
-#TODO: Get Bond Yiends for 30y, 10y, 2y, 3m, and yield curve (ie. 10y - 2y)
+#TODO: Get Bond Yields for 30y, 10y, 2y, 3m, and yield curve (ie. 10y - 2y)
+df_us_treasury_yields = get_us_treasury_yields('022_Daily_Treasury_Yields.xml')
 
 import pdb; pdb.set_trace()
 

@@ -4,6 +4,9 @@ from common import combine_df_on_index
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
 sheet_name = 'Database'
 
+# TODO: Update with data from offcial treasury website: 
+# https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=202202
+
 df_DTB3 = get_stlouisfed_data('DTB3')
 df_DGS10 = get_stlouisfed_data('DGS10')
 
