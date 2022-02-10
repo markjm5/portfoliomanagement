@@ -1,3 +1,4 @@
+from lib2to3.pgen2.pgen import DFAState
 from pandas.io import excel
 import requests
 import sys
@@ -192,61 +193,54 @@ def get_oecd_data(dataset, dimensions, params):
   #  print(exc_type, fname, exc_tb.tb_lineno)
 
 def get_us_treasury_yields(filename):
-    # https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202202
+  # https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202202
 
-    todays_date = date.today()
-    date_str = "%s%s" % (todays_date.strftime('%Y'), todays_date.strftime('%m'))
+  todays_date = date.today()
+  date_str = "%s%s" % (todays_date.strftime('%Y'), todays_date.strftime('%m'))
 
-    url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=%s" % (date_str,)
+  url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=%s" % (date_str,)
 
-    file_path = 'XML/%s' % filename 
-    try:
-        resp = requests.get(url=url)
+  file_path = 'XML/%s' % filename 
+  try:
+      resp = requests.get(url=url)
 
-        resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
-        # Write response to an XML File
-        with open(file_path, 'w') as f:
-            f.write(resp_formatted)
+      resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
+      # Write response to an XML File
+      with open(file_path, 'w') as f:
+          f.write(resp_formatted)
 
-    except requests.exceptions.ConnectionError:
-        print("Connection refused, Opening from File...")
+  except requests.exceptions.ConnectionError:
+      print("Connection refused, Opening from File...")
 
-    # Load in the XML file into ElementTree
-    tree = ET.parse(file_path)
+  # Load in the XML file into ElementTree
+  tree = ET.parse(file_path)
+  data = {'DATE': [], '2M': [], '3M': [], '10Y': [], '30Y': []}
+  df_us_treasury_yields = pd.DataFrame(data=data)
 
-    #Load into a dataframe and return the data frame
-    root = tree.getroot()
+  #Load into a dataframe and return the data frame
+  root = tree.getroot()
 
-    ns = {'ty': 'http://www.w3.org/2005/Atom', 'm': 'm'}
+  ns = {'ty': 'http://www.w3.org/2005/Atom'}
 
-    content = root.findall('./ty:entry/ty:content',ns)
+  # <class 'xml.etree.ElementTree.Element'>
+  for content in root.findall('./ty:entry/ty:content',ns):
+    temp_row = []
 
-    latest_content = content[len(content) - 1]
+    for elem in content.iter():
+      #Check if current tag is the date, 30y, 10y, 2y or 3m
+      if(elem.tag.__contains__("NEW_DATE")|elem.tag.__contains__("BC_2MONTH")|elem.tag.__contains__("BC_3MONTH")|elem.tag.__contains__("BC_10YEAR")|elem.tag.__contains__("BC_30YEARDISPLAY")):
+        temp_row.append(elem.text)        
 
-    # <class 'xml.etree.ElementTree.Element'>
+    #print(temp_row)
+    df_us_treasury_yields.loc[len(df_us_treasury_yields.index)] = temp_row
+    #print(elem.tag)
+    #print(elem.text)
 
-    for elem in latest_content.iter():
-      #TODO: Use regex to check if current tag is 30y, 10y, 2y, 3m
-      """
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}NEW_DATE >> 2022-02-09T00:00:00
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_1MONTH
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_2MONTH
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_3MONTH
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_6MONTH
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_1YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_2YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_3YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_5YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_7YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_10YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_20YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_30YEAR
-      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_30YEARDISPLAY 
-      """
-      print(elem.tag)
-      print(elem.text)
+  #TODO: Calculate yield curve (10y - 2y)
+  #TODO: Calculate yield curve (10y - 3y)
 
-    import pdb; pdb.set_trace()
+  return df_us_treasury_yields
+
 
 def get_yf_data(ticker, interval, start, end):
   data = yf.download(  # or pdr.get_data_yahoo(...
