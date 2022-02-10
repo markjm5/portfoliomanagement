@@ -194,11 +194,10 @@ def get_oecd_data(dataset, dimensions, params):
 def get_us_treasury_yields(filename):
     # https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202202
 
-    #TODO: Dynamically Load Todays Year and Month
     todays_date = date.today()
-    date_str = "%s%s" % (todays_date.year, todays_date.month)
-    import pdb; pdb.set_trace()
-    url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=202202"
+    date_str = "%s%s" % (todays_date.strftime('%Y'), todays_date.strftime('%m'))
+
+    url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=%s" % (date_str,)
 
     file_path = 'XML/%s' % filename 
     try:
@@ -217,6 +216,35 @@ def get_us_treasury_yields(filename):
 
     #Load into a dataframe and return the data frame
     root = tree.getroot()
+
+    ns = {'ty': 'http://www.w3.org/2005/Atom', 'm': 'm'}
+
+    content = root.findall('./ty:entry/ty:content',ns)
+
+    latest_content = content[len(content) - 1]
+
+    # <class 'xml.etree.ElementTree.Element'>
+
+    for elem in latest_content.iter():
+      #TODO: Use regex to check if current tag is 30y, 10y, 2y, 3m
+      """
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}NEW_DATE >> 2022-02-09T00:00:00
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_1MONTH
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_2MONTH
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_3MONTH
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_6MONTH
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_1YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_2YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_3YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_5YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_7YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_10YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_20YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_30YEAR
+      {http://schemas.microsoft.com/ado/2007/08/dataservices}BC_30YEARDISPLAY 
+      """
+      print(elem.tag)
+      print(elem.text)
 
     import pdb; pdb.set_trace()
 
