@@ -25,13 +25,7 @@ def get_current_ffr_target():
 
     page = requests.get(url=url)
     soup = BeautifulSoup(page.content, 'html.parser')
-
-    data = {'Date': []}
     
-    # Convert the dictionary into DataFrame
-    df_countries_pmi = pd.DataFrame(data)
-
-    #TODO: Need to scrape table for world production countries and numbers.
     table = soup.find('table')
 
     ffr_str = table.find('tbody').find('tr').find('td').text.strip()
