@@ -213,7 +213,7 @@ df_industrial_production = get_data(df_INDPRO)
 #print(df_nfp)
 #print(df_weekly_claims)
 #print(df_industrial_production)
-"""
+
 ##################################
 # Get US Rates and Currency Data #
 ##################################
@@ -251,7 +251,7 @@ print(df_current_ffr_target)
 print(df_eurodollar_futures)
 print(df_us_treasury_yields)
 print(df_dxy)
-import pdb; pdb.set_trace()
+
 #############################
 # Get US Leading Indicators #
 #############################
@@ -303,6 +303,15 @@ df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name
 df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
 df_ism_ser = get_data(df_ism_ser_017)
 
+#print(df_lei)
+#print(df_umcsi)
+#print(df_exp)
+#print(df_permits)
+#print(df_ism)
+#print(df_new_orders)
+#print(df_ism_ser)
+
+"""
 #TODO: Money Supply M1
 #TODO: Money Supply M2
 
