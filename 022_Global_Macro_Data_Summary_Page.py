@@ -289,10 +289,7 @@ sheet_name_017 = 'DB Details'
 # Get Original Sheet and store it in a dataframe
 df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name_017, True)
 df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
-
 df_ism_ser = get_data(df_ism_ser_017)
-
-import pdb; pdb.set_trace()
 
 #TODO: Money Supply M1
 #TODO: Money Supply M2
