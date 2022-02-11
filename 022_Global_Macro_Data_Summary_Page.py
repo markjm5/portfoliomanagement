@@ -128,6 +128,16 @@ def get_eurodollar_futures():
 
     return df_eurodollar_futures    
 
+def get_data(df):
+    # retrieve Last, 6m and 12m values for data specified in df
+    df_last = get_df_row(df, df['DATE'].max(), 'LAST')
+    df_6_months_ago = get_df_row(df, df['DATE'].max() - pd.DateOffset(months=6), '6M')
+    df_12_months_ago = get_df_row(df, df['DATE'].max() - pd.DateOffset(months=12),'12M')
+    df_new = combine_df_on_index(df_last, df_6_months_ago, 'COL0')
+    df_new = combine_df_on_index(df_new, df_12_months_ago, 'COL0')
+    df_new = reorder_cols(df_new)
+    return df_new
+
 def get_df_row(df, date, col_name):
     df = df.loc[(df['DATE'] == date)].T
     df = df.iloc[1: , :]    
@@ -196,14 +206,7 @@ sheet_name_013 = 'Database'
 # Get Original Sheet and store it in a dataframe
 df_data_013 = convert_excelsheet_to_dataframe(excel_file_path_013, sheet_name_013, True)
 
-# retrieve Last, 6m and 12m values for 30y, 10y and 2y yields
-df_us_treasury_yields_last = get_df_row(df_data_013, df_data_013['DATE'].max(), 'LAST')
-df_us_treasury_yields_6_months_ago = get_df_row(df_data_013, df_data_013['DATE'].max() - pd.DateOffset(months=6), '6M')
-df_us_treasury_yields_12_months_ago = get_df_row(df_data_013, df_data_013['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_us_treasury_yields = combine_df_on_index(df_us_treasury_yields_last, df_us_treasury_yields_6_months_ago, 'COL0')
-df_us_treasury_yields = combine_df_on_index(df_us_treasury_yields, df_us_treasury_yields_12_months_ago, 'COL0')
-df_us_treasury_yields = reorder_cols(df_us_treasury_yields)
-
+df_us_treasury_yields = get_data(df_data_013)
 
 # Get DXY for Last, 6m, 12m
 excel_file_path_001 = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/001_Lagging_Indicator_YoY_Asset_Class_Performance.xlsm'
@@ -216,13 +219,7 @@ df_dxy_001 = df_data_001.filter(['DATE','DX-Y.NYB'])
 #Rename column
 df_dxy_001 = df_dxy_001.rename(columns={"DX-Y.NYB": "DXY"})
 
-# Conference Board LEI
-df_dxy_last = get_df_row(df_dxy_001.filter(['DATE','DXY']), df_dxy_001['DATE'].max(), 'LAST')
-df_dxy_6_months_ago = get_df_row(df_dxy_001.filter(['DATE','DXY']), df_dxy_001['DATE'].max() - pd.DateOffset(months=6), '6M')
-df_dxy_12_months_ago = get_df_row(df_dxy_001.filter(['DATE','DXY']), df_dxy_001['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_dxy = combine_df_on_index(df_dxy_last, df_dxy_6_months_ago, 'COL0')
-df_dxy = combine_df_on_index(df_dxy, df_dxy_12_months_ago, 'COL0')
-df_dxy = reorder_cols(df_dxy)
+df_dxy = get_data(df_dxy_001)
 
 #############################
 # Get US Leading Indicators #
@@ -238,29 +235,9 @@ df_lei_015 = df_data_015.filter(['DATE','LEI']).dropna()
 df_umcsi_015 = df_data_015.filter(['DATE','UMCSI']).dropna()
 df_exp_015 = df_data_015.filter(['DATE','EXPECTED']).dropna()
 
-# Conference Board LEI
-df_lei_last = get_df_row(df_lei_015.filter(['DATE','LEI']).dropna(), df_lei_015['DATE'].max(), 'LAST')
-df_lei_6_months_ago = get_df_row(df_lei_015.filter(['DATE','LEI']).dropna(), df_lei_015['DATE'].max() - pd.DateOffset(months=6), '6M')
-df_lei_12_months_ago = get_df_row(df_lei_015.filter(['DATE','LEI']).dropna(), df_lei_015['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_lei = combine_df_on_index(df_lei_last, df_lei_6_months_ago, 'COL0')
-df_lei = combine_df_on_index(df_lei, df_lei_12_months_ago, 'COL0')
-df_lei = reorder_cols(df_lei)
-
-# UMCSI Index
-df_umcsi_last = get_df_row(df_umcsi_015.filter(['DATE','UMCSI']).dropna(), df_umcsi_015['DATE'].max(),'LAST')
-df_umcsi_6_months_ago = get_df_row(df_umcsi_015.filter(['DATE','UMCSI']).dropna(), df_umcsi_015['DATE'].max() - pd.DateOffset(months=6),'6M')
-df_umcsi_12_months_ago = get_df_row(df_umcsi_015.filter(['DATE','UMCSI']).dropna(), df_umcsi_015['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_umcsi = combine_df_on_index(df_umcsi_last, df_umcsi_6_months_ago, 'COL0')
-df_umcsi = combine_df_on_index(df_umcsi, df_umcsi_12_months_ago, 'COL0')
-df_umcsi = reorder_cols(df_umcsi)
-
-# UMCSI Exp
-df_exp_last = get_df_row(df_exp_015.filter(['DATE','EXPECTED']).dropna(), df_exp_015['DATE'].max(),'LAST')
-df_exp_6_months_ago = get_df_row(df_exp_015.filter(['DATE','EXPECTED']).dropna(), df_exp_015['DATE'].max() - pd.DateOffset(months=6),'6M')
-df_exp_12_months_ago = get_df_row(df_exp_015.filter(['DATE','EXPECTED']).dropna(), df_exp_015['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_exp = combine_df_on_index(df_exp_last, df_exp_6_months_ago, 'COL0')
-df_exp = combine_df_on_index(df_exp, df_exp_12_months_ago, 'COL0')
-df_exp = reorder_cols(df_exp)
+df_lei = get_data(df_lei_015)
+df_umcsi = get_data(df_umcsi_015)
+df_exp = get_data(df_exp_015)
 
 # Building Permits
 excel_file_path_020 = '/Trading_Excel_Files/03_Leading_Indicators/020_Leading_Indicator_US_Housing_Market.xlsm'
@@ -270,12 +247,7 @@ sheet_name_020 = 'Database New'
 df_permits_020 = convert_excelsheet_to_dataframe(excel_file_path_020, sheet_name_020, True)
 df_permits_020 = df_permits_020.filter(['DATE','PERMIT']).dropna()
 
-df_permits_last = get_df_row(df_permits_020, df_permits_020['DATE'].max(),'LAST')
-df_permits_6_months_ago = get_df_row(df_permits_020, df_permits_020['DATE'].max() - pd.DateOffset(months=6),'6M')
-df_permits_12_months_ago = get_df_row(df_permits_020, df_permits_020['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_permits = combine_df_on_index(df_permits_last, df_permits_6_months_ago, 'COL0')
-df_permits = combine_df_on_index(df_permits, df_permits_12_months_ago, 'COL0')
-df_permits = reorder_cols(df_permits)
+df_permits = get_data(df_permits_020)
 
 # ISM Manufacturing, ISM Manuf New Orders
 excel_file_path_016 = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
@@ -288,19 +260,8 @@ df_ism_man_016 = df_ism_man_016.filter(['DATE','ISM', 'NEW_ORDERS'])
 df_ism_016 = df_ism_man_016.filter(['DATE','ISM']).dropna()
 df_new_orders_016 = df_ism_man_016.filter(['DATE','NEW_ORDERS']).dropna()
 
-df_ism_last = get_df_row(df_ism_016, df_ism_016['DATE'].max(),'LAST')
-df_ism_6_months_ago = get_df_row(df_ism_016, df_ism_016['DATE'].max() - pd.DateOffset(months=6),'6M')
-df_ism_12_months_ago = get_df_row(df_ism_016, df_ism_016['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_ism = combine_df_on_index(df_ism_last, df_ism_6_months_ago, 'COL0')
-df_ism = combine_df_on_index(df_ism, df_ism_12_months_ago, 'COL0')
-df_ism = reorder_cols(df_ism)
-
-df_new_orders_last = get_df_row(df_new_orders_016, df_new_orders_016['DATE'].max(),'LAST')
-df_new_orders_6_months_ago = get_df_row(df_new_orders_016, df_new_orders_016['DATE'].max() - pd.DateOffset(months=6),'6M')
-df_new_orders_12_months_ago = get_df_row(df_new_orders_016, df_new_orders_016['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_new_orders = combine_df_on_index(df_new_orders_last, df_new_orders_6_months_ago, 'COL0')
-df_new_orders = combine_df_on_index(df_new_orders, df_new_orders_12_months_ago, 'COL0')
-df_new_orders = reorder_cols(df_new_orders)
+df_ism = get_data(df_ism_016)
+df_new_orders = get_data(df_new_orders_016)
 
 # ISM Services
 excel_file_path_017 = '/Trading_Excel_Files/03_Leading_Indicators/017_Leading_Indicator_US_ISM_Services.xlsm'
@@ -310,13 +271,7 @@ sheet_name_017 = 'DB Details'
 df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name_017, True)
 df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
 
-df_ism_ser_last = get_df_row(df_ism_ser_017, df_ism_ser_017['DATE'].max(),'LAST')
-df_ism_ser_6_months_ago = get_df_row(df_ism_ser_017, df_ism_ser_017['DATE'].max() - pd.DateOffset(months=6),'6M')
-df_ism_ser_12_months_ago = get_df_row(df_ism_ser_017, df_ism_ser_017['DATE'].max() - pd.DateOffset(months=12),'12M')
-df_ism_ser = combine_df_on_index(df_ism_ser_last, df_ism_ser_6_months_ago, 'COL0')
-df_ism_ser = combine_df_on_index(df_ism_ser, df_ism_ser_12_months_ago, 'COL0')
-df_ism_ser = reorder_cols(df_ism_ser)
-
+df_ism_ser = get_data(df_ism_ser_017)
 """
 
 #TODO: Money Supply M1
