@@ -128,6 +128,25 @@ def get_eurodollar_futures():
 
     return df_eurodollar_futures    
 
+def get_df_row(df, date, col_name):
+    df = df.loc[(df['DATE'] == date)].T
+    df = df.iloc[1: , :]    
+    df.rename(columns={ df.columns[0]: col_name }, inplace = True)
+    df.reset_index(inplace=True)
+    df = df.rename(columns = {'index':'COL0'})
+    return df
+
+def reorder_cols(df):
+    cols = list(df)
+    # move the column to head of list
+    cols.insert(0, cols.pop(cols.index('COL0')))
+    cols.insert(1, cols.pop(cols.index('LAST')))
+    cols.insert(2, cols.pop(cols.index('6M')))
+    cols.insert(3, cols.pop(cols.index('12M')))
+    # reorder
+    df = df[cols]
+    return df
+
 ############################################
 # Get US Lagging and Coincident Indicators #
 ############################################
@@ -169,7 +188,7 @@ current_ffr_target = get_current_ffr_target()
 
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
-
+"""
 # Get US Treasury Yields #
 excel_file_path_013 = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
 sheet_name_013 = 'Database'
@@ -178,88 +197,73 @@ sheet_name_013 = 'Database'
 df_data_013 = convert_excelsheet_to_dataframe(excel_file_path_013, sheet_name_013, True)
 
 # retrieve Last, 6m and 12m values for 30y, 10y and 2y yields
+df_us_treasury_yields_last = get_df_row(df_data_013, df_data_013['DATE'].max(), 'LAST')
+df_us_treasury_yields_6_months_ago = get_df_row(df_data_013, df_data_013['DATE'].max() - pd.DateOffset(months=6), '6M')
+df_us_treasury_yields_12_months_ago = get_df_row(df_data_013, df_data_013['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_us_treasury_yields = combine_df_on_index(df_us_treasury_yields_last, df_us_treasury_yields_6_months_ago, 'COL0')
+df_us_treasury_yields = combine_df_on_index(df_us_treasury_yields, df_us_treasury_yields_12_months_ago, 'COL0')
+df_us_treasury_yields = reorder_cols(df_us_treasury_yields)
 
-df_last = df_data_013.loc[(df_data_013['DATE'] == df_data_013['DATE'].max())].T
-df_last = df_last.iloc[1: , :]
-df_last.rename(columns={ df_last.columns[0]: "LAST" }, inplace = True)
-df_last.reset_index(inplace=True)
-df_last = df_last.rename(columns = {'index':'RATE'})
-
-df_6_months_ago = df_data_013.loc[(df_data_013['DATE'] == df_data_013['DATE'].max() - pd.DateOffset(months=6))].T
-df_6_months_ago = df_6_months_ago.iloc[1: , :]
-df_6_months_ago.rename(columns={ df_6_months_ago.columns[0]: "6M" }, inplace = True)
-df_6_months_ago.reset_index(inplace=True)
-df_6_months_ago = df_6_months_ago.rename(columns = {'index':'RATE'})
-
-df_12_months_ago = df_data_013.loc[(df_data_013['DATE'] == df_data_013['DATE'].max() - pd.DateOffset(months=12))].T
-df_12_months_ago = df_12_months_ago.iloc[1: , :]
-df_12_months_ago.rename(columns={ df_12_months_ago.columns[0]: "12M" }, inplace = True)
-df_12_months_ago.reset_index(inplace=True)
-df_12_months_ago = df_12_months_ago.rename(columns = {'index':'RATE'})
-
-df_us_treasury_yields = combine_df_on_index(df_last, df_6_months_ago, 'RATE')
-df_us_treasury_yields = combine_df_on_index(df_us_treasury_yields, df_12_months_ago, 'RATE')
-
-# get a list of columns
-cols = list(df_us_treasury_yields)
-# move the column to head of list
-cols.insert(0, cols.pop(cols.index('RATE')))
-cols.insert(1, cols.pop(cols.index('LAST')))
-cols.insert(2, cols.pop(cols.index('6M')))
-cols.insert(3, cols.pop(cols.index('12M')))
-
-# reorder
-df_us_treasury_yields = df_us_treasury_yields[cols]
 
 # Get DXY for Last, 6m, 12m
 excel_file_path_001 = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/001_Lagging_Indicator_YoY_Asset_Class_Performance.xlsm'
-
 sheet_name_001 = 'Database'
+
 # Get Original Sheet and store it in a dataframe
 df_data_001 = convert_excelsheet_to_dataframe(excel_file_path_001, sheet_name_001, True)
+df_dxy_001 = df_data_001.filter(['DATE','DX-Y.NYB'])
 
-df_data_001 = df_data_001.filter(['DATE','DX-Y.NYB'])
+#Rename column
+df_dxy_001 = df_dxy_001.rename(columns={"DX-Y.NYB": "DXY"})
 
-df_last = df_data_001.loc[(df_data_001['DATE'] == df_data_001['DATE'].max())].T
-df_last = df_last.iloc[1: , :]
-df_last.rename(columns={ df_last.columns[0]: "LAST" }, inplace = True)
-df_last.reset_index(inplace=True)
-df_last = df_last.rename(columns = {'index':'SYMBOL'})
+# Conference Board LEI
+df_dxy_last = get_df_row(df_dxy_001.filter(['DATE','DXY']), df_dxy_001['DATE'].max(), 'LAST')
+df_dxy_6_months_ago = get_df_row(df_dxy_001.filter(['DATE','DXY']), df_dxy_001['DATE'].max() - pd.DateOffset(months=6), '6M')
+df_dxy_12_months_ago = get_df_row(df_dxy_001.filter(['DATE','DXY']), df_dxy_001['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_dxy = combine_df_on_index(df_dxy_last, df_dxy_6_months_ago, 'COL0')
+df_dxy = combine_df_on_index(df_dxy, df_dxy_12_months_ago, 'COL0')
+df_dxy = reorder_cols(df_dxy)
 
-df_6_months_ago = df_data_001.loc[(df_data_001['DATE'] == df_data_001['DATE'].max() - pd.DateOffset(months=6))].T
-df_6_months_ago = df_6_months_ago.iloc[1: , :]
-df_6_months_ago.rename(columns={ df_6_months_ago.columns[0]: "6M" }, inplace = True)
-df_6_months_ago.reset_index(inplace=True)
-df_6_months_ago = df_6_months_ago.rename(columns = {'index':'SYMBOL'})
-
-df_12_months_ago = df_data_001.loc[(df_data_001['DATE'] == df_data_001['DATE'].max() - pd.DateOffset(months=12))].T
-df_12_months_ago = df_12_months_ago.iloc[1: , :]
-df_12_months_ago.rename(columns={ df_12_months_ago.columns[0]: "12M" }, inplace = True)
-df_12_months_ago.reset_index(inplace=True)
-df_12_months_ago = df_12_months_ago.rename(columns = {'index':'SYMBOL'})
-
-df_dxy = combine_df_on_index(df_last, df_6_months_ago, 'SYMBOL')
-df_dxy = combine_df_on_index(df_dxy, df_12_months_ago, 'SYMBOL')
-
-# get a list of columns
-cols = list(df_dxy)
-# move the column to head of list
-cols.insert(0, cols.pop(cols.index('SYMBOL')))
-cols.insert(1, cols.pop(cols.index('LAST')))
-cols.insert(2, cols.pop(cols.index('6M')))
-cols.insert(3, cols.pop(cols.index('12M')))
-
-# reorder
-df_dxy = df_dxy[cols]
-"""
 #############################
 # Get US Leading Indicators #
 #############################
 
+excel_file_path_015 = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_LEI_Consumer_Confidence.xlsm'
+sheet_name_015 = 'DB LEI'
+
+# Get Original Sheet and store it in a dataframe
+df_data_015 = convert_excelsheet_to_dataframe(excel_file_path_015, sheet_name_015, True)
+
+df_lei_015 = df_data_015.filter(['DATE','LEI']).dropna()
+df_umcsi_015 = df_data_015.filter(['DATE','UMCSI']).dropna()
+df_exp_015 = df_data_015.filter(['DATE','EXPECTED']).dropna()
+
+# Conference Board LEI
+df_lei_last = get_df_row(df_lei_015.filter(['DATE','LEI']).dropna(), df_lei_015['DATE'].max(), 'LAST')
+df_lei_6_months_ago = get_df_row(df_lei_015.filter(['DATE','LEI']).dropna(), df_lei_015['DATE'].max() - pd.DateOffset(months=6), '6M')
+df_lei_12_months_ago = get_df_row(df_lei_015.filter(['DATE','LEI']).dropna(), df_lei_015['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_lei = combine_df_on_index(df_lei_last, df_lei_6_months_ago, 'COL0')
+df_lei = combine_df_on_index(df_lei, df_lei_12_months_ago, 'COL0')
+df_lei = reorder_cols(df_lei)
+
+# UMCSI Index
+df_umcsi_last = get_df_row(df_umcsi_015.filter(['DATE','UMCSI']).dropna(), df_umcsi_015['DATE'].max(),'LAST')
+df_umcsi_6_months_ago = get_df_row(df_umcsi_015.filter(['DATE','UMCSI']).dropna(), df_umcsi_015['DATE'].max() - pd.DateOffset(months=6),'6M')
+df_umcsi_12_months_ago = get_df_row(df_umcsi_015.filter(['DATE','UMCSI']).dropna(), df_umcsi_015['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_umcsi = combine_df_on_index(df_umcsi_last, df_umcsi_6_months_ago, 'COL0')
+df_umcsi = combine_df_on_index(df_umcsi, df_umcsi_12_months_ago, 'COL0')
+df_umcsi = reorder_cols(df_umcsi)
+
+# UMCSI Exp
+df_exp_last = get_df_row(df_exp_015.filter(['DATE','EXPECTED']).dropna(), df_exp_015['DATE'].max(),'LAST')
+df_exp_6_months_ago = get_df_row(df_exp_015.filter(['DATE','EXPECTED']).dropna(), df_exp_015['DATE'].max() - pd.DateOffset(months=6),'6M')
+df_exp_12_months_ago = get_df_row(df_exp_015.filter(['DATE','EXPECTED']).dropna(), df_exp_015['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_exp = combine_df_on_index(df_exp_last, df_exp_6_months_ago, 'COL0')
+df_exp = combine_df_on_index(df_exp, df_exp_12_months_ago, 'COL0')
+df_exp = reorder_cols(df_exp)
+
 import pdb; pdb.set_trace()
-#TODO: UMCSI Index
-#TODO: UMCSI Exp
-#TODO: Conference Board LEI
+
 #TODO: Building Permits
 #TODO: ISM Manufacturing
 #TODO: ISM Manuf New Orders
