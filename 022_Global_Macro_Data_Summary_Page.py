@@ -143,7 +143,7 @@ df_CPILFESL = get_stlouisfed_data('CPILFESL')
 
 #US  Core PCE
 df_PCEPILFE = get_stlouisfed_data('PCEPILFE')
-
+lyca
 #US Retail Sales Ex Auto and Gas
 df_MARTSSM44W72USS = get_stlouisfed_data('MARTSSM44W72USS')
 
@@ -257,6 +257,22 @@ df_dxy = df_dxy[cols]
 #############################
 
 import pdb; pdb.set_trace()
+#TODO: UMCSI Index
+#TODO: UMCSI Exp
+#TODO: Conference Board LEI
+#TODO: Building Permits
+#TODO: ISM Manufacturing
+#TODO: ISM Manuf New Orders
+#TODO: ISM Services
+#TODO: Money Supply M1
+#TODO: Money Supply M2
+
+#TODO: Get ISM Manufacutring Sectors #
+
+
+###############################
+# Get PMI Manufacturing World #
+###############################
 
 
 
