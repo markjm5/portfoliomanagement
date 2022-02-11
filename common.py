@@ -61,7 +61,7 @@ def get_us_gdp_fred():
   df_GDPC1['GDPQoQ_ANNUALIZED'] = ((1 + df_GDPC1['GDPQoQ']) ** 4) - 1
 
   return df_GDPC1
-"""
+
 
 # Get GDP Data from St Louis FRED #
 def get_gdp_fred(series_name):
@@ -75,6 +75,7 @@ def get_gdp_fred(series_name):
   df_GDP['GDPQoQ_ANNUALIZED'] = ((1 + df_GDP['GDPQoQ']) ** 4) - 1
 
   return df_GDP
+"""
 
 def get_data_fred(series_name, col_name, period):
 

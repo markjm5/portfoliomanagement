@@ -1,7 +1,7 @@
 import re
 import pandas as pd
 from bs4 import BeautifulSoup
-from common import get_gdp_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import get_data_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index, _util_check_diff_list
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
@@ -228,7 +228,8 @@ df_ism_headline_index = scrape_ism_manufacturing_headline_index(ism_date, ism_mo
 #################################
 
 #Get US GDP
-df_GDPC1 = get_gdp_fred('GDPC1')
+#df_GDPC1 = get_gdp_fred('GDPC1')
+df_GDPC1 = get_data_fred('GDPC1', 'GDPC1', 'Q')
 
 ###########################################
 # Get S&P500 Monthly Close Prices from YF #

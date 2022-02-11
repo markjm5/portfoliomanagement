@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, get_gdp_fred,get_oecd_data
+from common import combine_df_on_index, get_yf_data, get_data_fred,get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
@@ -256,7 +256,8 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 
 series_name = 'CLVMEURSCAB1GQEA19'
 
-df_EuroAreaGDP = get_gdp_fred(series_name)
+#df_EuroAreaGDP = get_gdp_fred(series_name)
+df_EuroAreaGDP = get_data_fred(df_EuroAreaGDP, 'CLVMEURSCAB1GQEA19', 'Q')
 
 #Drop unnecessary columns
 df_EuroAreaGDP = df_EuroAreaGDP.drop(columns=series_name, axis=1)
