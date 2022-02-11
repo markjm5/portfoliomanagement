@@ -16,7 +16,7 @@ from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data, get_gdp_fred,get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
-from common import get_stlouisfed_data, get_us_treasury_yields
+from common import get_stlouisfed_data
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 
@@ -210,13 +210,54 @@ cols.insert(3, cols.pop(cols.index('12M')))
 
 # reorder
 df_us_treasury_yields = df_us_treasury_yields[cols]
-"""
-#TODO get DXY for Last, 6m, 12m
-import pdb; pdb.set_trace()
 
+# Get DXY for Last, 6m, 12m
+excel_file_path_001 = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/001_Lagging_Indicator_YoY_Asset_Class_Performance.xlsm'
+
+sheet_name_001 = 'Database'
+# Get Original Sheet and store it in a dataframe
+df_data_001 = convert_excelsheet_to_dataframe(excel_file_path_001, sheet_name_001, True)
+
+df_data_001 = df_data_001.filter(['DATE','DX-Y.NYB'])
+
+df_last = df_data_001.loc[(df_data_001['DATE'] == df_data_001['DATE'].max())].T
+df_last = df_last.iloc[1: , :]
+df_last.rename(columns={ df_last.columns[0]: "LAST" }, inplace = True)
+df_last.reset_index(inplace=True)
+df_last = df_last.rename(columns = {'index':'SYMBOL'})
+
+df_6_months_ago = df_data_001.loc[(df_data_001['DATE'] == df_data_001['DATE'].max() - pd.DateOffset(months=6))].T
+df_6_months_ago = df_6_months_ago.iloc[1: , :]
+df_6_months_ago.rename(columns={ df_6_months_ago.columns[0]: "6M" }, inplace = True)
+df_6_months_ago.reset_index(inplace=True)
+df_6_months_ago = df_6_months_ago.rename(columns = {'index':'SYMBOL'})
+
+df_12_months_ago = df_data_001.loc[(df_data_001['DATE'] == df_data_001['DATE'].max() - pd.DateOffset(months=12))].T
+df_12_months_ago = df_12_months_ago.iloc[1: , :]
+df_12_months_ago.rename(columns={ df_12_months_ago.columns[0]: "12M" }, inplace = True)
+df_12_months_ago.reset_index(inplace=True)
+df_12_months_ago = df_12_months_ago.rename(columns = {'index':'SYMBOL'})
+
+df_dxy = combine_df_on_index(df_last, df_6_months_ago, 'SYMBOL')
+df_dxy = combine_df_on_index(df_dxy, df_12_months_ago, 'SYMBOL')
+
+# get a list of columns
+cols = list(df_dxy)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('SYMBOL')))
+cols.insert(1, cols.pop(cols.index('LAST')))
+cols.insert(2, cols.pop(cols.index('6M')))
+cols.insert(3, cols.pop(cols.index('12M')))
+
+# reorder
+df_dxy = df_dxy[cols]
+"""
 #############################
 # Get US Leading Indicators #
 #############################
+
+import pdb; pdb.set_trace()
+
 
 
 print("Done!")
