@@ -172,9 +172,10 @@ df_eurodollar_futures = get_eurodollar_futures()
 """
 
 # Get Bond Yields for 30y, 10y, 2y, 3m, and yield curve (ie. 10y - 2y)
-df_us_treasury_yields = get_us_treasury_yields('022_Daily_Treasury_Yields.xml')
-
+df_us_treasury_yields = get_us_treasury_yields()
+#TODO: Get latest row
 import pdb; pdb.set_trace()
+
 
 #TODO get DXY for Last, 6m, 12m
 

@@ -192,8 +192,10 @@ def get_oecd_data(dataset, dimensions, params):
   #  fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
   #  print(exc_type, fname, exc_tb.tb_lineno)
 
-def get_us_treasury_yields(filename):
+def get_us_treasury_yields():
   # https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?type=daily_treasury_yield_curve&field_tdr_date_value_month=202202
+
+  filename = '000_Daily_Treasury_Yields.xml'
 
   todays_date = date.today()
   date_str = "%s%s" % (todays_date.strftime('%Y'), todays_date.strftime('%m'))
@@ -236,8 +238,12 @@ def get_us_treasury_yields(filename):
     #print(elem.tag)
     #print(elem.text)
 
-  #TODO: Calculate yield curve (10y - 2y)
-  #TODO: Calculate yield curve (10y - 3y)
+  # format columns
+  df_us_treasury_yields['2M'] = pd.to_numeric(df_us_treasury_yields['2M'])
+  df_us_treasury_yields['3M'] = pd.to_numeric(df_us_treasury_yields['3M'])
+  df_us_treasury_yields['10Y'] = pd.to_numeric(df_us_treasury_yields['10Y'])
+  df_us_treasury_yields['30Y'] = pd.to_numeric(df_us_treasury_yields['30Y'])
+  df_us_treasury_yields['DATE'] = pd.to_datetime(df_us_treasury_yields['DATE'],format='%Y-%m-%d')
 
   return df_us_treasury_yields
 
