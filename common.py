@@ -216,7 +216,7 @@ def get_us_treasury_yields():
 
   # Load in the XML file into ElementTree
   tree = ET.parse(file_path)
-  data = {'DATE': [], '2M': [], '3M': [], '10Y': [], '30Y': []}
+  data = {'DATE': [], '2Y': [], '3Y': [], '10Y': [], '30Y': []}
   df_us_treasury_yields = pd.DataFrame(data=data)
 
   #Load into a dataframe and return the data frame
@@ -230,7 +230,7 @@ def get_us_treasury_yields():
 
     for elem in content.iter():
       #Check if current tag is the date, 30y, 10y, 2y or 3m
-      if(elem.tag.__contains__("NEW_DATE")|elem.tag.__contains__("BC_2MONTH")|elem.tag.__contains__("BC_3MONTH")|elem.tag.__contains__("BC_10YEAR")|elem.tag.__contains__("BC_30YEARDISPLAY")):
+      if(elem.tag.__contains__("NEW_DATE")|elem.tag.__contains__("BC_2YEAR")|elem.tag.__contains__("BC_3YEAR")|elem.tag.__contains__("BC_10YEAR")|elem.tag.__contains__("BC_30YEARDISPLAY")):
         temp_row.append(elem.text)        
 
     #print(temp_row)
@@ -239,8 +239,8 @@ def get_us_treasury_yields():
     #print(elem.text)
 
   # format columns
-  df_us_treasury_yields['2M'] = pd.to_numeric(df_us_treasury_yields['2M'])
-  df_us_treasury_yields['3M'] = pd.to_numeric(df_us_treasury_yields['3M'])
+  df_us_treasury_yields['2Y'] = pd.to_numeric(df_us_treasury_yields['2Y'])
+  df_us_treasury_yields['3Y'] = pd.to_numeric(df_us_treasury_yields['3Y'])
   df_us_treasury_yields['10Y'] = pd.to_numeric(df_us_treasury_yields['10Y'])
   df_us_treasury_yields['30Y'] = pd.to_numeric(df_us_treasury_yields['30Y'])
   df_us_treasury_yields['DATE'] = pd.to_datetime(df_us_treasury_yields['DATE'],format='%Y-%m-%d')
