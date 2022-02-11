@@ -39,7 +39,14 @@ def get_current_ffr_target():
     if(len(arr_rate) > 0):
         current_ffr_target = arr_rate[0]
 
-    return current_ffr_target
+    # put value into a df with COL0, LAST headers
+    current_ffr_target = "%s%%" % (current_ffr_target)
+    data = [['Fed Funds Target Rate', current_ffr_target]]
+    
+    # Create the pandas DataFrame
+    df_current_ffr_target = pd.DataFrame(columns=['COL0', 'LAST'], data=data)
+
+    return df_current_ffr_target
 
 def get_eurodollar_futures():
 
@@ -124,7 +131,7 @@ def get_eurodollar_futures():
     data = [['Euro Futures 1m', one_month_value], ['Euro Futures 6m', six_month_value], ['Euro Futures 12m', twelve_month_value]]
     
     # Create the pandas DataFrame
-    df_eurodollar_futures = pd.DataFrame(columns=['COL1', 'LAST'], data=data)
+    df_eurodollar_futures = pd.DataFrame(columns=['COL0', 'LAST'], data=data)
 
     return df_eurodollar_futures    
 
@@ -165,7 +172,7 @@ def reorder_cols(df):
 # Get US Lagging and Coincident Indicators #
 ############################################
 """
-"""
+
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
 df_GDPC1 = get_data_fred('GDPC1', 'GDP', 'Q')
 df_us_gdp = get_data(df_GDPC1)
@@ -206,14 +213,14 @@ df_industrial_production = get_data(df_INDPRO)
 #print(df_nfp)
 #print(df_weekly_claims)
 #print(df_industrial_production)
-
+"""
 ##################################
 # Get US Rates and Currency Data #
 ##################################
 sheet_name = 'DB US Rates and Currency'
 
 # Get Current Fed Funds Current Target Rate
-current_ffr_target = get_current_ffr_target()
+df_current_ffr_target = get_current_ffr_target()
 
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
@@ -240,6 +247,11 @@ df_dxy_001 = df_dxy_001.rename(columns={"DX-Y.NYB": "DXY"})
 
 df_dxy = get_data(df_dxy_001)
 
+print(df_current_ffr_target)
+print(df_eurodollar_futures)
+print(df_us_treasury_yields)
+print(df_dxy)
+import pdb; pdb.set_trace()
 #############################
 # Get US Leading Indicators #
 #############################
