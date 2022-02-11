@@ -171,9 +171,13 @@ current_ffr_target = get_current_ffr_target()
 df_eurodollar_futures = get_eurodollar_futures()
 """
 
-# Get Bond Yields for 30y, 10y, 2y, 3m, and yield curve (ie. 10y - 2y)
-df_us_treasury_yields = get_us_treasury_yields()
-#TODO: Get latest row
+excel_file_path_013 = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
+sheet_name_013 = 'Database'
+
+# Get Original Sheet and store it in a dataframe
+df_data_013 = convert_excelsheet_to_dataframe(excel_file_path_013, sheet_name_013, True)
+#TODO: retrieve Last, 6m and 12m values for 30y, 10y and 2y yields
+
 import pdb; pdb.set_trace()
 
 

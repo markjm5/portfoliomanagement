@@ -12,7 +12,7 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 df_updated = combine_df_on_index(df_original, us_treasury_yields, 'DATE')
 
-df_updated = df_updated.drop(columns=['30Y', '3Y'], axis=1)
+df_updated = df_updated.drop(columns=['3Y'], axis=1)
 
 # get a list of columns
 cols = list(df_updated)
@@ -20,6 +20,7 @@ cols = list(df_updated)
 cols.insert(0, cols.pop(cols.index('DATE')))
 cols.insert(1, cols.pop(cols.index('2Y')))
 cols.insert(2, cols.pop(cols.index('10Y')))
+cols.insert(3, cols.pop(cols.index('30Y')))
 
 # reorder
 df_updated = df_updated[cols]
