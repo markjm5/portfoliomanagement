@@ -16,7 +16,7 @@ from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_data, get_gdp_fred,get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
-from common import get_stlouisfed_data
+from common import get_stlouisfed_data, get_gdp_fred, get_data_fred
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 
@@ -133,17 +133,21 @@ def get_data(df):
     df_last = get_df_row(df, df['DATE'].max(), 'LAST')
     df_6_months_ago = get_df_row(df, df['DATE'].max() - pd.DateOffset(months=6), '6M')
     df_12_months_ago = get_df_row(df, df['DATE'].max() - pd.DateOffset(months=12),'12M')
+
     df_new = combine_df_on_index(df_last, df_6_months_ago, 'COL0')
     df_new = combine_df_on_index(df_new, df_12_months_ago, 'COL0')
     df_new = reorder_cols(df_new)
     return df_new
 
 def get_df_row(df, date, col_name):
-    df = df.loc[(df['DATE'] == date)].T
+
+    # match on year and month only and don't worry about the day
+    df = df.loc[(df['DATE'].dt.to_period('M') == date.to_period('M'))].T    
     df = df.iloc[1: , :]    
     df.rename(columns={ df.columns[0]: col_name }, inplace = True)
     df.reset_index(inplace=True)
     df = df.rename(columns = {'index':'COL0'})
+
     return df
 
 def reorder_cols(df):
@@ -161,33 +165,39 @@ def reorder_cols(df):
 # Get US Lagging and Coincident Indicators #
 ############################################
 """
-sheet_name = 'DB US Lagging Indicators'
-
-#US GDP
-df_GDPC1 = get_gdp_fred('GDPC1')
-#TODO: Get last GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
+"""
+# Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
+df_GDPC1 = get_data_fred('GDPC1', 'GDP', 'Q')
+df_us_gdp = get_data(df_GDPC1)
 
 #US  Core CPI
-df_CPILFESL = get_stlouisfed_data('CPILFESL')
+df_CPILFESL = get_data_fred('CPILFESL', 'CORE_CPI', 'M')
+df_core_cpi = get_data(df_CPILFESL)
 
 #US  Core PCE
-df_PCEPILFE = get_stlouisfed_data('PCEPILFE')
-lyca
+df_PCEPILFE = get_data_fred('PCEPILFE', 'CORE_PCE', 'M')
+df_core_pce = get_data(df_PCEPILFE)
+
 #US Retail Sales Ex Auto and Gas
-df_MARTSSM44W72USS = get_stlouisfed_data('MARTSSM44W72USS')
+df_MARTSSM44W72USS = get_data_fred('MARTSSM44W72USS','RETAIL_SALES','M')
+df_retail_sales = get_data(df_MARTSSM44W72USS)
 
 #US Unemployment Rate
-df_UNRATE = get_stlouisfed_data('UNRATE')
+df_UNRATE = get_data_fred('UNRATE', 'UNEMPLOYMENT_RATE','M')
+df_unemployment_rate = get_data(df_UNRATE)
 
 #US NFP
 df_PAYEMS = get_stlouisfed_data('PAYEMS')
+df_nfp = get_data(df_PAYEMS)
 
 #US Weekly Claims
 df_ICSA = get_stlouisfed_data('ICSA')
+df_weekly_claims = get_data(df_ICSA)
 
 #US Industrial Production
-df_INDPRO = get_stlouisfed_data('INDPRO')
+df_INDPRO = get_data_fred('INDPRO', 'INDUSTRIAL_PRODUCTION','M')
 
+import pdb; pdb.set_trace()
 ##################################
 # Get US Rates and Currency Data #
 ##################################
@@ -272,7 +282,7 @@ df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name
 df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
 
 df_ism_ser = get_data(df_ism_ser_017)
-"""
+
 
 #TODO: Money Supply M1
 #TODO: Money Supply M2

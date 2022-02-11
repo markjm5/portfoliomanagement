@@ -76,6 +76,24 @@ def get_gdp_fred(series_name):
 
   return df_GDP
 
+def get_data_fred(series_name, col_name, period):
+
+  df = get_stlouisfed_data(series_name)
+  df = df.rename(columns={series_name: col_name})
+
+  if(period=='Q'):
+    df['%sQoQ' % (col_name,)] = (df[col_name] - df[col_name].shift()) / df[col_name].shift()
+    df['%sYoY' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=4)) / df[col_name].shift(periods=4)
+    df['%sQoQ_ANNUALIZED' % (col_name,)] = ((1 + df['%sQoQ' % (col_name)]) ** 4) - 1
+
+  elif(period=='M'):
+    df['%sMoM' % (col_name,)] = (df[col_name] - df[col_name].shift()) / df[col_name].shift()
+    df['%sQoQ' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=4)) / df[col_name].shift(periods=4)
+    df['%sYoY' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=12)) / df[col_name].shift(periods=12)
+    df['%sQoQ_ANNUALIZED' % (col_name,)] = ((1 + df['%sQoQ' % (col_name)]) ** 12) - 1
+
+  return df
+
 def get_oecd_data(dataset, dimensions, params):
 
   dim_args = ['+'.join(d) for d in dimensions]
