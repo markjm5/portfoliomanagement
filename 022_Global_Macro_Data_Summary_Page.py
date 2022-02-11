@@ -188,7 +188,7 @@ current_ffr_target = get_current_ffr_target()
 
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
-"""
+
 # Get US Treasury Yields #
 excel_file_path_013 = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
 sheet_name_013 = 'Database'
@@ -262,22 +262,76 @@ df_exp = combine_df_on_index(df_exp_last, df_exp_6_months_ago, 'COL0')
 df_exp = combine_df_on_index(df_exp, df_exp_12_months_ago, 'COL0')
 df_exp = reorder_cols(df_exp)
 
-import pdb; pdb.set_trace()
+# Building Permits
+excel_file_path_020 = '/Trading_Excel_Files/03_Leading_Indicators/020_Leading_Indicator_US_Housing_Market.xlsm'
+sheet_name_020 = 'Database New'
 
-#TODO: Building Permits
-#TODO: ISM Manufacturing
-#TODO: ISM Manuf New Orders
-#TODO: ISM Services
+# Get Original Sheet and store it in a dataframe
+df_permits_020 = convert_excelsheet_to_dataframe(excel_file_path_020, sheet_name_020, True)
+df_permits_020 = df_permits_020.filter(['DATE','PERMIT']).dropna()
+
+df_permits_last = get_df_row(df_permits_020, df_permits_020['DATE'].max(),'LAST')
+df_permits_6_months_ago = get_df_row(df_permits_020, df_permits_020['DATE'].max() - pd.DateOffset(months=6),'6M')
+df_permits_12_months_ago = get_df_row(df_permits_020, df_permits_020['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_permits = combine_df_on_index(df_permits_last, df_permits_6_months_ago, 'COL0')
+df_permits = combine_df_on_index(df_permits, df_permits_12_months_ago, 'COL0')
+df_permits = reorder_cols(df_permits)
+
+# ISM Manufacturing, ISM Manuf New Orders
+excel_file_path_016 = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
+sheet_name_016 = 'DB Details'
+
+# Get Original Sheet and store it in a dataframe
+df_ism_man_016 = convert_excelsheet_to_dataframe(excel_file_path_016, sheet_name_016, True)
+df_ism_man_016 = df_ism_man_016.filter(['DATE','ISM', 'NEW_ORDERS'])
+
+df_ism_016 = df_ism_man_016.filter(['DATE','ISM']).dropna()
+df_new_orders_016 = df_ism_man_016.filter(['DATE','NEW_ORDERS']).dropna()
+
+df_ism_last = get_df_row(df_ism_016, df_ism_016['DATE'].max(),'LAST')
+df_ism_6_months_ago = get_df_row(df_ism_016, df_ism_016['DATE'].max() - pd.DateOffset(months=6),'6M')
+df_ism_12_months_ago = get_df_row(df_ism_016, df_ism_016['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_ism = combine_df_on_index(df_ism_last, df_ism_6_months_ago, 'COL0')
+df_ism = combine_df_on_index(df_ism, df_ism_12_months_ago, 'COL0')
+df_ism = reorder_cols(df_ism)
+
+df_new_orders_last = get_df_row(df_new_orders_016, df_new_orders_016['DATE'].max(),'LAST')
+df_new_orders_6_months_ago = get_df_row(df_new_orders_016, df_new_orders_016['DATE'].max() - pd.DateOffset(months=6),'6M')
+df_new_orders_12_months_ago = get_df_row(df_new_orders_016, df_new_orders_016['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_new_orders = combine_df_on_index(df_new_orders_last, df_new_orders_6_months_ago, 'COL0')
+df_new_orders = combine_df_on_index(df_new_orders, df_new_orders_12_months_ago, 'COL0')
+df_new_orders = reorder_cols(df_new_orders)
+
+# ISM Services
+excel_file_path_017 = '/Trading_Excel_Files/03_Leading_Indicators/017_Leading_Indicator_US_ISM_Services.xlsm'
+sheet_name_017 = 'DB Details'
+
+# Get Original Sheet and store it in a dataframe
+df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name_017, True)
+df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
+
+df_ism_ser_last = get_df_row(df_ism_ser_017, df_ism_ser_017['DATE'].max(),'LAST')
+df_ism_ser_6_months_ago = get_df_row(df_ism_ser_017, df_ism_ser_017['DATE'].max() - pd.DateOffset(months=6),'6M')
+df_ism_ser_12_months_ago = get_df_row(df_ism_ser_017, df_ism_ser_017['DATE'].max() - pd.DateOffset(months=12),'12M')
+df_ism_ser = combine_df_on_index(df_ism_ser_last, df_ism_ser_6_months_ago, 'COL0')
+df_ism_ser = combine_df_on_index(df_ism_ser, df_ism_ser_12_months_ago, 'COL0')
+df_ism_ser = reorder_cols(df_ism_ser)
+
+"""
+
 #TODO: Money Supply M1
 #TODO: Money Supply M2
 
-#TODO: Get ISM Manufacutring Sectors #
-
+import pdb; pdb.set_trace()
 
 ###############################
 # Get PMI Manufacturing World #
 ###############################
 
+
+#################################
+# Get ISM Manufacturing Sectors #
+#################################
 
 
 print("Done!")
