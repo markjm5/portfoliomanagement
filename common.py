@@ -82,15 +82,15 @@ def get_data_fred(series_name, col_name, period):
   df = df.rename(columns={series_name: col_name})
 
   if(period=='Q'):
-    df['%sQoQ' % (col_name,)] = (df[col_name] - df[col_name].shift()) / df[col_name].shift()
-    df['%sYoY' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=4)) / df[col_name].shift(periods=4)
-    df['%sQoQ_ANNUALIZED' % (col_name,)] = ((1 + df['%sQoQ' % (col_name)]) ** 4) - 1
+    df['%s_QoQ' % (col_name,)] = (df[col_name] - df[col_name].shift()) / df[col_name].shift()
+    df['%s_YoY' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=4)) / df[col_name].shift(periods=4)
+    df['%s_QoQ_ANNUALIZED' % (col_name,)] = ((1 + df['%s_QoQ' % (col_name)]) ** 4) - 1
 
   elif(period=='M'):
-    df['%sMoM' % (col_name,)] = (df[col_name] - df[col_name].shift()) / df[col_name].shift()
-    df['%sQoQ' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=4)) / df[col_name].shift(periods=4)
-    df['%sYoY' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=12)) / df[col_name].shift(periods=12)
-    df['%sQoQ_ANNUALIZED' % (col_name,)] = ((1 + df['%sQoQ' % (col_name)]) ** 12) - 1
+    df['%s_MoM' % (col_name,)] = (df[col_name] - df[col_name].shift()) / df[col_name].shift()
+    df['%s_QoQ' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=4)) / df[col_name].shift(periods=4)
+    df['%s_YoY' % (col_name,)] = (df[col_name] - df[col_name].shift(periods=12)) / df[col_name].shift(periods=12)
+    df['%s_QoQ_ANNUALIZED' % (col_name,)] = ((1 + df['%s_QoQ' % (col_name)]) ** 12) - 1
 
   return df
 

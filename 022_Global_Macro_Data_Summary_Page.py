@@ -147,8 +147,8 @@ def get_df_row(df, date, col_name):
     df.rename(columns={ df.columns[0]: col_name }, inplace = True)
     df.reset_index(inplace=True)
     df = df.rename(columns = {'index':'COL0'})
-
-    return df
+    #in calse df has extra columns, make sure only to return COL0 and col_name fields each time
+    return df.filter(['COL0',col_name])
 
 def reorder_cols(df):
     cols = list(df)
@@ -164,6 +164,7 @@ def reorder_cols(df):
 ############################################
 # Get US Lagging and Coincident Indicators #
 ############################################
+"""
 """
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
 df_GDPC1 = get_data_fred('GDPC1', 'GDP', 'Q')
@@ -196,6 +197,15 @@ df_weekly_claims = get_data(df_ICSA)
 #US Industrial Production
 df_INDPRO = get_data_fred('INDPRO', 'INDUSTRIAL_PRODUCTION','M')
 df_industrial_production = get_data(df_INDPRO)
+
+#print(df_us_gdp)
+#print(df_core_cpi)
+#print(df_core_pce)
+#print(df_retail_sales)
+#print(df_unemployment_rate)
+#print(df_nfp)
+#print(df_weekly_claims)
+#print(df_industrial_production)
 
 ##################################
 # Get US Rates and Currency Data #
@@ -281,7 +291,8 @@ df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name
 df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
 
 df_ism_ser = get_data(df_ism_ser_017)
-"""
+
+import pdb; pdb.set_trace()
 
 #TODO: Money Supply M1
 #TODO: Money Supply M2
