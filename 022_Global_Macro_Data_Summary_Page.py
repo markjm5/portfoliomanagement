@@ -169,19 +169,50 @@ current_ffr_target = get_current_ffr_target()
 
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
-"""
 
+# Get US Treasury Yields #
 excel_file_path_013 = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
 sheet_name_013 = 'Database'
 
 # Get Original Sheet and store it in a dataframe
 df_data_013 = convert_excelsheet_to_dataframe(excel_file_path_013, sheet_name_013, True)
-#TODO: retrieve Last, 6m and 12m values for 30y, 10y and 2y yields
 
-import pdb; pdb.set_trace()
+# retrieve Last, 6m and 12m values for 30y, 10y and 2y yields
 
+df_last = df_data_013.loc[(df_data_013['DATE'] == df_data_013['DATE'].max())].T
+df_last = df_last.iloc[1: , :]
+df_last.rename(columns={ df_last.columns[0]: "LAST" }, inplace = True)
+df_last.reset_index(inplace=True)
+df_last = df_last.rename(columns = {'index':'RATE'})
 
+df_6_months_ago = df_data_013.loc[(df_data_013['DATE'] == df_data_013['DATE'].max() - pd.DateOffset(months=6))].T
+df_6_months_ago = df_6_months_ago.iloc[1: , :]
+df_6_months_ago.rename(columns={ df_6_months_ago.columns[0]: "6M" }, inplace = True)
+df_6_months_ago.reset_index(inplace=True)
+df_6_months_ago = df_6_months_ago.rename(columns = {'index':'RATE'})
+
+df_12_months_ago = df_data_013.loc[(df_data_013['DATE'] == df_data_013['DATE'].max() - pd.DateOffset(months=12))].T
+df_12_months_ago = df_12_months_ago.iloc[1: , :]
+df_12_months_ago.rename(columns={ df_12_months_ago.columns[0]: "12M" }, inplace = True)
+df_12_months_ago.reset_index(inplace=True)
+df_12_months_ago = df_12_months_ago.rename(columns = {'index':'RATE'})
+
+df_us_treasury_yields = combine_df_on_index(df_last, df_6_months_ago, 'RATE')
+df_us_treasury_yields = combine_df_on_index(df_us_treasury_yields, df_12_months_ago, 'RATE')
+
+# get a list of columns
+cols = list(df_us_treasury_yields)
+# move the column to head of list
+cols.insert(0, cols.pop(cols.index('RATE')))
+cols.insert(1, cols.pop(cols.index('LAST')))
+cols.insert(2, cols.pop(cols.index('6M')))
+cols.insert(3, cols.pop(cols.index('12M')))
+
+# reorder
+df_us_treasury_yields = df_us_treasury_yields[cols]
+"""
 #TODO get DXY for Last, 6m, 12m
+import pdb; pdb.set_trace()
 
 #############################
 # Get US Leading Indicators #
