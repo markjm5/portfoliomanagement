@@ -324,14 +324,15 @@ df_ism_ser = reorder_cols(df_ism_ser)
 
 import pdb; pdb.set_trace()
 
-###############################
-# Get PMI Manufacturing World #
-###############################
-
-
 #################################
 # Get ISM Manufacturing Sectors #
 #################################
+
+
+
+###############################
+# Get PMI Manufacturing World #
+###############################
 
 
 print("Done!")
