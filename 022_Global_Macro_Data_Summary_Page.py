@@ -14,9 +14,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, get_gdp_fred,get_oecd_data
+from common import combine_df_on_index, get_yf_data, get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
-from common import get_stlouisfed_data, get_gdp_fred, get_data_fred
+from common import get_stlouisfed_data, get_data_fred
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
 
