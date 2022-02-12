@@ -375,7 +375,7 @@ sheet_name_016 = 'DB Manufacturing ISM'
 
 # Get Original Sheet and store it in a dataframe
 df_ism_sectors_016 = convert_excelsheet_to_dataframe(excel_file_path_016, sheet_name_016, True).dropna()
-df_ism_sectors_016 = df_ism_sectors_016.tail(3)
+df_ism_sectors_016 = df_ism_sectors_016.tail(6)
 
 # Write the updated df back to the excel sheet. Just overwrite what is already there
 write_dataframe_to_excel(excel_file_path, sheet_name, df_ism_sectors_016, False, 0)
@@ -386,7 +386,76 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_ism_sectors_016, False,
 
 sheet_name = 'DB PMI Manufacturing World'
 
-import pdb; pdb.set_trace()
+excel_file_path_018 = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
+sheet_name_018 = 'DB Country PMI'
 
+# Load original data from excel file into original df
+df_pmi_countries_world_018 = convert_excelsheet_to_dataframe(excel_file_path_018, sheet_name_018, False)
+df_pmi_countries_world_018 = df_pmi_countries_world_018.filter(['Date','United States','China','Euro Area','Japan','Germany','France','United Kingdom','Italy','Spain','Brazil','Mexico','Russia','India','Canada','Australia','Indonesia','South Korea','Taiwan','Greece','Ireland','Turkey','Czech Republic','Poland','Denmark']).dropna()
+df_pmi_countries_world_018 = df_pmi_countries_world_018.rename(columns={"Date": "DATE"})
+
+# Add Global PMI
+sheet_name_018 = 'DB Global PMI'
+# Load original data from excel file into original df
+df_global_pmi_018 = convert_excelsheet_to_dataframe(excel_file_path_018, sheet_name_018, True)
+df_global_pmi_018 = df_global_pmi_018.filter(['DATE', 'Global']).dropna()
+
+# Add US ISM
+sheet_name_018 = 'DB US ISM Manufacturing'
+# Load original data from excel file into original df
+df_us_ism_018 = convert_excelsheet_to_dataframe(excel_file_path_018, sheet_name_018, True)
+df_us_ism_018 = df_us_ism_018.filter(['DATE', 'ISM Manufacturing']).dropna()
+df_us_ism_018 = df_us_ism_018.rename(columns={"ISM Manufacturing": "US ISM"})
+
+df_pmi_man_world = combine_df_on_index(df_pmi_countries_world_018, df_global_pmi_018, "DATE")
+df_pmi_man_world = combine_df_on_index(df_pmi_man_world, df_us_ism_018, "DATE")
+
+df_pmi_man_world = df_pmi_man_world.rename(columns={'US ISM': 'ISM','United States': 'US','China': 'CHN', 'Euro Area': 'EU','Japan': 'JPN','Germany': 'DEU',
+                                                'France': 'FRA','United Kingdom': 'UK', 'Italy': 'ITA','Spain': 'ESP', 'Brazil': 'BRA',  
+                                                'Mexico': 'MEX', 'Russia': 'RUS',  'India': 'IND', 'Canada': 'CAN', 'Australia': 'AUS', 
+                                                'Indonesia': 'IDN', 'South Korea': 'KOR', 'Taiwan': 'TAI', 'Greece': 'GRE', 'Ireland':'IRE', 
+                                                'Turkey': 'TUR', 'Czech Republic': 'CZE', 'Poland': 'POL', 'Denmark': 'DEN'}) 
+
+#Reorder columns
+# get a list of columns
+cols = list(df_pmi_man_world)
+
+# Move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+cols.insert(1, cols.pop(cols.index('Global')))
+cols.insert(2, cols.pop(cols.index('ISM')))
+cols.insert(3, cols.pop(cols.index('US'))) 
+cols.insert(4, cols.pop(cols.index('CHN'))) 
+cols.insert(5, cols.pop(cols.index('EU')))      
+cols.insert(6, cols.pop(cols.index('JPN')))          
+cols.insert(7, cols.pop(cols.index('DEU')))                
+cols.insert(8, cols.pop(cols.index('FRA')))         
+cols.insert(9, cols.pop(cols.index('UK'))) 
+cols.insert(10, cols.pop(cols.index('ITA')))          
+cols.insert(11, cols.pop(cols.index('ESP'))) 
+cols.insert(12, cols.pop(cols.index('BRA')))  
+cols.insert(13, cols.pop(cols.index('MEX'))) 
+cols.insert(14, cols.pop(cols.index('RUS')))  
+cols.insert(15, cols.pop(cols.index('IND')))   
+cols.insert(16, cols.pop(cols.index('CAN')))  
+cols.insert(17, cols.pop(cols.index('AUS')))      
+cols.insert(18, cols.pop(cols.index('IDN'))) 
+cols.insert(19, cols.pop(cols.index('KOR')))  
+cols.insert(20, cols.pop(cols.index('TAI'))) 
+cols.insert(21, cols.pop(cols.index('GRE'))) 
+cols.insert(22, cols.pop(cols.index('IRE'))) 
+cols.insert(23, cols.pop(cols.index('TUR')))           
+cols.insert(24, cols.pop(cols.index('CZE'))) 
+cols.insert(25, cols.pop(cols.index('POL'))) 
+cols.insert(26, cols.pop(cols.index('DEN')))   
+# Reorder
+df_pmi_man_world = df_pmi_man_world[cols]
+
+# Get Original Sheet and store it in a dataframe
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+df_updated = combine_df_on_index(df_original, df_pmi_man_world, 'DATE')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 print("Done!")
