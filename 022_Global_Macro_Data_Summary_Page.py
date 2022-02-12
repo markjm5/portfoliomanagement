@@ -285,7 +285,6 @@ df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
-"""
 #############################
 # Get US Leading Indicators #
 #############################
@@ -376,13 +375,24 @@ df_updated = combine_df_on_index(df_original, df_us_leading_indicators, 'COL0')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
-import pdb; pdb.set_trace()
-
+"""
 #################################
 # Get ISM Manufacturing Sectors #
 #################################
+
 sheet_name = 'DB ISM Manufacturing Sectors'
 
+excel_file_path_016 = '/Trading_Excel_Files/03_Leading_Indicators/016_Leading_Indicator_US_ISM_Manufacturing.xlsm'
+sheet_name_016 = 'DB Manufacturing ISM'
+
+# Get Original Sheet and store it in a dataframe
+df_ism_sectors_016 = convert_excelsheet_to_dataframe(excel_file_path_016, sheet_name_016, True).dropna()
+df_ism_sectors_016 = df_ism_sectors_016.tail(3)
+
+# Write the updated df back to the excel sheet. Just overwrite what is already there
+write_dataframe_to_excel(excel_file_path, sheet_name, df_ism_sectors_016, False, 0)
+
+import pdb; pdb.set_trace()
 
 ###############################
 # Get PMI Manufacturing World #
