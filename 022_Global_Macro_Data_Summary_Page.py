@@ -18,7 +18,7 @@ from common import combine_df_on_index, get_yf_data, get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
 from common import get_stlouisfed_data, get_data_fred
 
-excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
+excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/022_Global_Macro_Data_Summary_Page.xlsm'
 
 def get_current_ffr_target():
 
@@ -172,6 +172,9 @@ def reorder_cols(df):
 # Get US Lagging and Coincident Indicators #
 ############################################
 """
+"""
+sheet_name = 'DB US Lagging Indicators'
+
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
 df_GDPC1 = get_data_fred('GDPC1', 'GDP', 'Q')
 df_us_gdp = get_data(df_GDPC1)
@@ -183,6 +186,8 @@ df_core_cpi = get_data(df_CPILFESL)
 #US  Core PCE
 df_PCEPILFE = get_data_fred('PCEPILFE', 'CORE_PCE', 'M')
 df_core_pce = get_data(df_PCEPILFE)
+
+#TODO: Add Core Retail Sales and Retail Sales
 
 #US Retail Sales Ex Auto and Gas
 df_MARTSSM44W72USS = get_data_fred('MARTSSM44W72USS','RETAIL_SALES','M')
@@ -204,14 +209,36 @@ df_weekly_claims = get_data(df_ICSA)
 df_INDPRO = get_data_fred('INDPRO', 'INDUSTRIAL_PRODUCTION','M')
 df_industrial_production = get_data(df_INDPRO)
 
-#print(df_us_gdp)
-#print(df_core_cpi)
-#print(df_core_pce)
-#print(df_retail_sales)
-#print(df_unemployment_rate)
-#print(df_nfp)
-#print(df_weekly_claims)
-#print(df_industrial_production)
+# Write to excel file
+
+df_temp = df_us_gdp.append(df_core_cpi, ignore_index=True)
+df_temp = df_temp.append(df_core_pce, ignore_index=True)
+df_temp = df_temp.append(df_retail_sales, ignore_index=True)
+df_temp = df_temp.append(df_unemployment_rate, ignore_index=True)
+df_temp = df_temp.append(df_nfp, ignore_index=True)
+df_temp = df_temp.append(df_weekly_claims, ignore_index=True)
+df_temp = df_temp.append(df_industrial_production, ignore_index=True)
+
+#Select Final Columns
+df_lagging_indicators = df_temp.loc[df_temp['COL0'] == 'GDP_QoQ']
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'GDP_YoY'],True)
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'CORE_CPI_MoM'],True)
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'CORE_PCE_MoM'],True)
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'RETAIL_SALES_MoM'],True)
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'UNEMPLOYMENT_RATE_MoM'],True)
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'PAYEMS'],True) #NFP
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'ICSA'],True) #Weekly Claims
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'INDUSTRIAL_PRODUCTION_MoM'],True)
+
+# Get Original Sheet and store it in a dataframe
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+df_updated = combine_df_on_index(df_original, df_lagging_indicators, 'COL0')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+
+import pdb; pdb.set_trace()
 
 ##################################
 # Get US Rates and Currency Data #
@@ -246,14 +273,23 @@ df_dxy_001 = df_dxy_001.rename(columns={"DX-Y.NYB": "DXY"})
 
 df_dxy = get_data(df_dxy_001)
 
-print(df_current_ffr_target)
-print(df_eurodollar_futures)
-print(df_us_treasury_yields)
-print(df_dxy)
+#print(df_current_ffr_target)
+#print(df_eurodollar_futures)
+#print(df_us_treasury_yields)
+#print(df_dxy)
+
+# Get Original Sheet and store it in a dataframe
+#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
+
+# Write the updated df back to the excel sheet
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 #############################
 # Get US Leading Indicators #
 #############################
+sheet_name = 'DB US Leading Indicators'
 
 excel_file_path_015 = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_LEI_Consumer_Confidence.xlsm'
 sheet_name_015 = 'DB LEI'
@@ -320,18 +356,24 @@ df_m2 = get_data(df_M2REAL)
 #print(df_m1)
 #print(df_m2)
 
-"""
+# Get Original Sheet and store it in a dataframe
+#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+#df_updated = combine_df_on_index(df_original, df_us_leading_indicators, 'COL0')
+
+# Write the updated df back to the excel sheet
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 #################################
 # Get ISM Manufacturing Sectors #
 #################################
-import pdb; pdb.set_trace()
-
+sheet_name = 'DB ISM Manufacturing Sectors'
 
 
 ###############################
 # Get PMI Manufacturing World #
 ###############################
+sheet_name = 'DB PMI Manufacturing World'
 
 
 print("Done!")
