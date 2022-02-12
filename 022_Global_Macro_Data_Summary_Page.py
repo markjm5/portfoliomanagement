@@ -1,22 +1,12 @@
-from multiprocessing.sharedctypes import Value
 import requests
-import calendar
 import re
 import pandas as pd
-import xml.etree.ElementTree as ET
-from inspect import getmembers, isclass, isfunction
-from datetime import datetime as dt
-from dateutil import parser, relativedelta
-from datetime import date
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-from requests.models import parse_header_links
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, get_oecd_data
-from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index
-from common import get_stlouisfed_data, get_data_fred
+from common import combine_df_on_index, get_stlouisfed_data, get_data_fred
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/022_Global_Macro_Data_Summary_Page.xlsm'
 
@@ -171,7 +161,6 @@ def reorder_cols(df):
 ############################################
 # Get US Lagging and Coincident Indicators #
 ############################################
-"""
 
 sheet_name = 'DB US Lagging Indicators'
 
@@ -375,7 +364,6 @@ df_updated = combine_df_on_index(df_original, df_us_leading_indicators, 'COL0')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
-"""
 #################################
 # Get ISM Manufacturing Sectors #
 #################################
@@ -392,12 +380,13 @@ df_ism_sectors_016 = df_ism_sectors_016.tail(3)
 # Write the updated df back to the excel sheet. Just overwrite what is already there
 write_dataframe_to_excel(excel_file_path, sheet_name, df_ism_sectors_016, False, 0)
 
-import pdb; pdb.set_trace()
-
 ###############################
 # Get PMI Manufacturing World #
 ###############################
+
 sheet_name = 'DB PMI Manufacturing World'
+
+import pdb; pdb.set_trace()
 
 
 print("Done!")
