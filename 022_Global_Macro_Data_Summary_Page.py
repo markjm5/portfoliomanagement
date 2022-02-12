@@ -172,7 +172,6 @@ def reorder_cols(df):
 # Get US Lagging and Coincident Indicators #
 ############################################
 """
-
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
 df_GDPC1 = get_data_fred('GDPC1', 'GDP', 'Q')
 df_us_gdp = get_data(df_GDPC1)
@@ -303,6 +302,14 @@ df_ism_ser_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name
 df_ism_ser_017 = df_ism_ser_017.filter(['DATE','ISM_SERVICES']).dropna()
 df_ism_ser = get_data(df_ism_ser_017)
 
+# Money Supply M1
+df_M1REAL = get_data_fred('M1REAL','M1','M')
+df_m1 = get_data(df_M1REAL)
+
+# Money Supply M2
+df_M2REAL = get_data_fred('M2REAL','M2','M')
+df_m2 = get_data(df_M2REAL)
+
 #print(df_lei)
 #print(df_umcsi)
 #print(df_exp)
@@ -310,16 +317,15 @@ df_ism_ser = get_data(df_ism_ser_017)
 #print(df_ism)
 #print(df_new_orders)
 #print(df_ism_ser)
+#print(df_m1)
+#print(df_m2)
 
 """
-#TODO: Money Supply M1
-#TODO: Money Supply M2
-
-import pdb; pdb.set_trace()
 
 #################################
 # Get ISM Manufacturing Sectors #
 #################################
+import pdb; pdb.set_trace()
 
 
 
