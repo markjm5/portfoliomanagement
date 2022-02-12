@@ -239,7 +239,7 @@ df_updated = combine_df_on_index(df_original, df_lagging_indicators, 'COL0')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-"""
+
 ##################################
 # Get US Rates and Currency Data #
 ##################################
@@ -285,11 +285,11 @@ df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
-import pdb; pdb.set_trace()
-
+"""
 #############################
 # Get US Leading Indicators #
 #############################
+
 sheet_name = 'DB US Leading Indicators'
 
 excel_file_path_015 = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_LEI_Consumer_Confidence.xlsm'
@@ -347,23 +347,36 @@ df_m1 = get_data(df_M1REAL)
 df_M2REAL = get_data_fred('M2REAL','M2','M')
 df_m2 = get_data(df_M2REAL)
 
-#print(df_lei)
-#print(df_umcsi)
-#print(df_exp)
-#print(df_permits)
-#print(df_ism)
-#print(df_new_orders)
-#print(df_ism_ser)
-#print(df_m1)
-#print(df_m2)
+# Temp df to combine all rows
+df_temp = df_lei.append(df_umcsi, ignore_index=True)
+df_temp = df_temp.append(df_exp, ignore_index=True)
+df_temp = df_temp.append(df_permits, ignore_index=True)
+df_temp = df_temp.append(df_ism, ignore_index=True)
+df_temp = df_temp.append(df_new_orders, ignore_index=True)
+df_temp = df_temp.append(df_ism_ser, ignore_index=True)
+df_temp = df_temp.append(df_m1, ignore_index=True)
+df_temp = df_temp.append(df_m2, ignore_index=True)
+
+#Select Final Columns
+df_us_leading_indicators = df_temp.loc[df_temp['COL0'] == 'GDP_QoQ']
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'UMCSI'],True)
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'EXPECTED'],True)
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'LEI'],True)
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'PERMIT'],True)
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'ISM'],True)
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'NEW_ORDERS'],True)
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'ISM_SERVICES'],True) 
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'M1_MoM'],True) 
+df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'M2_MoM'],True)
 
 # Get Original Sheet and store it in a dataframe
-#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-#df_updated = combine_df_on_index(df_original, df_us_leading_indicators, 'COL0')
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+df_updated = combine_df_on_index(df_original, df_us_leading_indicators, 'COL0')
 
 # Write the updated df back to the excel sheet
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+
+import pdb; pdb.set_trace()
 
 #################################
 # Get ISM Manufacturing Sectors #
