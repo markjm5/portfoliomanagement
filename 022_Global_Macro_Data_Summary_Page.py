@@ -380,6 +380,22 @@ df_ism_sectors_016 = df_ism_sectors_016.tail(6)
 # Write the updated df back to the excel sheet. Just overwrite what is already there
 write_dataframe_to_excel(excel_file_path, sheet_name, df_ism_sectors_016, False, 0)
 
+###########################
+# Get ISM Service Sectors #
+###########################
+
+sheet_name = 'DB ISM Services Sectors'
+
+excel_file_path_017 = '/Trading_Excel_Files/03_Leading_Indicators/017_Leading_Indicator_US_ISM_Services.xlsm'
+sheet_name_017 = 'DB Services ISM'
+
+# Get Original Sheet and store it in a dataframe
+df_ism_sectors_017 = convert_excelsheet_to_dataframe(excel_file_path_017, sheet_name_017, True).dropna()
+df_ism_sectors_017 = df_ism_sectors_017.tail(6)
+
+# Write the updated df back to the excel sheet. Just overwrite what is already there
+write_dataframe_to_excel(excel_file_path, sheet_name, df_ism_sectors_017, False, 0)
+
 ###############################
 # Get PMI Manufacturing World #
 ###############################
