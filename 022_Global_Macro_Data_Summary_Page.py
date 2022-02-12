@@ -172,7 +172,7 @@ def reorder_cols(df):
 # Get US Lagging and Coincident Indicators #
 ############################################
 """
-"""
+
 sheet_name = 'DB US Lagging Indicators'
 
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
@@ -187,11 +187,13 @@ df_core_cpi = get_data(df_CPILFESL)
 df_PCEPILFE = get_data_fred('PCEPILFE', 'CORE_PCE', 'M')
 df_core_pce = get_data(df_PCEPILFE)
 
-#TODO: Add Core Retail Sales and Retail Sales
+#US Retail Sales
+df_RSAFS = get_data_fred('RSAFS','RETAIL_SALES','M')
+df_retail_sales = get_data(df_RSAFS)
 
-#US Retail Sales Ex Auto and Gas
-df_MARTSSM44W72USS = get_data_fred('MARTSSM44W72USS','RETAIL_SALES','M')
-df_retail_sales = get_data(df_MARTSSM44W72USS)
+#US Core Retail Sales (Ex Auto and Gas)
+df_MARTSSM44W72USS = get_data_fred('MARTSSM44W72USS','CORE_RETAIL_SALES','M')
+df_core_retail_sales = get_data(df_MARTSSM44W72USS)
 
 #US Unemployment Rate
 df_UNRATE = get_data_fred('UNRATE', 'UNEMPLOYMENT_RATE','M')
@@ -209,11 +211,11 @@ df_weekly_claims = get_data(df_ICSA)
 df_INDPRO = get_data_fred('INDPRO', 'INDUSTRIAL_PRODUCTION','M')
 df_industrial_production = get_data(df_INDPRO)
 
-# Write to excel file
-
+# Temp df to combine all rows
 df_temp = df_us_gdp.append(df_core_cpi, ignore_index=True)
 df_temp = df_temp.append(df_core_pce, ignore_index=True)
 df_temp = df_temp.append(df_retail_sales, ignore_index=True)
+df_temp = df_temp.append(df_core_retail_sales, ignore_index=True)
 df_temp = df_temp.append(df_unemployment_rate, ignore_index=True)
 df_temp = df_temp.append(df_nfp, ignore_index=True)
 df_temp = df_temp.append(df_weekly_claims, ignore_index=True)
@@ -225,6 +227,7 @@ df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0']
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'CORE_CPI_MoM'],True)
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'CORE_PCE_MoM'],True)
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'RETAIL_SALES_MoM'],True)
+df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'CORE_RETAIL_SALES_MoM'],True)
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'UNEMPLOYMENT_RATE_MoM'],True)
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'PAYEMS'],True) #NFP
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'ICSA'],True) #Weekly Claims
@@ -232,14 +235,11 @@ df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0']
 
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
 df_updated = combine_df_on_index(df_original, df_lagging_indicators, 'COL0')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-
-import pdb; pdb.set_trace()
-
+"""
 ##################################
 # Get US Rates and Currency Data #
 ##################################
@@ -273,18 +273,19 @@ df_dxy_001 = df_dxy_001.rename(columns={"DX-Y.NYB": "DXY"})
 
 df_dxy = get_data(df_dxy_001)
 
-#print(df_current_ffr_target)
-#print(df_eurodollar_futures)
-#print(df_us_treasury_yields)
-#print(df_dxy)
+# Temp df to combine all rows
+df_us_rates_currency = df_current_ffr_target.append(df_eurodollar_futures, ignore_index=True)
+df_us_rates_currency = df_us_rates_currency.append(df_us_treasury_yields, ignore_index=True)
+df_us_rates_currency = df_us_rates_currency.append(df_dxy, ignore_index=True)
 
 # Get Original Sheet and store it in a dataframe
-#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-#df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
 
 # Write the updated df back to the excel sheet
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+
+import pdb; pdb.set_trace()
 
 #############################
 # Get US Leading Indicators #
