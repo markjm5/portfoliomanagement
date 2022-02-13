@@ -4,6 +4,7 @@ import pandas as pd
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_stlouisfed_data, get_data_fred
@@ -41,16 +42,26 @@ def get_current_ffr_target():
 def get_eurodollar_futures():
 
     url = "https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html"
+    #url = "https://www.espncricinfo.com/"
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    #chrome_options.add_argument('ignore-certificate-errors')
+
+    #ua = UserAgent(verify_ssl=False)
+
+    #userAgent = ua.random
+    #print(userAgent)
+    #import pdb; pdb.set_trace()
+
+    #chrome_options.add_argument(f'user-agent={userAgent}')
     chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166")
 
     driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
     driver.get(url)
     html = driver.page_source
     driver.close()
-
+    import pdb; pdb.set_trace()
     soup = BeautifulSoup(html, 'html.parser')
     table = soup.find('table')
 
@@ -161,7 +172,7 @@ def reorder_cols(df):
 ############################################
 # Get US Lagging and Coincident Indicators #
 ############################################
-
+"""
 #sheet_name = 'DB US Lagging Indicators'
 
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
@@ -236,9 +247,11 @@ sheet_name = 'DB US Rates and Currency'
 
 # Get Current Fed Funds Current Target Rate
 df_current_ffr_target = get_current_ffr_target()
-
+"""
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
+
+import pdb; pdb.set_trace()
 
 # Get US Treasury Yields #
 excel_file_path_013 = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
