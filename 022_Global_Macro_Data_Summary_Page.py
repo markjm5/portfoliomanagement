@@ -162,7 +162,7 @@ def reorder_cols(df):
 # Get US Lagging and Coincident Indicators #
 ############################################
 
-sheet_name = 'DB US Lagging Indicators'
+#sheet_name = 'DB US Lagging Indicators'
 
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
 df_GDPC1 = get_data_fred('GDPC1', 'GDP', 'Q')
@@ -223,11 +223,11 @@ df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0']
 df_lagging_indicators = df_lagging_indicators.append(df_temp.loc[df_temp['COL0'] == 'INDUSTRIAL_PRODUCTION_MoM'],True)
 
 # Get Original Sheet and store it in a dataframe
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-df_updated = combine_df_on_index(df_original, df_lagging_indicators, 'COL0')
+#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+#df_updated = combine_df_on_index(df_original, df_lagging_indicators, 'COL0')
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 ##################################
 # Get US Rates and Currency Data #
@@ -268,17 +268,17 @@ df_us_rates_currency = df_us_rates_currency.append(df_us_treasury_yields, ignore
 df_us_rates_currency = df_us_rates_currency.append(df_dxy, ignore_index=True)
 
 # Get Original Sheet and store it in a dataframe
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
+#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+#df_updated = combine_df_on_index(df_original, df_us_rates_currency, 'COL0')
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
 #############################
 # Get US Leading Indicators #
 #############################
 
-sheet_name = 'DB US Leading Indicators'
+#sheet_name = 'DB US Leading Indicators'
 
 excel_file_path_015 = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_LEI_Consumer_Confidence.xlsm'
 sheet_name_015 = 'DB LEI'
@@ -357,9 +357,19 @@ df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['
 df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'M1_MoM'],True) 
 df_us_leading_indicators = df_us_leading_indicators.append(df_temp.loc[df_temp['COL0'] == 'M2_MoM'],True)
 
+sheet_name = 'DB US Indicators'
+
+# Combine all US Indicator Rows
+df_us_indicators = df_lagging_indicators.append(df_us_rates_currency, ignore_index=True)
+df_us_indicators = df_us_indicators.append(df_us_leading_indicators, ignore_index=True)
+
+#df_lagging_indicators
+#df_us_rates_currency
+#df_us_leading_indicators
+
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-df_updated = combine_df_on_index(df_original, df_us_leading_indicators, 'COL0')
+df_updated = combine_df_on_index(df_original, df_us_indicators, 'COL0')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
