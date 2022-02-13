@@ -4,7 +4,7 @@ from datetime import datetime as dt
 from dateutil import relativedelta
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
-from common import get_data_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe, 
+from common import get_data_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe
 from common import combine_df_on_index, write_dataframe_to_excel
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_LEI_Consumer_Confidence.xlsm'

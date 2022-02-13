@@ -3,7 +3,7 @@
 python 002_Lagging_Indicator_US_GDP.py
 python 003_Lagging_Indicator_World_GDP.py
 python 005_Lagging_Indicator_Job_Market_US_World.py
-python 006_Lagging_Indicator_Personal_Consumption_Expenditures.py
+python 006_Lagging_Indicator_PCE.py
 python 007_Lagging_Indicator_US_Inflation.py
 python 008_Lagging_Indicator_Global_Inflation.py
 python 009_Lagging_Indicator_US_Industrial_Production.py
