@@ -382,14 +382,19 @@ sheet_name = 'DB US Indicators'
 df_us_indicators = df_lagging_indicators.append(df_us_rates_currency, ignore_index=True)
 df_us_indicators = df_us_indicators.append(df_us_leading_indicators, ignore_index=True)
 
-#Rename Columns to match Excel
-df_us_indicators = df_us_indicators.rename(columns={'GDP_QoQ':'GDP qoq','GDP_YoY':'GDP yoy','CORE_CPI_MoM':'Core CPI',
+#Make COL0 the index so that we can rename each row
+df_us_indicators = df_us_indicators.set_index('COL0')
+
+#Rename Rows to match Excel
+df_us_indicators = df_us_indicators.rename(index={'GDP_QoQ':'GDP qoq','GDP_YoY':'GDP yoy','CORE_CPI_MoM':'Core CPI',
                         'CORE_PCE_MoM':'Core PCE','RETAIL_SALES_MoM':'Retail Sales MoM','CORE_RETAIL_SALES_MoM':'Core Retail Sales',
                         'UNEMPLOYMENT_RATE_MoM':'Unemployment Rate','PAYEMS':'Non-Farm Payroll','ICSA':'Weekly Claims',
                         'INDUSTRIAL_PRODUCTION_MoM':'Industrial Production','UMCSI':'UMCSI Index','EXPECTED':'UMCSI Exp',
                         'LEI':'Conference Board LEI','PERMIT':'Building Permits','ISM':'ISM Manufacturing',
                         'NEW_ORDERS':'ISM Manuf New orders','ISM_SERVICES':'ISM Services','M1_MoM':'Money Supply M1',
                         'M2_MoM':'Money Supply M2'})
+
+df_us_indicators.reset_index(level=0, inplace=True)
 
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
