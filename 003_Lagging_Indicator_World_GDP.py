@@ -6,8 +6,10 @@ from common import combine_df_on_index, scrape_world_gdp_table
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/003_Lagging_Indicator_World_GDP.xlsm'
 
 #https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/QNA/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LTU+LVA+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA19+EU27_2020+G-7+NAFTA+OECDE+G-20+OECD+ARG+BRA+BGR+CHN+IND+IDN+ROU+RUS+SAU+ZAF.B1_GE+P31S14_S15+P3S13+P51+P52_P53+B11+P6+P7.GYSA+GPSA+CTQRGPSA.Q/all?startTime=2019-Q3&endTime=2021-Q3
-
+#import certifi
+#from cif import cif
 #print(certifi.where())
+# /Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/venv/lib/python3.10/site-packages/certifi/cacert.pem
 
 ##########################
 # Get QoQ Data from OECD #

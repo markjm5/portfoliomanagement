@@ -17,7 +17,9 @@ def scrape_conference_board_lei():
   url_lei = 'https://www.conference-board.org/data/bcicountry.cfm?cid=1'
 
   # Add additional column to df with China PMI Index
-  page = requests.get(url=url_lei,verify=False)
+  #*page = requests.get(url=url_lei,verify=False)
+  page = requests.get(url=url_lei)
+
   soup = BeautifulSoup(page.content, 'html.parser')
 
   # Get the date of the article

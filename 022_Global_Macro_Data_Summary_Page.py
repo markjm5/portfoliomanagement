@@ -517,5 +517,5 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # www.conference-board.org
 # www.ismworld.org
 # ecommerce.ismworld.org
-
+# Go Daddy Secure Certificate Authority - G2
 print("Done!")

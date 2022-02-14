@@ -357,14 +357,16 @@ def get_ism_manufacturing_content():
   ism_date, ism_month = get_ism_date(1)
   url_ism = get_ism_manufacturing_url(ism_month)
 
-  page = requests.get(url=url_ism,verify=False)
+  #*page = requests.get(url=url_ism,verify=False)
+  page = requests.get(url=url_ism)
 
   if(page.status_code == 404):
       # Use previous month to get ISM data
       ism_date, ism_month = get_ism_date(2)
       url_ism = get_ism_manufacturing_url(ism_month)
 
-      page = requests.get(url=url_ism,verify=False)
+      #*page = requests.get(url=url_ism,verify=False)
+      page = requests.get(url=url_ism)
 
   return ism_date, ism_month, page
 
@@ -373,14 +375,16 @@ def get_ism_services_content():
   ism_date, ism_month = get_ism_date(1)
   url_ism = get_ism_services_url(ism_month)
 
-  page = requests.get(url=url_ism,verify=False)
+  #*page = requests.get(url=url_ism,verify=False)
+  page = requests.get(url=url_ism)
 
   if(page.status_code == 404):
       # Use previous month to get ISM data
       ism_date, ism_month = get_ism_date(2)
       url_ism = get_ism_services_url(ism_month)
 
-      page = requests.get(url=url_ism,verify=False)
+      #*page = requests.get(url=url_ism,verify=False)
+      page = requests.get(url=url_ism)
 
   return ism_date, ism_month, page
 
@@ -412,7 +416,9 @@ def scrape_ism_manufacturing_headline_index(ism_date, ism_month):
 
   url_ism = get_ism_manufacturing_url(ism_month)
 
-  page = requests.get(url=url_ism,verify=False)
+  #*page = requests.get(url=url_ism,verify=False)
+  page = requests.get(url=url_ism)
+
   soup = BeautifulSoup(page.content, 'html.parser')
 
   #Get all html tables on the page
@@ -475,7 +481,9 @@ def scrape_ism_services_headline_index(ism_date, ism_month):
 
     url_ism = get_ism_services_url(ism_month)
 
-    page = requests.get(url=url_ism,verify=False)
+    #**page = requests.get(url=url_ism,verify=False)
+    page = requests.get(url=url_ism)
+
     soup = BeautifulSoup(page.content, 'html.parser')
 
     #Get all html tables on the page
