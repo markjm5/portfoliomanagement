@@ -396,9 +396,25 @@ df_us_indicators = df_us_indicators.rename(index={'GDP_QoQ':'GDP qoq','GDP_YoY':
 
 df_us_indicators.reset_index(level=0, inplace=True)
 
+df_us_indicators = df_us_indicators.rename(columns={"LAST": "Last", "6M": "6m", "12M": "12m"})
+
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 df_updated = combine_df_on_index(df_original, df_us_indicators, 'COL0')
+
+
+#Reorder columns
+# get a list of columns
+cols = list(df_updated)
+
+# Move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('COL0')))
+cols.insert(1, cols.pop(cols.index('Last')))
+cols.insert(2, cols.pop(cols.index('6m')))
+cols.insert(3, cols.pop(cols.index('12m')))
+
+# Reorder
+df_updated = df_updated[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
