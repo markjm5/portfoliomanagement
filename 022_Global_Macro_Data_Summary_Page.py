@@ -61,7 +61,7 @@ def get_eurodollar_futures():
     driver.get(url)
     html = driver.page_source
     driver.close()
-    import pdb; pdb.set_trace()
+
     soup = BeautifulSoup(html, 'html.parser')
     table = soup.find('table')
 
@@ -108,23 +108,31 @@ def get_eurodollar_futures():
                 current_value = float(row['Last'])
             except ValueError as e:
                 pass        
+            except TypeError as e:
+                pass
         elif(index==2):
             try:
                 one_month_value = current_value - float(row['Last'])
             except ValueError as e:
                 pass        
+            except TypeError as e:
+                pass
 
         elif(index==5):
             try:
                 six_month_value = current_value - float(row['Last'])
             except ValueError as e:
                 pass        
+            except TypeError as e:
+                pass
 
         elif(index==11):
             try:
                 twelve_month_value = current_value - float(row['Last'])
             except ValueError as e:
                 pass        
+            except TypeError as e:
+                pass
 
         print("%s-%s" % (row['Month'], row['Last']))
 
@@ -172,7 +180,7 @@ def reorder_cols(df):
 ############################################
 # Get US Lagging and Coincident Indicators #
 ############################################
-"""
+
 #sheet_name = 'DB US Lagging Indicators'
 
 # Get last US GDP Number (QoQ, YoY). Then get GDP numbers for 6m and 12m ago from last
@@ -247,11 +255,9 @@ sheet_name = 'DB US Rates and Currency'
 
 # Get Current Fed Funds Current Target Rate
 df_current_ffr_target = get_current_ffr_target()
-"""
+
 # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
 df_eurodollar_futures = get_eurodollar_futures()
-
-import pdb; pdb.set_trace()
 
 # Get US Treasury Yields #
 excel_file_path_013 = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'

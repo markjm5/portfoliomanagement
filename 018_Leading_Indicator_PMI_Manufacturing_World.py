@@ -257,15 +257,15 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 series_name = 'CLVMEURSCAB1GQEA19'
 
 #df_EuroAreaGDP = get_gdp_fred(series_name)
-df_EuroAreaGDP = get_data_fred(df_EuroAreaGDP, 'CLVMEURSCAB1GQEA19', 'Q')
+df_EuroAreaGDP = get_data_fred('CLVMEURSCAB1GQEA19', 'GDP', 'Q')
 
 #Drop unnecessary columns
-df_EuroAreaGDP = df_EuroAreaGDP.drop(columns=series_name, axis=1)
-df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDPYoY', axis=1)
-df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDPQoQ_ANNUALIZED', axis=1)
+df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDP', axis=1)
+df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDP_YoY', axis=1)
+df_EuroAreaGDP = df_EuroAreaGDP.drop(columns='GDP_QoQ_ANNUALIZED', axis=1)
 
 #Rename column
-df_EuroAreaGDP = df_EuroAreaGDP.rename(columns={"GDPQoQ": "EuroGDPQoQ"})
+df_EuroAreaGDP = df_EuroAreaGDP.rename(columns={"GDP_QoQ": "EuroGDPQoQ"})
 
 #Combine new data with original data
 df_updated = combine_df_on_index(df_original, df_EuroAreaGDP, 'DATE')
