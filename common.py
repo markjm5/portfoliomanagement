@@ -1,3 +1,4 @@
+import sys
 from lib2to3.pgen2.pgen import DFAState
 from pandas.io import excel
 import requests
@@ -108,7 +109,9 @@ def get_oecd_data(dataset, dimensions, params):
       date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
-  file_path = '~/Documents/PythonProjects/PortfolioManagement/XML/%s' % params['filename'] 
+  #file_path = '/Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/XML/%s' % params['filename'] 
+  file_path = "%s/XML/%s" % (sys.path[0],params['filename'])
+
   try:
     #resp = requests.get(url=url,params=params)
     #resp = requests.get(url=url,verify=False)
