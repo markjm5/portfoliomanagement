@@ -108,7 +108,7 @@ def get_oecd_data(dataset, dimensions, params):
       date_range = 'MTH'
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
-  file_path = 'XML/%s' % params['filename'] 
+  file_path = '~/Documents/PythonProjects/PortfolioManagement/XML/%s' % params['filename'] 
   try:
     #resp = requests.get(url=url,params=params)
     #resp = requests.get(url=url,verify=False)

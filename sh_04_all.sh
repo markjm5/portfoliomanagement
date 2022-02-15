@@ -1,10 +1,10 @@
 #!/bin/bash
 
 SECONDS=0
-source /Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/venv/bin/activate  
-bash ./sh_01_lagging_coincident_indicators.sh
-bash ./sh_02_central_banks_interest_rates.sh
-bash ./sh_03_leading_indicators.sh
+source ~/Documents/PythonProjects/PortfolioManagement/venv/bin/activate  
+bash ~/Documents/PythonProjects/PortfolioManagement/sh_01_lagging_coincident_indicators.sh
+bash ~/Documents/PythonProjects/PortfolioManagement/sh_02_central_banks_interest_rates.sh
+bash ~/Documents/PythonProjects/PortfolioManagement/sh_03_leading_indicators.sh
 
 duration=$SECONDS
 echo "Total Time: $(($duration / 60)) minutes and $(($duration % 60)) seconds"

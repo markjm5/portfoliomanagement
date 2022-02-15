@@ -18,7 +18,7 @@ def get_us_treasury_yields():
 
   url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=%s" % (date_str,)
 
-  file_path = 'XML/%s' % filename 
+  file_path = '~/Documents/PythonProjects/PortfolioManagement/XML/%s' % filename 
   try:
       resp = requests.get(url=url)
 
