@@ -112,7 +112,7 @@ def get_eurodollar_futures():
                 pass
         elif(index==2):
             try:
-                one_month_value = current_value - float(row['Last'])
+                one_month_value = (current_value - float(row['Last']))/100
             except ValueError as e:
                 pass        
             except TypeError as e:
@@ -120,7 +120,7 @@ def get_eurodollar_futures():
 
         elif(index==5):
             try:
-                six_month_value = current_value - float(row['Last'])
+                six_month_value = (current_value - float(row['Last']))/100
             except ValueError as e:
                 pass        
             except TypeError as e:
@@ -128,7 +128,8 @@ def get_eurodollar_futures():
 
         elif(index==11):
             try:
-                twelve_month_value = current_value - float(row['Last'])
+                twelve_month_value = (current_value - float(row['Last']))/100
+
             except ValueError as e:
                 pass        
             except TypeError as e:
