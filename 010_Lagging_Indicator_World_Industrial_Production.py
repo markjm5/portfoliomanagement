@@ -50,10 +50,9 @@ def scrape_table_world_production(url):
 
   return df
 
-def scrape_table_china_production():
-  currentYear = dt.now().strftime('%Y')
+def scrape_table_china_caixin_pmi():
+  #currentYear = dt.now().strftime('%Y')
   url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
-  url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
 
   # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
   header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
@@ -107,17 +106,59 @@ def scrape_table_china_production():
   cols.insert(1, cols.pop(cols.index('HSBC China PMI')))
   df_caixin_pmi = df_caixin_pmi[cols]
 
+  return df_caixin_pmi
+
+def scrape_table_china_industrial_production():
+  #currentYear = dt.now().strftime('%Y')
+  url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
+
+  #TODO: **********Change so that we extract the percentage growth from table rather than paragraph************
+
+  # COPY CAIXIN:
+  #      Date                  HSBC China PMI
+  #    0 2022-03-31             NaN
+  #    1 2022-02-28            50.4
+  #    2 2022-01-29            49.1
+  #    3 2021-12-31            50.9
+  #    4 2021-11-30            49.9
+  #    5 2021-10-31            50.6
+  #    (Pdb) df_caixin_pmi.dtypes
+  #    Date              datetime64[ns]
+  #    HSBC China PMI           float64
+   #   dtype: object
+
+
   #Get IP YoY Percentage Growth using Regex
   page = requests.get(url=url_ip_yoy)
   soup = BeautifulSoup(page.content, 'html.parser')
+  
+  table = soup.find('table') 
+  df_ip_yoy = convert_html_table_to_df(table, False)
 
+  #Rename Columns
+  df_ip_yoy.rename(columns={ df_ip_yoy.columns[0]: "Release_Date",df_ip_yoy.columns[2]: "Month",df_ip_yoy.columns[3]: "YoY" }, inplace = True)
+
+  #Remove unnecessary columns
+  df_ip_yoy = df_ip_yoy.drop(['GMT', 'Previous', 'Consensus', 'TEForecast'], axis=1)
+
+  #If the Month col contains multiple months, split them up into multiple rows
+  df_ip_yoy = df_ip_yoy.assign(Month=df_ip_yoy.Month.str.split("-")).explode('Month')
+
+  #Reset index
+  df_ip_yoy = df_ip_yoy.reset_index(drop=True)
+
+  import pdb; pdb.set_trace()
+  #TODO: Create new Date field with correct Month and Year
+  #TODO: Reformat actual value
+  #   
+  """
   #get the paragraph with the sentence about latest china percentage growth in month and year
   paragraph = soup.find("h2", attrs={'id': 'description'})
 
   # Use https://pythex.org/ to check that regex are selecting correctly
   pattern_select = re.compile(r'([\-]?[0-9]\.[0-9]\s(?=percent\s)[A-Za-z,&;\s\-0-9]*,)')
   matches = re.findall(pattern_select, paragraph.text)#pattern_select.finditer(paragraph.text)
-
+  import pdb; pdb.set_trace()
   #Use regex to extract percentage, month and year from string
   pattern_percentage = re.compile(r'([\-]?[0-9]\.[0-9]\s(?=percent\s))')
   pattern_month_year = re.compile(r'(\b(?:Jan(?:uary)?|Feb(?:ruary)?|...|Dec(?:ember)?) (?:19[7-9]\d|2\d{3})(?=\D|$))')
@@ -138,13 +179,14 @@ def scrape_table_china_production():
   df_ip_yoy = df_ip_yoy[cols]
 
   df_ip_yoy['YoY'] = pd.to_numeric(df_ip_yoy['YoY'])/100
+  """
 
-  return df_caixin_pmi, df_ip_yoy
+  return df_ip_yoy
 
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-
+"""
 sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
@@ -166,9 +208,6 @@ df_updated = df_original.merge(df_capital_investment, on='Code')
 
 df_updated = df_updated.drop(['Investment_Percentage_x'], axis=1)
 df_updated = df_updated.rename(columns={'Investment_Percentage_y': 'Investment_Percentage'})
-
-#LEGACY: Write to a csv file in the correct directory
-#write_to_directory(df_capital_investment,'010_Lagging_Indicator_Capital_Investment.csv')
 
 df_world_gdp = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
@@ -228,7 +267,9 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 sheet_name = 'China Production data'
 
 #Get China Production Data
-df_caixin_pmi, df_ip_yoy = scrape_table_china_production()
+df_caixin_pmi = scrape_table_china_caixin_pmi()
+"""
+df_ip_yoy = scrape_table_china_industrial_production()
 
 #temporary field called period_month so that we can combine df_caixin_pmi and df_ip_yoy together on Month only
 df_caixin_pmi['period_month'] = pd.DatetimeIndex(df_caixin_pmi['Date']).month

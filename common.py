@@ -661,9 +661,17 @@ def convert_html_table_to_df(table, contains_th):
 
     td = tr.find_all('td')
     for obs in td:
-      text = str(obs.text).strip()
-      temp_row.append(text)        
-    
+      
+      exclude = False
+
+      if(obs.find_all('div')):
+        if 'hidden' in obs.find_all('div')[0].attrs['class']:
+          exclude = True
+
+      if not exclude:
+        text = str(obs.text).strip()
+        temp_row.append(text)        
+
     if(len(temp_row) == len(df.columns)):
       df.loc[len(df.index)] = temp_row
   
