@@ -1,6 +1,7 @@
 import pandas as pd
 import wbgapi as wb
 import requests
+import numpy as np
 import re
 import calendar
 from datetime import datetime as dt
@@ -112,22 +113,6 @@ def scrape_table_china_industrial_production():
   #currentYear = dt.now().strftime('%Y')
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
 
-  #TODO: **********Change so that we extract the percentage growth from table rather than paragraph************
-
-  # COPY CAIXIN:
-  #      Date                  HSBC China PMI
-  #    0 2022-03-31             NaN
-  #    1 2022-02-28            50.4
-  #    2 2022-01-29            49.1
-  #    3 2021-12-31            50.9
-  #    4 2021-11-30            49.9
-  #    5 2021-10-31            50.6
-  #    (Pdb) df_caixin_pmi.dtypes
-  #    Date              datetime64[ns]
-  #    HSBC China PMI           float64
-   #   dtype: object
-
-
   #Get IP YoY Percentage Growth using Regex
   page = requests.get(url=url_ip_yoy)
   soup = BeautifulSoup(page.content, 'html.parser')
@@ -147,46 +132,25 @@ def scrape_table_china_industrial_production():
   #Reset index
   df_ip_yoy = df_ip_yoy.reset_index(drop=True)
 
-  import pdb; pdb.set_trace()
-  #TODO: Create new Date field with correct Month and Year
-  #TODO: Reformat actual value
-  #   
-  """
-  #get the paragraph with the sentence about latest china percentage growth in month and year
-  paragraph = soup.find("h2", attrs={'id': 'description'})
-
-  # Use https://pythex.org/ to check that regex are selecting correctly
-  pattern_select = re.compile(r'([\-]?[0-9]\.[0-9]\s(?=percent\s)[A-Za-z,&;\s\-0-9]*,)')
-  matches = re.findall(pattern_select, paragraph.text)#pattern_select.finditer(paragraph.text)
-  import pdb; pdb.set_trace()
-  #Use regex to extract percentage, month and year from string
-  pattern_percentage = re.compile(r'([\-]?[0-9]\.[0-9]\s(?=percent\s))')
-  pattern_month_year = re.compile(r'(\b(?:Jan(?:uary)?|Feb(?:ruary)?|...|Dec(?:ember)?) (?:19[7-9]\d|2\d{3})(?=\D|$))')
-  match_percentage = re.findall(pattern_percentage,matches[0])
-  match_month_year = re.findall(pattern_month_year,matches[0])
-
-  df_ip_yoy = pd.DataFrame()
-
-  # Put match_percentage, match_month_year into df with correct data types
-  # Return relevant dfs so that they can be used to write to excel
-  df_ip_yoy.insert(0,"Date",[pd.to_datetime(match_month_year[0], format='%B %Y')],True)
-  df_ip_yoy.insert(0,"YoY",[match_percentage[0].strip()],True)
-
-  # Reorder Columns
-  cols = list(df_ip_yoy)
-  cols.insert(0, cols.pop(cols.index('Date')))
-  cols.insert(1, cols.pop(cols.index('YoY')))
-  df_ip_yoy = df_ip_yoy[cols]
+  #Drop rows with empty value for YoY
+  df_ip_yoy['YoY'].replace('', np.nan, inplace=True)
+  df_ip_yoy.dropna(subset=['YoY'], inplace=True)
+  df_ip_yoy['YoY'] = df_ip_yoy['YoY'].map(lambda x: x.rstrip('%'))
 
   df_ip_yoy['YoY'] = pd.to_numeric(df_ip_yoy['YoY'])/100
-  """
+
+  #TODO: Convert Month to have the correct year and correct month end day
+  df_ip_yoy.insert(0,"Date",pd.to_datetime(df_ip_yoy['Month'], format='%b'),True)
+
+  df_ip_yoy = df_ip_yoy.drop(columns='Release_Date', axis=1)
+  df_ip_yoy = df_ip_yoy.drop(columns='Month', axis=1)
 
   return df_ip_yoy
 
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-"""
+
 sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
@@ -268,7 +232,7 @@ sheet_name = 'China Production data'
 
 #Get China Production Data
 df_caixin_pmi = scrape_table_china_caixin_pmi()
-"""
+
 df_ip_yoy = scrape_table_china_industrial_production()
 
 #temporary field called period_month so that we can combine df_caixin_pmi and df_ip_yoy together on Month only
@@ -280,6 +244,7 @@ df_china_pmi = combine_df_on_index(df_caixin_pmi, df_ip_yoy,'period_month')
 
 #Combine finished, so we dont need period_month anymore
 df_china_pmi = df_china_pmi.drop(columns='period_month', axis=1)
+#import pdb; pdb.set_trace()
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
