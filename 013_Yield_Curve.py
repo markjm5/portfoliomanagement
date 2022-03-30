@@ -16,10 +16,11 @@ def get_us_treasury_yields():
 
   todays_date = date.today()
   date_str = "%s%s" % (todays_date.strftime('%Y'), todays_date.strftime('%m'))
+  #date_str = "202202"
 
   url = "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=%s" % (date_str,)
 
-  #import pdb; pdb.set_trace()
+  #cimport pdb; pdb.set_trace()
 
   #file_path = '/Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/XML/%s' % filename 
 
@@ -62,7 +63,7 @@ def get_us_treasury_yields():
 
   # format columns
 
-  df_us_treasury_yields['2Y'] = pd.to_numeric(df_us_treasury_yields['3M'])
+  df_us_treasury_yields['3M'] = pd.to_numeric(df_us_treasury_yields['3M'])
   df_us_treasury_yields['2Y'] = pd.to_numeric(df_us_treasury_yields['2Y'])
   df_us_treasury_yields['3Y'] = pd.to_numeric(df_us_treasury_yields['3Y'])
   df_us_treasury_yields['10Y'] = pd.to_numeric(df_us_treasury_yields['10Y'])
@@ -74,7 +75,7 @@ def get_us_treasury_yields():
 
 us_treasury_yields = get_us_treasury_yields()
 #TODO: Format Data to match excel spreadsheet
-
+#import pdb; pdb.set_trace()
 # Get Original Sheet and store it in a dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
