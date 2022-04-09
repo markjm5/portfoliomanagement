@@ -1,7 +1,6 @@
-import requests
 import pandas as pd
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index
+from common import combine_df_on_index, get_page
 from datetime import datetime
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/007_Lagging_Indicator_US_Inflation.xlsm'
@@ -13,7 +12,8 @@ def get_newyorkfed_target_rate(type, dimensions):
 
   url = "https://markets.newyorkfed.org/api/rates/%s/%s/search.json?startDate=%s&endDate=%s" % (type,dimensions[0], dimensions[1], dimensions[2])
 
-  resp = requests.get(url=url)
+  resp = get_page(url)
+  #resp = requests.get(url=url)
 
   json = resp.json() 
 

@@ -1,4 +1,3 @@
-import requests
 import pandas as pd
 import re
 from datetime import datetime as dt
@@ -6,7 +5,7 @@ from dateutil import relativedelta
 from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_data_fred, get_sp500_monthly_prices, convert_excelsheet_to_dataframe
-from common import combine_df_on_index, write_dataframe_to_excel
+from common import combine_df_on_index, write_dataframe_to_excel, get_page
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/015_Leading_Indicator_US_LEI_Consumer_Confidence.xlsm'
 sheet_name = 'DB LEI'
@@ -19,16 +18,7 @@ def scrape_conference_board_lei():
 
   # Add additional column to df with China PMI Index
   #*page = requests.get(url=url_lei,verify=False)
-
-  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
-  page = requests.get(url=url_lei,headers=header)
-
-  try:
-      page.raise_for_status()
-  except requests.exceptions.HTTPError as e:
-      # Whoops it wasn't a 200
-      raise Exception("Http Response (%s) Is Not 200: %s" % (url_lei, str(page.status_code)))
+  page = get_page(url_lei)
 
   soup = BeautifulSoup(page.content, 'html.parser')
 

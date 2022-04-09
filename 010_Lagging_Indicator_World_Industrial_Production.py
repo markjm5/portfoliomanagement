@@ -1,6 +1,5 @@
 import pandas as pd
 import wbgapi as wb
-import requests
 import numpy as np
 import re
 import calendar
@@ -8,22 +7,14 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, scrape_world_gdp_table
-from common import convert_html_table_to_df
+from common import convert_html_table_to_df, get_page
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
 def scrape_table_world_production(url):
   #Scrape GDP Table from https://tradingeconomics.com/country-list/industrial-production?continent=world
 
-  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
-  page = requests.get(url=url,headers=header)
-
-  try:
-      page.raise_for_status()
-  except requests.exceptions.HTTPError as e:
-      # Whoops it wasn't a 200
-      raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
+  page = get_page(url)
 
   soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -64,15 +55,7 @@ def scrape_table_china_caixin_pmi():
   #currentYear = dt.now().strftime('%Y')
   url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
 
-  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
-  page = requests.get(url=url_caixin_pmi,headers=header)
-
-  try:
-      page.raise_for_status()
-  except requests.exceptions.HTTPError as e:
-      # Whoops it wasn't a 200
-      raise Exception("Http Response (%s) Is Not 200: %s" % (url_caixin_pmi, str(page.status_code)))
+  page = get_page(url_caixin_pmi)
 
   soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -129,15 +112,7 @@ def scrape_table_china_industrial_production():
   #currentYear = dt.now().strftime('%Y')
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
 
-  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
-  page = requests.get(url=url_ip_yoy,headers=header)
-
-  try:
-      page.raise_for_status()
-  except requests.exceptions.HTTPError as e:
-      # Whoops it wasn't a 200
-      raise Exception("Http Response (%s) Is Not 200: %s" % (url_ip_yoy, str(page.status_code)))
+  page = get_page(url_ip_yoy)
 
   soup = BeautifulSoup(page.content, 'html.parser')
   

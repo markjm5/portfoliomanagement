@@ -1,9 +1,8 @@
-import requests
 import pandas as pd
 from datetime import datetime as dt
 from bs4 import BeautifulSoup
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index
+from common import combine_df_on_index, get_page
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/019_Leading_Indicator_PMI_Services_World.xlsm'
 
@@ -11,15 +10,7 @@ def scrape_table_country_pmi():
 
     url = "https://tradingeconomics.com/country-list/services-pmi"
 
-    # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-    header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
-    page = requests.get(url=url,headers=header)
-
-    try:
-        page.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        # Whoops it wasn't a 200
-        raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
+    page = get_page(url)
 
     soup = BeautifulSoup(page.content, 'html.parser')
 

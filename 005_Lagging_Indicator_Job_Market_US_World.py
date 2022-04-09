@@ -1,25 +1,15 @@
-import requests
 import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import date
 from common import get_stlouisfed_data, get_oecd_data, convert_excelsheet_to_dataframe
-from common import combine_df_on_index, write_dataframe_to_excel
+from common import combine_df_on_index, write_dataframe_to_excel, get_page
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/005_Lagging_Indicator_Job_Market_US_World.xlsm'
 
 #Scrape this table and get latest ADP number
 def scrape_world_gdp_table(url):
   #Scrape GDP Table from Trading Economics
-
-  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
-  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
-  page = requests.get(url=url,headers=header)
-
-  try:
-      page.raise_for_status()
-  except requests.exceptions.HTTPError as e:
-      # Whoops it wasn't a 200
-      raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
+  page = get_page(url)
 
   soup = BeautifulSoup(page.content, 'html.parser')
 

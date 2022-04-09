@@ -1,10 +1,9 @@
 import sys
-import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
 from datetime import date
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index
+from common import combine_df_on_index, get_page
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Yield_Curve.xlsm'
 sheet_name = 'Database'
@@ -26,16 +25,12 @@ def get_us_treasury_yields():
 
   file_path = "%s/XML/%s" % (sys.path[0],filename)
 
-  try:
-      resp = requests.get(url=url)
+  resp = get_page(url)
 
-      resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
-      # Write response to an XML File
-      with open(file_path, 'w') as f:
-          f.write(resp_formatted)
-
-  except requests.exceptions.ConnectionError:
-      print("Connection refused, Opening from File...")
+  resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
+  # Write response to an XML File
+  with open(file_path, 'w') as f:
+      f.write(resp_formatted)
 
   # Load in the XML file into ElementTree
   tree = ET.parse(file_path)

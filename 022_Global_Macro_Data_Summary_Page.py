@@ -1,4 +1,3 @@
-import requests
 import re
 import pandas as pd
 from selenium import webdriver
@@ -7,7 +6,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_stlouisfed_data, get_data_fred
+from common import combine_df_on_index, get_stlouisfed_data, get_data_fred, get_page
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/022_Global_Macro_Data_Summary_Page.xlsm'
 
@@ -15,7 +14,8 @@ def get_current_ffr_target():
 
     url = "https://www.bankrate.com/rates/interest-rates/federal-funds-rate.aspx"
 
-    page = requests.get(url=url)
+    page = get_page(url)
+
     soup = BeautifulSoup(page.content, 'html.parser')
     
     table = soup.find('table')
