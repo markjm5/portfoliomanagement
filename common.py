@@ -28,6 +28,13 @@ def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)
 
   resp = requests.get(url=url)
+
+  try:
+      resp.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url,str(resp.status_code)))
+
   json = resp.json() 
   
   df = pd.DataFrame(columns=["DATE",series_code])
@@ -112,6 +119,32 @@ def get_oecd_data(dataset, dimensions, params):
   #file_path = '/Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/XML/%s' % params['filename'] 
   file_path = "%s/XML/%s" % (sys.path[0],params['filename'])
 
+  resp = requests.get(url=url)
+
+  try:
+      resp.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+
+      if(resp.status_code == 400):
+        #It didnt work with the original order of the params so lets try again
+        url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s.%s.%s.%s/all?startTime=%s&endTime=%s" % (dataset, dim_args[1],dim_args[0],dim_args[2],dim_args[3],params['startTime'],params['endTime'])
+
+        #clean up any situation where the format of the url is broken
+        url = url.replace('..','.')
+
+        #resp = requests.get(url=url,verify=False)
+        resp = requests.get(url=url)
+        try:
+            resp.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            # Whoops it wasn't a 200 after 2 attempts
+            raise Exception("Http Response (%s) Is Not 200 after 2 attempts: %s" % (url,str(resp.status_code)))
+      else:
+            # Whoops it wasn't a 200 
+            raise Exception("Http Response (%s) Is Not 200: %s" % (url,str(resp.status_code)))
+
+  """
   try:
     #resp = requests.get(url=url,params=params)
     #resp = requests.get(url=url,verify=False)
@@ -126,14 +159,12 @@ def get_oecd_data(dataset, dimensions, params):
 
       #resp = requests.get(url=url,verify=False)
       resp = requests.get(url=url)
+  """
 
-    resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
-    # Write response to an XML File
-    with open(file_path, 'w') as f:
-      f.write(resp_formatted)
-
-  except requests.exceptions.ConnectionError:
-    print("Connection refused, Opening from File...")
+  resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
+  # Write response to an XML File
+  with open(file_path, 'w') as f:
+    f.write(resp_formatted)
 
   # Load in the XML file into ElementTree
   tree = ET.parse(file_path)
@@ -313,9 +344,17 @@ def scrape_world_gdp_table(url):
   #Scrape GDP Table from Trading Economics
   #url = "https://tradingeconomics.com/matrix"
 
-  page = requests.get(url=url)
-  soup = BeautifulSoup(page.content, 'html.parser')
+  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url,headers=header)
 
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
+
+  soup = BeautifulSoup(page.content, 'html.parser')
   table = soup.find('table')
   table_rows = table.find_all('tr', attrs={'align':'center'})
   table_rows_header = table.find_all('tr')[0].find_all('th')
@@ -363,13 +402,24 @@ def get_ism_manufacturing_content():
   #*page = requests.get(url=url_ism,verify=False)
   page = requests.get(url=url_ism)
 
-  if(page.status_code == 404):
-      # Use previous month to get ISM data
-      ism_date, ism_month = get_ism_date(2)
-      url_ism = get_ism_manufacturing_url(ism_month)
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+    if(page.status_code == 404):
+        # Use previous month to get ISM data
+        ism_date, ism_month = get_ism_date(2)
+        url_ism = get_ism_manufacturing_url(ism_month)
 
-      #*page = requests.get(url=url_ism,verify=False)
-      page = requests.get(url=url_ism)
+        #*page = requests.get(url=url_ism,verify=False)
+        page = requests.get(url=url_ism)
+
+        try:
+            page.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+          # Whoops it wasn't a 200 
+          raise Exception("Http Response (%s) Is Not 200 after 2 attempts: %s" % (url_ism,str(page.status_code)))
+    else:
+        raise Exception("Http Response (%s) Is Not 200: %s" % (url_ism,str(page.status_code)))
 
   return ism_date, ism_month, page
 
@@ -381,13 +431,24 @@ def get_ism_services_content():
   #*page = requests.get(url=url_ism,verify=False)
   page = requests.get(url=url_ism)
 
-  if(page.status_code == 404):
-      # Use previous month to get ISM data
-      ism_date, ism_month = get_ism_date(2)
-      url_ism = get_ism_services_url(ism_month)
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+    if(page.status_code == 404):
+        # Use previous month to get ISM data
+        ism_date, ism_month = get_ism_date(2)
+        url_ism = get_ism_services_url(ism_month)
 
-      #*page = requests.get(url=url_ism,verify=False)
-      page = requests.get(url=url_ism)
+        #*page = requests.get(url=url_ism,verify=False)
+        page = requests.get(url=url_ism)
+
+        try:
+            page.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+          # Whoops it wasn't a 200 
+          raise Exception("Http Response (%s) Is Not 200 after 2 attempts: %s" % (url_ism,str(page.status_code)))
+    else:
+        raise Exception("Http Response (%s) Is Not 200: %s" % (url_ism,str(page.status_code)))
 
   return ism_date, ism_month, page
 
@@ -421,6 +482,12 @@ def scrape_ism_manufacturing_headline_index(ism_date, ism_month):
 
   #*page = requests.get(url=url_ism,verify=False)
   page = requests.get(url=url_ism)
+
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+    # Whoops it wasn't a 200 
+    raise Exception("Http Response (%s) Is Not 200: %s" % (url_ism,str(page.status_code)))
 
   soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -486,6 +553,12 @@ def scrape_ism_services_headline_index(ism_date, ism_month):
 
     #**page = requests.get(url=url_ism,verify=False)
     page = requests.get(url=url_ism)
+
+    try:
+        page.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200 
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url_ism,str(page.status_code)))
 
     soup = BeautifulSoup(page.content, 'html.parser')
 

@@ -22,19 +22,15 @@ def scrape_manufacturing_new_orders_production():
     pattern_new_orders = re.compile(r'(growth in new orders [A-Za-z,&;\s]* (January|February|...|December))')
     pattern_production = re.compile(r'(growth in production [A-Za-z,&;\s]* (January|February|...|December))')
 
-
     for para in paras:
         #Get the specific paragraph
         if(len(pattern_manufacturing.findall(para.text)) > 0):
-        #if('manufacturing industries reporting growth in %s' % (ism_month) in para.text):
             para_manufacturing = para.text
 
         if(len(pattern_new_orders.findall(para.text)) > 0):
-        #if('growth in new orders' in para.text and '%s' % (ism_month) in para.text):
             para_new_orders = para.text
 
         if(len(pattern_production.findall(para.text)) > 0):
-        #if('growth in production' in para.text and '%s' % (ism_month) in para.text):
             para_production = para.text
 
     return para_manufacturing, para_new_orders, para_production, ism_date, ism_month

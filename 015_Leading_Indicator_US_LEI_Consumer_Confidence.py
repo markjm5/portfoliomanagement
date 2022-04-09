@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import re
 from datetime import datetime as dt
 from dateutil import relativedelta
 from bs4 import BeautifulSoup
@@ -18,15 +19,29 @@ def scrape_conference_board_lei():
 
   # Add additional column to df with China PMI Index
   #*page = requests.get(url=url_lei,verify=False)
-  page = requests.get(url=url_lei)
+
+  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url_lei,headers=header)
+
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url_lei, str(page.status_code)))
 
   soup = BeautifulSoup(page.content, 'html.parser')
 
   # Get the date of the article
-  date_string = soup.find("p", {"class": "date"}).text[0 + len('Released: '):len(soup.find("p", {"class": "date"}).text)].replace(',','')
+  #TODO: REPLACE WITH REGEX
+  date_text = soup.find("p", {"class": "date"}).text.strip()
+
+  pattern_regex = re.compile(r'((?<=:\s)[A-Za-z,&;\s,0-9]*)')
+  date_string = re.search(pattern_regex,date_text).group(0)
 
   # Convert article date into datetime, and get the previous month because that will be the LEI month
-  article_date = dt.strptime(date_string, "%A %B %d %Y")
+  article_date = dt.strptime(date_string, "%A, %B %d, %Y")
+
   lei_date = article_date - relativedelta.relativedelta(months=1)
 
   paragraph = "" #The para that contains the LEI monthly value

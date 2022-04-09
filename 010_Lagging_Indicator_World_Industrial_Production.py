@@ -15,7 +15,16 @@ excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lag
 def scrape_table_world_production(url):
   #Scrape GDP Table from https://tradingeconomics.com/country-list/industrial-production?continent=world
 
-  page = requests.get(url=url)
+  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url,headers=header)
+
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
+
   soup = BeautifulSoup(page.content, 'html.parser')
 
   #TODO: Need to scrape table for world production countries and numbers.
@@ -58,6 +67,13 @@ def scrape_table_china_caixin_pmi():
   # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
   header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
   page = requests.get(url=url_caixin_pmi,headers=header)
+
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url_caixin_pmi, str(page.status_code)))
+
   soup = BeautifulSoup(page.content, 'html.parser')
 
   table = soup.find('table') 
@@ -113,8 +129,16 @@ def scrape_table_china_industrial_production():
   #currentYear = dt.now().strftime('%Y')
   url_ip_yoy = 'https://tradingeconomics.com/china/industrial-production'
 
-  #Get IP YoY Percentage Growth using Regex
-  page = requests.get(url=url_ip_yoy)
+  # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url_ip_yoy,headers=header)
+
+  try:
+      page.raise_for_status()
+  except requests.exceptions.HTTPError as e:
+      # Whoops it wasn't a 200
+      raise Exception("Http Response (%s) Is Not 200: %s" % (url_ip_yoy, str(page.status_code)))
+
   soup = BeautifulSoup(page.content, 'html.parser')
   
   table = soup.find('table') 

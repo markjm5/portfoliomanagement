@@ -9,7 +9,16 @@ excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.
 
 def scrape_table_country_rating(url):
 
-    page = requests.get(url=url)
+    # When website blocks your request, simulate browser request: https://stackoverflow.com/questions/56506210/web-scraping-with-python-problem-with-beautifulsoup
+    header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+    page = requests.get(url=url,headers=header)
+
+    try:
+        page.raise_for_status()
+    except requests.exceptions.HTTPError as e:
+        # Whoops it wasn't a 200
+        raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
+
     soup = BeautifulSoup(page.content, 'html.parser')
 
     #TODO: Need to scrape table for world production countries and numbers.
