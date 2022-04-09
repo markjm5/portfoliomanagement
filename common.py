@@ -1,24 +1,21 @@
 import sys
-from lib2to3.pgen2.pgen import DFAState
-from pandas.io import excel
 import requests
-import sys
+import time
 import os.path
-import csv
 import pandas as pd
 import xml.etree.ElementTree as ET
 import openpyxl
-from openpyxl.utils.dataframe import dataframe_to_rows
-from itertools import islice
-from datetime import date
-from datetime import datetime as dt
-from dateutil import parser, relativedelta
-import time
-from bs4 import BeautifulSoup
-from requests.models import parse_header_links
 import re
 import yfinance as yf
 import investpy as invest
+from openpyxl.utils.dataframe import dataframe_to_rows
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from datetime import date
+from datetime import datetime as dt
+from dateutil import relativedelta
+from bs4 import BeautifulSoup
 
 ############################
 # Data Retrieval Functions #
@@ -36,6 +33,22 @@ def get_page(url):
       raise Exception("Http Response (%s) Is Not 200: %s" % (url, str(page.status_code)))
 
   return page
+
+def get_page_selenium(url):
+
+  #Selenium Browser Emulation Tool
+  chrome_options = Options()
+  chrome_options.add_argument("--headless")
+  chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166")
+
+  driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
+  driver.get(url)
+
+  html = driver.page_source
+  driver.close()
+
+  return html
+
 
 def get_stlouisfed_data(series_code):
   url = "https://api.stlouisfed.org/fred/series/observations?series_id=%s&api_key=8067a107f45ff78491c1e3117245a0a3&file_type=json" % (series_code,)

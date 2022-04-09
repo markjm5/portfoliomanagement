@@ -1,12 +1,8 @@
 import re
 import pandas as pd
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
-from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_stlouisfed_data, get_data_fred, get_page
+from common import combine_df_on_index, get_stlouisfed_data, get_data_fred, get_page, get_page_selenium
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/022_Global_Macro_Data_Summary_Page.xlsm'
 
@@ -42,25 +38,8 @@ def get_current_ffr_target():
 def get_eurodollar_futures():
 
     url = "https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html"
-    #url = "https://www.espncricinfo.com/"
 
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    #chrome_options.add_argument('ignore-certificate-errors')
-
-    #ua = UserAgent(verify_ssl=False)
-
-    #userAgent = ua.random
-    #print(userAgent)
-    #import pdb; pdb.set_trace()
-
-    #chrome_options.add_argument(f'user-agent={userAgent}')
-    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows Phone 10.0; Android 4.2.1; Microsoft; Lumia 640 XL LTE) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Mobile Safari/537.36 Edge/12.10166")
-
-    driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
-    driver.get(url)
-    html = driver.page_source
-    driver.close()
+    html = get_page_selenium(url)
 
     soup = BeautifulSoup(html, 'html.parser')
     table = soup.find('table')
