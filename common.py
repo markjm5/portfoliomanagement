@@ -389,7 +389,9 @@ def get_ism_manufacturing_content():
   ism_date, ism_month = get_ism_date(1)
   url_ism = get_ism_manufacturing_url(ism_month)
 
-  page = requests.get(url=url_ism)
+  #This is duplicate code found in get_page function but we need to handle special case of ism data where page may not be found and we need to switch to 1 month previous
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url_ism,headers=header)
 
   try:
       page.raise_for_status()
@@ -411,7 +413,9 @@ def get_ism_services_content():
   ism_date, ism_month = get_ism_date(1)
   url_ism = get_ism_services_url(ism_month)
 
-  page = requests.get(url=url_ism)
+  #This is duplicate code found in get_page function but we need to handle special case of ism data where page may not be found and we need to switch to 1 month previous
+  header={'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36'}
+  page = requests.get(url=url_ism,headers=header)
 
   try:
       page.raise_for_status()
