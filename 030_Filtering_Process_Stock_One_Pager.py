@@ -1,46 +1,11 @@
-import requests
-import sys
-import json
-
 import pandas as pd
 from datetime import date
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data
+from common import get_fmpcloud_data
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_Stock_One_Page.xlsm'
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
-
-def get_fmpcloud_data(url, filename):
-
-    #TODO: check if current file has todays system date, and if it does load from current file. Otherwise, continue to call the api
-    file_path = "%s/JSON/%s" % (sys.path[0],filename)
-    data_list = []
-
-    try:
-        #TODO: Check if file date is today. If so, continue. Otherwise, throw exception so that we can use the API instead to load the data
-
-        # opening the file in read mode
-        my_file = open(file_path, "r")        
-        data = my_file.read()
-        
-        # replacing end splitting the text 
-        # when newline ('\n') is seen.
-        liststr = data.split("\n")
-        #print(data_into_list)
-        my_file.close()
-        data_list = eval(liststr[0])
-
-    except:
-
-        data_list.append(requests.get(url).json())
-
-        # Write response to an XML File
-        with open(file_path, 'w') as f:
-            for item in data_list:
-                f.write("%s\n" % item)
-
-    return data_list
 
 sheet_name = 'Database S&P500'
 df_sp_500 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
@@ -53,11 +18,10 @@ data = get_fmpcloud_data(url,'030_SP500_details.json')
 
 sp_price = ""
 
-#TODO: Ensure that whether loaded from file or api, we are able to get the price.
-for index in range(len(data)):
-    for key in data[index]:
-        if key['symbol'] == '^GSPC':
-            sp_price = key['price']
+#Ensure that whether loaded from file or api, we are able to get the price.
+for index in data:
+    if index['symbol'] == '^GSPC':
+        sp_price = index['price']
 
 print(sp_price)
 
