@@ -287,22 +287,26 @@ def get_yf_data(ticker, interval, start, end):
 
   return df_yf
 
-def get_fmpcloud_data(url, filename):
+def get_api_json_data(url, filename):
 
     #check if current file has todays system date, and if it does load from current file. Otherwise, continue to call the api
     file_path = "%s/JSON/%s" % (sys.path[0],filename)
     data_list = []
 
     todays_date = date.today()
-    file_mod_date = time.ctime(os.path.getmtime(file_path))
-    file_mod_date = dt.strptime(file_mod_date, '%a %b %d %H:%M:%S %Y')
+    try:
+      file_mod_date = time.ctime(os.path.getmtime(file_path))
+      file_mod_date = dt.strptime(file_mod_date, '%a %b %d %H:%M:%S %Y')
+    except FileNotFoundError as e:
+      #Set file mod date to nothing as we do not have a file
+      file_mod_date = None
 
     try:
         #Check if file date is today. If so, continue. Otherwise, throw exception so that we can use the API instead to load the data
         if(file_mod_date.date() == todays_date):
             my_file = open(file_path, "r")        
         else:
-            #TODO: Throw exception so that we can read the data from api
+            # Throw exception so that we can read the data from api
             raise Exception('Need to read from API') 
     except Exception as error:
         temp_data = []
