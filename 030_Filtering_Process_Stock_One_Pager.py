@@ -1,8 +1,10 @@
 import pandas as pd
 from pandas.tseries.offsets import BDay
 from datetime import date
+from datetime import datetime as dt
+from dateutil.relativedelta import relativedelta
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import get_api_json_data
+from common import get_api_json_data,combine_df_on_index, write_value_to_cell_excel
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_Stock_One_Page.xlsm'
 
@@ -10,13 +12,15 @@ fmpcloud_account_key = '14afe305132a682a2742743df532707d'
 nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 
 todays_date = date.today()
+one_year_ago = dt(todays_date.year - 1, 12, 31)
+two_year_ago = dt(todays_date.year - 2, 12, 31)
+three_year_ago = dt(todays_date.year - 3, 12, 31)
 
-#################################
-# Get Aggregate Data for S&P500 #
-#################################
-
-sheet_name = 'Database S&P500'
-df_sp_500 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+#########################
+# Get S&P500 Last Price #
+#########################
+"""
+sheet_name = 'Data S&P 500'
 
 url = "https://fmpcloud.io/api/v3/quotes/index?apikey=%s" % (fmpcloud_account_key)
 data_sp_price = get_api_json_data(url,'030_SP500_details.json')
@@ -24,6 +28,16 @@ sp_price = ""
 for index in data_sp_price:
     if index['symbol'] == '^GSPC':
         sp_price = index['price']
+row = 4
+column = 4
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, sp_price)
+"""
+#################################
+# Get Aggregate Data for S&P500 #
+#################################
+
+sheet_name = 'Database S&P500'
+df_sp_500 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_EARNINGS_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
 data_sp_earnings = get_api_json_data(url,'030_SP500_earnings.json')
@@ -36,6 +50,40 @@ data_sp_earnings_ratio = get_api_json_data(url,'030_SP500_price_to_earnings_rati
 
 url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_PSR_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
 data_sp_price_to_sales_ratio = get_api_json_data(url,'030_SP500_price_to_sales_ratio.json')
+
+df = pd.DataFrame()
+df.insert(0,"DATE",[],True)
+df.insert(1,"EPS",[],True)
+df.insert(1,"DIVIDEND_YIELD",[],True)
+df.insert(1,"PE_RATIO",[],True)
+df.insert(1,"PRICE_SALES_RATIO",[],True)
+
+for index in data_sp_earnings['dataset']['data']:   
+    #TODO: Get Current
+
+    #TODO: Add to Dataframe
+    if(one_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
+        print(index[0])
+        print(index[1])
+
+    if(two_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
+        print(index[0])
+        print(index[1])
+
+    if(three_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
+        print(index[0])
+        print(index[1])
+
+    #TODO: 
+import pdb; pdb.set_trace()
+
+#TODO: Convert the above json files into a dataframe
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+df_updated = combine_df_on_index(df_original, df, 'TICKER')
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 #TODO:
 # Earnings Per Share (Annual)
@@ -62,6 +110,8 @@ data_industry_pe_ratio = get_api_json_data(url,'030_industry_pe_ratio.json')
 
 import pdb; pdb.set_trace()
 
+#TODO: Convert the above json files into a dataframe
+
 ################################################
 # Get Aggregate Data for Single Name Companies #
 ################################################
@@ -70,6 +120,8 @@ sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 import pdb; pdb.set_trace()
+
+#TODO: Convert the above json files into a dataframe
 
 #Winners and Losers:
 # https://fmpcloud.io/api/v3/actives?apikey=14afe305132a682a2742743df532707d

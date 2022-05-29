@@ -700,6 +700,20 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
   book.save(excel_file_path)
   book.close()
 
+def write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value):
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
+  sheet = book[sheet_name]
+  book.active = sheet
+
+  #sheet['A1'] = 1
+  sheet.cell(row=row, column=column).value = value
+
+  book.save(excel_file_path)
+  book.close()
+
 ####################
 # Helper Functions #
 ####################
