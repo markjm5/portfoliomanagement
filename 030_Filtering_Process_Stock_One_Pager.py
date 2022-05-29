@@ -14,7 +14,6 @@ nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 todays_date = date.today()
 one_year_ago = dt(todays_date.year - 1, 12, 31)
 two_year_ago = dt(todays_date.year - 2, 12, 31)
-three_year_ago = dt(todays_date.year - 3, 12, 31)
 
 #########################
 # Get S&P500 Last Price #
@@ -59,9 +58,9 @@ df.insert(1,"PE_RATIO",[],True)
 df.insert(1,"PRICE_SALES_RATIO",[],True)
 
 for index in data_sp_earnings['dataset']['data']:   
-    #TODO: Get Current
+    #TODO: Get Current value
 
-    #TODO: Add to Dataframe
+    #TODO: Get previous values and add to Dataframe
     if(one_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
         print(index[0])
         print(index[1])
@@ -70,17 +69,10 @@ for index in data_sp_earnings['dataset']['data']:
         print(index[0])
         print(index[1])
 
-    if(three_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
-        print(index[0])
-        print(index[1])
-
-    #TODO: 
 import pdb; pdb.set_trace()
 
-#TODO: Convert the above json files into a dataframe
-
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-df_updated = combine_df_on_index(df_original, df, 'TICKER')
+df_updated = combine_df_on_index(df_original, df, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
