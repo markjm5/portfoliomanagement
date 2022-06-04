@@ -14,6 +14,12 @@ nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 todays_date = date.today()
 one_year_ago = dt(todays_date.year - 1, 12, 31)
 two_year_ago = dt(todays_date.year - 2, 12, 31)
+three_year_ago = dt(todays_date.year - 3, 12, 31)
+
+list_dates = []
+list_dates.append(one_year_ago)
+list_dates.append(two_year_ago)
+list_dates.append(three_year_ago)
 
 #########################
 # Get S&P500 Last Price #
@@ -30,13 +36,13 @@ for index in data_sp_price:
 row = 4
 column = 4
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, sp_price)
-"""
+
 #################################
 # Get Aggregate Data for S&P500 #
 #################################
 
 sheet_name = 'Database S&P500'
-df_sp_500 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+#df_sp_500 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_EARNINGS_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
 data_sp_earnings = get_api_json_data(url,'030_SP500_earnings.json')
@@ -50,29 +56,33 @@ data_sp_earnings_ratio = get_api_json_data(url,'030_SP500_price_to_earnings_rati
 url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_PSR_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
 data_sp_price_to_sales_ratio = get_api_json_data(url,'030_SP500_price_to_sales_ratio.json')
 
-df = pd.DataFrame()
-df.insert(0,"DATE",[],True)
-df.insert(1,"EPS",[],True)
-df.insert(1,"DIVIDEND_YIELD",[],True)
-df.insert(1,"PE_RATIO",[],True)
-df.insert(1,"PRICE_SALES_RATIO",[],True)
+df_sp_earnings = pd.DataFrame()
+df_sp_dividend_yield = pd.DataFrame()
+df_sp_earnings_ratio = pd.DataFrame()
+df_sp_price_to_sales_ratio = pd.DataFrame()
 
 for index in data_sp_earnings['dataset']['data']:   
-    #TODO: Get Current value
+    df_sp_earnings = df_sp_earnings.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "EPS": index[1]}, ignore_index=True)
 
-    #TODO: Get previous values and add to Dataframe
-    if(one_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
-        print(index[0])
-        print(index[1])
+for index in data_sp_dividend_yield['dataset']['data']:   
+    df_sp_dividend_yield = df_sp_dividend_yield.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "DIVIDEND_YIELD": index[1]}, ignore_index=True)
 
-    if(two_year_ago == dt.strptime(index[0],"%Y-%m-%d")):
-        print(index[0])
-        print(index[1])
+for index in data_sp_earnings_ratio['dataset']['data']:   
+    df_sp_earnings_ratio = df_sp_earnings_ratio.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "PE_RATIO": index[1]}, ignore_index=True)
 
-import pdb; pdb.set_trace()
+for index in data_sp_price_to_sales_ratio['dataset']['data']:   
+    df_sp_price_to_sales_ratio = df_sp_price_to_sales_ratio.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "PRICE_SALES_RATIO": index[1]}, ignore_index=True)
 
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-df_updated = combine_df_on_index(df_original, df, 'DATE')
+df_history = combine_df_on_index(df_sp_dividend_yield, df_sp_earnings,'DATE')
+df_history = combine_df_on_index(df_history, df_sp_earnings_ratio,'DATE')
+df_history = combine_df_on_index(df_history, df_sp_price_to_sales_ratio,'DATE')
+
+df_current = df_history.tail(1)
+
+df_history = df_history.loc[df_history['DATE'].isin(list_dates)]
+df_history = df_history.reset_index(drop=True)
+
+df_updated = combine_df_on_index(df_history, df_current,'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
@@ -84,10 +94,12 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Book Value per share
 # Calculate Price to Book (P/B)
 # Calculate Price to Sales (P/S) *
+"""
+##################################
+# Get Aggregate Data for Sectors #
+##################################
 
-#################################################
-# Get Aggregate Data for Sectors and Industries #
-#################################################
+sheet_name = 'Database Sectors'
 
 last_business_day = todays_date - BDay(1)
 todays_date_formatted = last_business_day.strftime("%Y-%m-%d")
@@ -96,13 +108,33 @@ todays_date_formatted = last_business_day.strftime("%Y-%m-%d")
 url = "https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
 data_sector_pe_ratio = get_api_json_data(url,'030_sector_pe_ratio.json')
 
+df_sector_pe_ratio = pd.DataFrame()
+
+#TODO: Read data from json files, and put them into dataframes and write them to excel
+
+for index in data_sector_pe_ratio:   
+    df_sector_pe_ratio = df_sector_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "SECTOR": index['sector'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_sector_pe_ratio, False, 0)
+
+#TODO: Convert the above json files into a dataframe
+#####################################
+# Get Aggregate Data for Industries #
+#####################################
+sheet_name = 'Database Industries'
+
 # Industries PE Ratio: https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
 url = "https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
 data_industry_pe_ratio = get_api_json_data(url,'030_industry_pe_ratio.json')
 
-import pdb; pdb.set_trace()
+df_industry_pe_ratio = pd.DataFrame()
 
-#TODO: Convert the above json files into a dataframe
+for index in data_industry_pe_ratio:   
+    df_industry_pe_ratio = df_industry_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "INDUSTRY": index['industry'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_industry_pe_ratio, False, 0)
 
 ################################################
 # Get Aggregate Data for Single Name Companies #
