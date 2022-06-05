@@ -94,7 +94,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Book Value per share
 # Calculate Price to Book (P/B)
 # Calculate Price to Sales (P/S) *
-"""
+
 ##################################
 # Get Aggregate Data for Sectors #
 ##################################
@@ -110,15 +110,12 @@ data_sector_pe_ratio = get_api_json_data(url,'030_sector_pe_ratio.json')
 
 df_sector_pe_ratio = pd.DataFrame()
 
-#TODO: Read data from json files, and put them into dataframes and write them to excel
-
 for index in data_sector_pe_ratio:   
     df_sector_pe_ratio = df_sector_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "SECTOR": index['sector'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_sector_pe_ratio, False, 0)
 
-#TODO: Convert the above json files into a dataframe
 #####################################
 # Get Aggregate Data for Industries #
 #####################################
@@ -135,6 +132,7 @@ for index in data_industry_pe_ratio:
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_industry_pe_ratio, False, 0)
+"""
 
 ################################################
 # Get Aggregate Data for Single Name Companies #
@@ -144,6 +142,14 @@ sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 import pdb; pdb.set_trace()
+#Companies over 3 billion turnover: https://fmpcloud.io/api/v3/stock-screener?&marketCapMoreThan=3000000000&apikey=14afe305132a682a2742743df532707d
+#Finwiz company quote: https://finviz.com/quote.ashx?t=CRM
+#Income Statement: https://fmpcloud.io/api/v3/income-statement/AAPL?limit=120&apikey=14afe305132a682a2742743df532707d
+#Balance Sheet: https://fmpcloud.io/api/v3/balance-sheet-statement/AAPL?limit=120&apikey=14afe305132a682a2742743df532707d
+#Cash Flow Statement: https://fmpcloud.io/api/v3/cash-flow-statement/AAPL?limit=120&apikey=14afe305132a682a2742743df532707d
+#Ratios: https://fmpcloud.io/api/v3/ratios/AAPL?limit=40&apikey=14afe305132a682a2742743df532707d
+
+# Forward Estimates Ratios: https://www.nasdaq.com/market-activity/stocks/aapl/price-earnings-peg-ratios
 
 #TODO: Convert the above json files into a dataframe
 
