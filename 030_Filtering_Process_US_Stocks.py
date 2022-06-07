@@ -26,7 +26,7 @@ list_dates.append(three_year_ago)
 #########################
 # Get S&P500 Last Price #
 #########################
-"""
+
 sheet_name = 'Data S&P 500'
 
 url = "https://fmpcloud.io/api/v3/quotes/index?apikey=%s" % (fmpcloud_account_key)
@@ -135,15 +135,12 @@ for index in data_industry_pe_ratio:
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_industry_pe_ratio, False, 0)
 
-"""
 ################################################
 # Get Aggregate Data for Single Name Companies #
 ################################################
 
 sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-
 
 df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME", "Ticker": "TICKER", "Market Cap (mil)": "MARKET_CAP", "Last EPS Surprise (%)": "LAST_EPS_SURPRISE_PERCENTAGE", "Div. Yield %": "DIVIDEND_YIELD_PERCENTAGE", "Exchange": "EXCHANGE", "Industry": "INDUSTRY", 
 "Sector": "SECTOR", "Month of Fiscal Yr End": "MONTH_OF_FISCAL_YR_END","F0 Consensus Est.": "EPS_F0_CONSENSUS","F1 Consensus Est.": "EPS_F1_CONSENSUS",
