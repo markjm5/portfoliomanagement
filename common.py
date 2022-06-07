@@ -331,6 +331,17 @@ def get_api_json_data(url, filename):
 
     return data_list
 
+def get_api_json_data_no_file(url):
+
+    data_list = []
+
+    todays_date = date.today()
+
+    data_list.append(requests.get(url).json())
+
+    return data_list
+
+
 # Get S&P500 Monthly Close Prices from YF #
 def get_sp500_monthly_prices():
   todays_date = date.today()
