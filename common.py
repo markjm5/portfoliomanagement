@@ -682,7 +682,7 @@ def write_to_directory(df,filename):
     file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
     df.to_csv(file_name, index=False)
 
-def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None, header_bold=False):
+def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None, format_header=False):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
@@ -709,7 +709,7 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
       cell = row[date_position]   # column date_position is a Date Field.
       cell.number_format = 'dd-mm-YYYY'
 
-  if(header_bold):  
+  if(format_header):  
     new_fill  = PatternFill(start_color='bde9f7', end_color='bde9f7', fill_type='solid')
     for cell in sheet[1:1]:
       cell.font = Font(bold=True)
