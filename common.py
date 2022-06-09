@@ -9,6 +9,7 @@ import re
 import yfinance as yf
 import investpy as invest
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.styles import Font, PatternFill
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
@@ -681,7 +682,7 @@ def write_to_directory(df,filename):
     file_name = os.path.join(userhome, 'Desktop', 'Trading_Excel_Files', 'Database',filename)
     df.to_csv(file_name, index=False)
 
-def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None):
+def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None, header_bold=False):
 
   filepath = os.path.realpath(__file__)
   excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
@@ -707,7 +708,13 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
     for row in sheet[2:sheet.max_row]: # skip the header
       cell = row[date_position]   # column date_position is a Date Field.
       cell.number_format = 'dd-mm-YYYY'
-    
+
+  if(header_bold):  
+    new_fill  = PatternFill(start_color='bde9f7', end_color='bde9f7', fill_type='solid')
+    for cell in sheet[1:1]:
+      cell.font = Font(bold=True)
+      cell.fill = new_fill
+
   book.save(excel_file_path)
   book.close()
 

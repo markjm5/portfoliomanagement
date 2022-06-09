@@ -175,7 +175,7 @@ df_us_companies_sales_growth = df_us_companies_sales_growth.rename(columns={"COM
 #df_updated_us_companies_sales_growth = combine_df_on_index(df_original_us_companies_sales_growth, df_us_companies_sales_growth,'Ticker')
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_sales_growth, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_sales_growth, False, 0, True)
 
 ##############
 # EPS Growth #
@@ -190,7 +190,7 @@ df_us_companies_eps_growth = df_us_companies_eps_growth.rename(columns={"COMPANY
 })
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_eps_growth, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_eps_growth, False, 0, True)
 
 ##################
 # Dividend Yield #
@@ -205,7 +205,7 @@ df_us_companies_dividend_yield = df_us_companies_dividend_yield.rename(columns={
 })
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_dividend_yield, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_dividend_yield, False, 0, True)
 
 ##############
 # Net Margin #
@@ -220,7 +220,7 @@ df_us_companies_net_margin = df_us_companies_net_margin.rename(columns={"COMPANY
 })
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_net_margin, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_net_margin, False, 0, True)
 
 ########
 # Debt #
@@ -235,7 +235,7 @@ df_us_companies_debt = df_us_companies_debt.rename(columns={"COMPANY_NAME": "Com
 })
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_debt, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_debt, False, 0, True)
 
 #########
 # Value #
@@ -250,6 +250,6 @@ df_us_companies_value = df_us_companies_value.rename(columns={"COMPANY_NAME": "C
 })
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_value, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_value, False, 0, True)
 
 print("Done!")
