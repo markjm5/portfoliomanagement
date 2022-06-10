@@ -1,5 +1,5 @@
 import pandas as pd
-import quandl
+import numpy as np
 from pandas.tseries.offsets import BDay
 from bs4 import BeautifulSoup
 from datetime import date
@@ -22,6 +22,24 @@ list_dates = []
 list_dates.append(one_year_ago)
 list_dates.append(two_year_ago)
 list_dates.append(three_year_ago)
+
+################################################
+# Get Aggregate Data for Single Name Companies #
+################################################
+
+sheet_name = 'Database US Companies'
+df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
+
+df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME", "Ticker": "TICKER", "Market Cap (mil)": "MARKET_CAP", "Last EPS Surprise (%)": "LAST_EPS_SURPRISE_PERCENTAGE", "Div. Yield %": "DIVIDEND_YIELD_PERCENTAGE", "Exchange": "EXCHANGE", "Industry": "INDUSTRY", 
+"Sector": "SECTOR", "Month of Fiscal Yr End": "MONTH_OF_FISCAL_YR_END","F0 Consensus Est.": "EPS_F0_CONSENSUS","F1 Consensus Est.": "EPS_F1_CONSENSUS",
+"F2 Consensus Est.": "EPS_F2_CONSENSUS","P/E (Trailing 12 Months)": "PE_TTM","P/E (F1)": "PE_F1","P/E (F2)": "PE_F2","PEG Ratio": "PEG_RATIO",
+"Next EPS Report Date  (yyyymmdd)": "NEXT_EPS_REPORT_DATE","Current ROE (TTM)": "CURRENT_ROE_TTM","5 Yr Historical Sales Growth": "5Y_HISTORICAL_SALES_GROWTH","F(1) Consensus Sales Est. ($mil)": "F1_CONSENSUS_SALES_ESTIMATE","Annual Sales ($mil)": "ANNUAL_SALES(MILLION)",
+"Price/Sales": "PRICE_SALES_RATIO", "Price/Book": "PRICE_BOOK_RATIO","Net Margin %": "NET_MARGIN_PERCENTAGE",
+"Operating Margin 12 Mo %": "OPERATING_MARGIN_12_MO","Debt/Total Capital": "DEBT_TOTAL_CAPITAL","Debt/Equity Ratio": "DEBT_EQUITY_RATIO","Current Ratio": "CURRENT_RATIO","Quick Ratio": "QUICK_RATIO"
+})
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies, False, 0)
 
 #########################
 # Get S&P500 Last Price #
@@ -46,6 +64,12 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, sp_price)
 sheet_name = 'Database S&P500'
 #df_sp_500 = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
+url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_SALES_GROWTH_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
+data_sp_sales_growth = get_api_json_data(url,'030_SP500_sales_growth.json')
+
+url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_EARNINGS_GROWTH_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
+data_sp_earnings_growth = get_api_json_data(url,'030_SP500_earnings_growth.json')
+
 url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_EARNINGS_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
 data_sp_earnings = get_api_json_data(url,'030_SP500_earnings.json')
 
@@ -58,10 +82,18 @@ data_sp_earnings_ratio = get_api_json_data(url,'030_SP500_price_to_earnings_rati
 url = "https://data.nasdaq.com/api/v3/datasets/MULTPL/SP500_PSR_YEAR.json?api_key=%s" % (nasdaq_data_api_key)
 data_sp_price_to_sales_ratio = get_api_json_data(url,'030_SP500_price_to_sales_ratio.json')
 
+df_sp_sales_growth = pd.DataFrame()
+df_sp_earnings_growth = pd.DataFrame()
 df_sp_earnings = pd.DataFrame()
 df_sp_dividend_yield = pd.DataFrame()
 df_sp_earnings_ratio = pd.DataFrame()
 df_sp_price_to_sales_ratio = pd.DataFrame()
+
+for index in data_sp_sales_growth['dataset']['data']:   
+    df_sp_sales_growth = df_sp_sales_growth.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "SALES_GROWTH": index[1]}, ignore_index=True)
+
+for index in data_sp_earnings_growth['dataset']['data']:   
+    df_sp_earnings_growth = df_sp_earnings_growth.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "EARNINGS_GROWTH": index[1]}, ignore_index=True)
 
 for index in data_sp_earnings['dataset']['data']:   
     df_sp_earnings = df_sp_earnings.append({"DATE": dt.strptime(index[0],"%Y-%m-%d"), "EPS": index[1]}, ignore_index=True)
@@ -78,6 +110,9 @@ for index in data_sp_price_to_sales_ratio['dataset']['data']:
 df_history = combine_df_on_index(df_sp_dividend_yield, df_sp_earnings,'DATE')
 df_history = combine_df_on_index(df_history, df_sp_earnings_ratio,'DATE')
 df_history = combine_df_on_index(df_history, df_sp_price_to_sales_ratio,'DATE')
+
+df_history = combine_df_on_index(df_history, df_sp_sales_growth,'DATE')
+df_history = combine_df_on_index(df_history, df_sp_earnings_growth,'DATE')
 
 df_current = df_history.tail(1)
 
@@ -101,11 +136,43 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Get Aggregate Data for Sectors #
 ##################################
 
+#TODO: Get Margin
+#TODO: Get EPS
+
 sheet_name = 'Database Sectors'
 
 last_business_day = todays_date - BDay(1)
 todays_date_formatted = last_business_day.strftime("%Y-%m-%d")
 
+df_us_sectors = df_us_companies.filter(['SECTOR',
+    'EPS_F0_CONSENSUS',                
+    'EPS_F1_CONSENSUS',                
+    'EPS_F2_CONSENSUS',                
+    'PE_TTM',                          
+    'PE_F1',                           
+    'PE_F2',                           
+    'PEG_RATIO',                       
+    'PRICE_SALES_RATIO',               
+    'PRICE_BOOK_RATIO',                
+    'NEXT_EPS_REPORT_DATE',            
+    'CURRENT_ROE_TTM',                 
+    '5Y_HISTORICAL_SALES_GROWTH',      
+    'F1_CONSENSUS_SALES_ESTIMATE',     
+    'ANNUAL_SALES(MILLION)',           
+    'NET_MARGIN_PERCENTAGE',           
+    'OPERATING_MARGIN_12_MO',          
+    'DEBT_TOTAL_CAPITAL',              
+    'DEBT_EQUITY_RATIO',               
+    'CURRENT_RATIO',                   
+    'QUICK_RATIO',                     
+])
+
+df_us_sectors = df_us_sectors.groupby(['SECTOR']).mean()
+df_us_sectors = np.round(df_us_sectors, decimals=2)
+df_us_sectors.reset_index(inplace=True)
+df_us_sectors = df_us_sectors.rename(columns = {'index':'SECTOR'})
+df_us_sectors = df_us_sectors[df_us_sectors.SECTOR != 'Unclassified']
+"""
 # Sectors PE Ratio: https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
 url = "https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
 data_sector_pe_ratio = get_api_json_data(url,'030_sector_pe_ratio.json')
@@ -114,15 +181,50 @@ df_sector_pe_ratio = pd.DataFrame()
 
 for index in data_sector_pe_ratio:   
     df_sector_pe_ratio = df_sector_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "SECTOR": index['sector'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
+"""
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_sector_pe_ratio, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_sectors, False, -1)
 
 #####################################
 # Get Aggregate Data for Industries #
 #####################################
+
+#TODO: Get Margin
+#TODO: Get EPS
+
 sheet_name = 'Database Industries'
 
+df_us_industries = df_us_companies.filter(['INDUSTRY',
+    'EPS_F0_CONSENSUS',                
+    'EPS_F1_CONSENSUS',                
+    'EPS_F2_CONSENSUS',                
+    'PE_TTM',                          
+    'PE_F1',                           
+    'PE_F2',                           
+    'PEG_RATIO',                       
+    'PRICE_SALES_RATIO',               
+    'PRICE_BOOK_RATIO',                
+    'NEXT_EPS_REPORT_DATE',            
+    'CURRENT_ROE_TTM',                 
+    '5Y_HISTORICAL_SALES_GROWTH',      
+    'F1_CONSENSUS_SALES_ESTIMATE',     
+    'ANNUAL_SALES(MILLION)',           
+    'NET_MARGIN_PERCENTAGE',           
+    'OPERATING_MARGIN_12_MO',          
+    'DEBT_TOTAL_CAPITAL',              
+    'DEBT_EQUITY_RATIO',               
+    'CURRENT_RATIO',                   
+    'QUICK_RATIO',                     
+])
+
+df_us_industries = df_us_industries.groupby(['INDUSTRY']).mean()
+df_us_industries = np.round(df_us_industries, decimals=2)
+df_us_industries.reset_index(inplace=True)
+df_us_industries = df_us_industries.rename(columns = {'index':'INDUSTRY'})
+df_us_industries = df_us_industries[df_us_industries.INDUSTRY != 'Unclassified']
+
+"""
 # Industries PE Ratio: https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
 url = "https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
 data_industry_pe_ratio = get_api_json_data(url,'030_industry_pe_ratio.json')
@@ -131,27 +233,10 @@ df_industry_pe_ratio = pd.DataFrame()
 
 for index in data_industry_pe_ratio:   
     df_industry_pe_ratio = df_industry_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "INDUSTRY": index['industry'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
+"""
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_industry_pe_ratio, False, 0)
-
-################################################
-# Get Aggregate Data for Single Name Companies #
-################################################
-
-sheet_name = 'Database US Companies'
-df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME", "Ticker": "TICKER", "Market Cap (mil)": "MARKET_CAP", "Last EPS Surprise (%)": "LAST_EPS_SURPRISE_PERCENTAGE", "Div. Yield %": "DIVIDEND_YIELD_PERCENTAGE", "Exchange": "EXCHANGE", "Industry": "INDUSTRY", 
-"Sector": "SECTOR", "Month of Fiscal Yr End": "MONTH_OF_FISCAL_YR_END","F0 Consensus Est.": "EPS_F0_CONSENSUS","F1 Consensus Est.": "EPS_F1_CONSENSUS",
-"F2 Consensus Est.": "EPS_F2_CONSENSUS","P/E (Trailing 12 Months)": "PE_TTM","P/E (F1)": "PE_F1","P/E (F2)": "PE_F2","PEG Ratio": "PEG_RATIO",
-"Next EPS Report Date  (yyyymmdd)": "NEXT_EPS_REPORT_DATE","Current ROE (TTM)": "CURRENT_ROE_TTM","5 Yr Historical Sales Growth": "5Y_HISTORICAL_SALES_GROWTH","F(1) Consensus Sales Est. ($mil)": "F1_CONSENSUS_SALES_ESTIMATE","Annual Sales ($mil)": "ANNUAL_SALES(MILLION)",
-"Price/Sales": "PRICE_SALES_RATIO", "Price/Book": "PRICE_BOOK_RATIO","Net Margin %": "NET_MARGIN_PERCENTAGE",
-"Operating Margin 12 Mo %": "OPERATING_MARGIN_12_MO","Debt/Total Capital": "DEBT_TOTAL_CAPITAL","Debt/Equity Ratio": "DEBT_EQUITY_RATIO","Current Ratio": "CURRENT_RATIO","Quick Ratio": "QUICK_RATIO"
-})
-
-# Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_industries, False, -1)
 
 ################
 # Sales Growth #
@@ -170,6 +255,7 @@ df_us_companies_sales_growth = df_us_companies_sales_growth.drop(columns='ANNUAL
 df_us_companies_sales_growth = df_us_companies_sales_growth.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", "SECTOR": "Sector", "INDUSTRY": "Industry", 
 "5Y_HISTORICAL_SALES_GROWTH": "5 Yr Historical Sales Growth","F1_SALES_GROWTH": "Sales Growth F1"
 })
+df_us_companies_sales_growth = np.round(df_us_companies_sales_growth, decimals=2)
 
 #Combine df_original_world_gdp with df_world_gdp
 #df_updated_us_companies_sales_growth = combine_df_on_index(df_original_us_companies_sales_growth, df_us_companies_sales_growth,'Ticker')
@@ -213,6 +299,8 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_dividend_y
 
 sheet_name = 'Margins'
 
+#TODO: Get last 3 years
+
 df_us_companies_net_margin = df_us_companies.filter(['COMPANY_NAME','TICKER','OPERATING_MARGIN_12_MO','NET_MARGIN_PERCENTAGE'])
 
 df_us_companies_net_margin = df_us_companies_net_margin.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", 
@@ -233,6 +321,8 @@ df_us_companies_debt = df_us_companies.filter(['COMPANY_NAME','TICKER','QUICK_RA
 df_us_companies_debt = df_us_companies_debt.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", "QUICK_RATIO": "Quick Ratio", "CURRENT_RATIO": "Current Ratio", 
 "DEBT_EQUITY_RATIO": "Debt/Equity Ratio","DEBT_TOTAL_CAPITAL": "Debt/Total Capital"
 })
+
+df_us_companies_debt = np.round(df_us_companies_debt, decimals=2)
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_debt, False, 0, True)
