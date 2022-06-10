@@ -53,8 +53,8 @@ sp_price = ""
 for index in data_sp_price:
     if index['symbol'] == '^GSPC':
         sp_price = index['price']
-row = 4
-column = 4
+row = 2
+column = 3
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, sp_price)
 
 #################################
@@ -136,10 +136,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 # Get Aggregate Data for Sectors #
 ##################################
 
-#TODO: Get Margin
-#TODO: Get EPS
-
-sheet_name = 'Database Sectors'
+sheet_name = 'Sectors'
 
 last_business_day = todays_date - BDay(1)
 todays_date_formatted = last_business_day.strftime("%Y-%m-%d")
@@ -150,21 +147,9 @@ df_us_sectors = df_us_companies.filter(['SECTOR',
     'EPS_F2_CONSENSUS',                
     'PE_TTM',                          
     'PE_F1',                           
-    'PE_F2',                           
-    'PEG_RATIO',                       
-    'PRICE_SALES_RATIO',               
-    'PRICE_BOOK_RATIO',                
-    'NEXT_EPS_REPORT_DATE',            
-    'CURRENT_ROE_TTM',                 
-    '5Y_HISTORICAL_SALES_GROWTH',      
-    'F1_CONSENSUS_SALES_ESTIMATE',     
-    'ANNUAL_SALES(MILLION)',           
-    'NET_MARGIN_PERCENTAGE',           
-    'OPERATING_MARGIN_12_MO',          
-    'DEBT_TOTAL_CAPITAL',              
-    'DEBT_EQUITY_RATIO',               
-    'CURRENT_RATIO',                   
-    'QUICK_RATIO',                     
+    'PE_F2',        
+    'NET_MARGIN_PERCENTAGE', 
+    'OPERATING_MARGIN_12_MO'    
 ])
 
 df_us_sectors = df_us_sectors.groupby(['SECTOR']).mean()
@@ -172,6 +157,11 @@ df_us_sectors = np.round(df_us_sectors, decimals=2)
 df_us_sectors.reset_index(inplace=True)
 df_us_sectors = df_us_sectors.rename(columns = {'index':'SECTOR'})
 df_us_sectors = df_us_sectors[df_us_sectors.SECTOR != 'Unclassified']
+
+df_us_sectors = df_us_sectors.rename(columns={"SECTOR": "Sector", "EPS_F0_CONSENSUS": "EPS F0 Consensus", "EPS_F1_CONSENSUS": "EPS F1 Consensus", "EPS_F2_CONSENSUS": "EPS F2 Consensus", 
+"PE_TTM": "P/E Trailing 12 Months","PE_F1": "P/E F1 Consensus","PE_F2": "P/E F2 Consensus","NET_MARGIN_PERCENTAGE": "Net Margin %","OPERATING_MARGIN_12_MO": "Operating Margin 12 Months"
+})
+
 """
 # Sectors PE Ratio: https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
 url = "https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
@@ -184,16 +174,13 @@ for index in data_sector_pe_ratio:
 """
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_sectors, False, -1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_sectors, False, -1, True)
 
 #####################################
 # Get Aggregate Data for Industries #
 #####################################
 
-#TODO: Get Margin
-#TODO: Get EPS
-
-sheet_name = 'Database Industries'
+sheet_name = 'Industries'
 
 df_us_industries = df_us_companies.filter(['INDUSTRY',
     'EPS_F0_CONSENSUS',                
@@ -202,20 +189,8 @@ df_us_industries = df_us_companies.filter(['INDUSTRY',
     'PE_TTM',                          
     'PE_F1',                           
     'PE_F2',                           
-    'PEG_RATIO',                       
-    'PRICE_SALES_RATIO',               
-    'PRICE_BOOK_RATIO',                
-    'NEXT_EPS_REPORT_DATE',            
-    'CURRENT_ROE_TTM',                 
-    '5Y_HISTORICAL_SALES_GROWTH',      
-    'F1_CONSENSUS_SALES_ESTIMATE',     
-    'ANNUAL_SALES(MILLION)',           
-    'NET_MARGIN_PERCENTAGE',           
-    'OPERATING_MARGIN_12_MO',          
-    'DEBT_TOTAL_CAPITAL',              
-    'DEBT_EQUITY_RATIO',               
-    'CURRENT_RATIO',                   
-    'QUICK_RATIO',                     
+    'NET_MARGIN_PERCENTAGE', 
+    'OPERATING_MARGIN_12_MO'    
 ])
 
 df_us_industries = df_us_industries.groupby(['INDUSTRY']).mean()
@@ -223,6 +198,10 @@ df_us_industries = np.round(df_us_industries, decimals=2)
 df_us_industries.reset_index(inplace=True)
 df_us_industries = df_us_industries.rename(columns = {'index':'INDUSTRY'})
 df_us_industries = df_us_industries[df_us_industries.INDUSTRY != 'Unclassified']
+
+df_us_industries = df_us_industries.rename(columns={"SECTOR": "Sector", "EPS_F0_CONSENSUS": "EPS F0 Consensus", "EPS_F1_CONSENSUS": "EPS F1 Consensus", "EPS_F2_CONSENSUS": "EPS F2 Consensus", 
+"PE_TTM": "P/E Trailing 12 Months","PE_F1": "P/E F1 Consensus","PE_F2": "P/E F2 Consensus","NET_MARGIN_PERCENTAGE": "Net Margin %","OPERATING_MARGIN_12_MO": "Operating Margin 12 Months"
+})
 
 """
 # Industries PE Ratio: https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
@@ -236,7 +215,7 @@ for index in data_industry_pe_ratio:
 """
 
 # Write the updated df back to the excel sheet
-write_dataframe_to_excel(excel_file_path, sheet_name, df_us_industries, False, -1)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_us_industries, False, -1, True)
 
 ################
 # Sales Growth #
