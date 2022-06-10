@@ -1,16 +1,14 @@
 import pandas as pd
 import numpy as np
 from pandas.tseries.offsets import BDay
-from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime as dt
-from dateutil.relativedelta import relativedelta
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import get_api_json_data,get_page,get_api_json_data_no_file, get_page_selenium, combine_df_on_index, write_value_to_cell_excel
+from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import get_api_json_data,combine_df_on_index, write_value_to_cell_excel, get_yf_data
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
 
-fmpcloud_account_key = '14afe305132a682a2742743df532707d'
+#fmpcloud_account_key = '14afe305132a682a2742743df532707d'
 nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 
 todays_date = date.today()
@@ -47,12 +45,28 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies, False, 0)
 
 sheet_name = 'Data S&P 500'
 
+date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
+yesterday_date = dt(todays_date.year, todays_date.month, todays_date.day - 1)
+date_yesterday_str = "%s-%s-%s" % (yesterday_date.year, yesterday_date.month, yesterday_date.day)
+
+df_etf = get_yf_data('^GSPC', "1d", date_yesterday_str, date_str)
+
+#Remove unnecessary columns and rename columns
+df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+df_etf = df_etf.rename(columns={"Close": '^GSPC'})
+
+sp_price = df_etf.iloc[1]['^GSPC']
+sp_price = "{:.2f}".format(sp_price)
+
+"""
 url = "https://fmpcloud.io/api/v3/quotes/index?apikey=%s" % (fmpcloud_account_key)
 data_sp_price = get_api_json_data(url,'030_SP500_details.json')
 sp_price = ""
 for index in data_sp_price:
     if index['symbol'] == '^GSPC':
         sp_price = index['price']
+"""
+
 row = 2
 column = 3
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, sp_price)
