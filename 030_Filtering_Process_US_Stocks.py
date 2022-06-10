@@ -277,9 +277,9 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_eps_growth
 
 sheet_name = 'Dividend Yield'
 
-df_us_companies_dividend_yield = df_us_companies.filter(['COMPANY_NAME','TICKER','DIVIDEND_YIELD_PERCENTAGE'])
+df_us_companies_dividend_yield = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','DIVIDEND_YIELD_PERCENTAGE'])
 
-df_us_companies_dividend_yield = df_us_companies_dividend_yield.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker",
+df_us_companies_dividend_yield = df_us_companies_dividend_yield.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker","SECTOR": "Sector", "INDUSTRY": "Industry",
 "DIVIDEND_YIELD_PERCENTAGE": "Div. Yield %"
 })
 
@@ -294,9 +294,9 @@ sheet_name = 'Margins'
 
 #TODO: Get last 3 years
 
-df_us_companies_net_margin = df_us_companies.filter(['COMPANY_NAME','TICKER','OPERATING_MARGIN_12_MO','NET_MARGIN_PERCENTAGE'])
+df_us_companies_net_margin = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','OPERATING_MARGIN_12_MO','NET_MARGIN_PERCENTAGE'])
 
-df_us_companies_net_margin = df_us_companies_net_margin.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", 
+df_us_companies_net_margin = df_us_companies_net_margin.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker","SECTOR": "Sector", "INDUSTRY": "Industry", 
 "OPERATING_MARGIN_12_MO": "Operating Margin 12 Mo %","NET_MARGIN_PERCENTAGE": "Net Margin %"
 })
 
@@ -309,10 +309,10 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_net_margin
 
 sheet_name = 'Debt Balance Sheet'
 
-df_us_companies_debt = df_us_companies.filter(['COMPANY_NAME','TICKER','QUICK_RATIO','CURRENT_RATIO','DEBT_EQUITY_RATIO', 'DEBT_TOTAL_CAPITAL'])
+df_us_companies_debt = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','QUICK_RATIO','CURRENT_RATIO','DEBT_EQUITY_RATIO', 'DEBT_TOTAL_CAPITAL'])
 
-df_us_companies_debt = df_us_companies_debt.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", "QUICK_RATIO": "Quick Ratio", "CURRENT_RATIO": "Current Ratio", 
-"DEBT_EQUITY_RATIO": "Debt/Equity Ratio","DEBT_TOTAL_CAPITAL": "Debt/Total Capital"
+df_us_companies_debt = df_us_companies_debt.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", "SECTOR": "Sector", "INDUSTRY": "Industry", 
+"QUICK_RATIO": "Quick Ratio", "CURRENT_RATIO": "Current Ratio", "DEBT_EQUITY_RATIO": "Debt/Equity Ratio","DEBT_TOTAL_CAPITAL": "Debt/Total Capital"
 })
 
 df_us_companies_debt = np.round(df_us_companies_debt, decimals=2)
@@ -326,10 +326,10 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies_debt, Fals
 
 sheet_name = 'Value'
 
-df_us_companies_value = df_us_companies.filter(['COMPANY_NAME','TICKER','PRICE_SALES_RATIO','PRICE_BOOK_RATIO','CURRENT_ROE_TTM'])
+df_us_companies_value = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','PRICE_SALES_RATIO','PRICE_BOOK_RATIO','CURRENT_ROE_TTM'])
 
-df_us_companies_value = df_us_companies_value.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", "PRICE_SALES_RATIO": "Price/Sales", "PRICE_BOOK_RATIO": "Price/Book", 
-"CURRENT_ROE_TTM": "Current ROE"
+df_us_companies_value = df_us_companies_value.rename(columns={"COMPANY_NAME": "Company Name", "TICKER": "Ticker", "SECTOR": "Sector", "INDUSTRY": "Industry",
+"PRICE_SALES_RATIO": "Price/Sales", "PRICE_BOOK_RATIO": "Price/Book", "CURRENT_ROE_TTM": "Current ROE"
 })
 
 # Write the updated df back to the excel sheet
