@@ -83,23 +83,12 @@ url_company_balance_sheet = "https://fmpcloud.io/api/v3/balance-sheet-statement/
 url_company_cash_flow_statement = "https://fmpcloud.io/api/v3/cash-flow-statement/%s?limit=120&apikey=1%s" % (ticker,fmpcloud_account_key)
 url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?limit=20&apikey=%s" % (ticker,fmpcloud_account_key)
 
-"""
-#nasdaq urls:
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/EE.json?api_key=%s" % (nasdaq_data_api_key)
-data_earnings_estimates = get_api_json_data_no_file(url)
-
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/SE.json?api_key=%s" % (nasdaq_data_api_key)
-data_sales_estimates = get_api_json_data_no_file(url)
-
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/FC.json?api_key=%s" % (nasdaq_data_api_key)
-data_fundamentals = get_api_json_data_no_file(url)
-
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/ES.json?api_key=%s" % (nasdaq_data_api_key)
-data_earnings_surprises = get_api_json_data_no_file(url)
-"""
-
 #Excel file where we will create our one pager
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
+
+#TODO: Load existing ticker sheet
+#TODO: If ticker sheet does not exist, create a new ticker sheet using template
+#TODO: Populate ticker sheet with data
 
 print(df_zacks_stock_data)
 print(df_finwiz_stock_data)
@@ -200,5 +189,19 @@ Dividend Yield
 ROE
 
 Historical Earnings Surprises
+
+#nasdaq urls:
+url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/EE.json?api_key=%s" % (nasdaq_data_api_key)
+data_earnings_estimates = get_api_json_data_no_file(url)
+
+url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/SE.json?api_key=%s" % (nasdaq_data_api_key)
+data_sales_estimates = get_api_json_data_no_file(url)
+
+url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/FC.json?api_key=%s" % (nasdaq_data_api_key)
+data_fundamentals = get_api_json_data_no_file(url)
+
+url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/ES.json?api_key=%s" % (nasdaq_data_api_key)
+data_earnings_surprises = get_api_json_data_no_file(url)
 """
+
 print("Done!")
