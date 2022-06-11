@@ -1,23 +1,25 @@
 import pandas as pd
-import quandl
 from pandas.tseries.offsets import BDay
 from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import get_api_json_data,get_page,get_api_json_data_no_file, get_page_selenium, combine_df_on_index, write_value_to_cell_excel
+from common import get_api_json_data,get_page, get_finwiz_stock_data, get_api_json_data_no_file, get_page_selenium, combine_df_on_index, write_value_to_cell_excel
 
 #################
 ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
-nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 
 temp_excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
 temp_sheet_name = 'Database US Companies'
+
+#Get company data from various sources
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
+df_zacks_stock_data = df_us_companies[df_us_companies['TICKER'] == ticker]
+df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
 
@@ -38,11 +40,11 @@ df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].re
 
 #urls:
 url_finviz = "https://finviz.com/quote.ashx?t=%s" % (ticker)
-url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,nasdaq_data_api_key)
-url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,nasdaq_data_api_key)
-url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,nasdaq_data_api_key)
-url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,nasdaq_data_api_key)
-url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,nasdaq_data_api_key)
+url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
+url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
 
 page = get_page(url_finviz)
 

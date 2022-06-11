@@ -288,6 +288,54 @@ def get_yf_data(ticker, interval, start, end):
 
   return df_yf
 
+def get_finwiz_stock_data(ticker):
+    df_company_data = pd.DataFrame()
+    url_finviz = "https://finviz.com/quote.ashx?t=%s" % (ticker)
+    page = get_page(url_finviz)
+
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    table = soup.find_all('table')
+    table_rows = table[8].find_all('tr', recursive=False)
+
+    emptyDict = {}
+
+    #Get rows of data.
+    for tr in table_rows:
+        tds = tr.find_all('td')
+        boolKey = True
+        keyValueSet = False
+        for td in tds:
+            if boolKey:
+                key = td.text.strip()
+                boolKey = False                
+            else:
+                value = td.text.strip()
+                boolKey = True
+                keyValueSet = True                
+
+            if keyValueSet:
+                emptyDict[key] = value
+                keyValueSet = False
+
+    df_company_data.loc[ticker, 'PE'] = emptyDict['P/E']
+    df_company_data.loc[ticker, 'EPS_TTM'] = emptyDict['EPS (ttm)']
+    df_company_data.loc[ticker, 'PE_FORWARD'] = emptyDict['Forward P/E']
+    df_company_data.loc[ticker, 'EPS_Y1'] = emptyDict['EPS next Y']
+    df_company_data.loc[ticker, 'PEG'] = emptyDict['PEG']
+    df_company_data.loc[ticker, 'EPS_Y0'] = emptyDict['EPS this Y']
+    df_company_data.loc[ticker, 'PRICE_BOOK'] = emptyDict['P/B']
+    df_company_data.loc[ticker, 'PRICE_BOOK'] = emptyDict['P/B']
+    df_company_data.loc[ticker, 'PRICE_SALES'] = emptyDict['P/S']
+    df_company_data.loc[ticker, 'TARGET_PRICE'] = emptyDict['Target Price']
+    df_company_data.loc[ticker, 'ROE'] = emptyDict['ROE']
+    df_company_data.loc[ticker, '52W_RANGE'] = emptyDict['52W Range']
+    df_company_data.loc[ticker, 'QUICK_RATIO'] = emptyDict['Quick Ratio']
+    df_company_data.loc[ticker, 'GROSS_MARGIN'] = emptyDict['Gross Margin']
+    df_company_data.loc[ticker, 'CURRENT_RATIO'] = emptyDict['Current Ratio']
+
+    return df_company_data
+
 def get_api_json_data(url, filename):
 
     #check if current file has todays system date, and if it does load from current file. Otherwise, continue to call the api
