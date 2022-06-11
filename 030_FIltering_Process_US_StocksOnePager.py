@@ -6,7 +6,7 @@ from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import get_api_json_data,get_page, get_finwiz_stock_data, get_api_json_data_no_file, get_page_selenium, combine_df_on_index, write_value_to_cell_excel
-
+from common import check_sheet_exists, create_sheet
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -55,7 +55,7 @@ temp_sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
-
+"""
 url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
 page = get_page_selenium(url_nasdaq)
 soup = BeautifulSoup(page, 'html.parser')
@@ -70,7 +70,7 @@ df_nasdaq_company_data.loc[ticker, 'PE_F0-1_ACTUAL'] = df_pe_ratios.iloc[0,0]
 df_nasdaq_company_data.loc[ticker, 'PE_F0_ESTIMATE'] = df_pe_ratios.iloc[0,1]
 df_nasdaq_company_data.loc[ticker, 'PE_F1_ESTIMATE'] = df_pe_ratios.iloc[0,2]
 df_nasdaq_company_data.loc[ticker, 'PE_F2_ESTIMATE'] = df_pe_ratios.iloc[0,3]
-
+"""
 #fmpcloud urls:
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
@@ -86,13 +86,24 @@ url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?l
 #Excel file where we will create our one pager
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
 
-#TODO: Load existing ticker sheet
-#TODO: If ticker sheet does not exist, create a new ticker sheet using template
-#TODO: Populate ticker sheet with data
+sheet_name = ticker
+sheet_template = "Template"
+
+#If sheet with ticker name does not exist, create one using the template
+if not check_sheet_exists(excel_file_path,sheet_name):
+    create_sheet(excel_file_path, sheet_name, sheet_template)
+
+#TODO: Populate ticker sheet with company and stock data
+
+row = 2
+column = 3
+value = "test"
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
 
 print(df_zacks_stock_data)
 print(df_finwiz_stock_data)
-print(df_nasdaq_company_data)
+#print(df_nasdaq_company_data)
 
 import pdb; pdb.set_trace()
 

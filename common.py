@@ -780,9 +780,42 @@ def write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value):
   book.save(excel_file_path)
   book.close()
 
+def check_sheet_exists(excel_file_path,sheet_name):
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
+      
+  if sheet_name in book.sheetnames:
+      return True
+
+  return False
+
+def create_sheet(excel_file_path, sheet, sheet_copy_name=False):
+  filepath = os.path.realpath(__file__)
+  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
+
+  if(sheet_copy_name):
+    book.active = book[sheet_copy_name]
+    source = book.active
+    target = book.copy_worksheet(source)
+    target.title = sheet
+  else:
+    book.create_sheet(sheet)
+    book.active = book[sheet]
+    target = book.active
+
+  target.sheet_properties.tabColor = "1072BA"
+  target.sheet_view.zoomScale = 160
+  book.save(excel_file_path)
+  book.close()
+
 ####################
 # Helper Functions #
 ####################
+
 
 def combine_df(df_original, df_new):
 
