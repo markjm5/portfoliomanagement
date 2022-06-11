@@ -341,9 +341,33 @@ def get_stockrow_stock_data(ticker):
   soup = BeautifulSoup(page, 'html.parser')
   table = soup.find_all('table')[0]
 
-  #TODO: Turn table into a dataframe, and return dataframe
+  table_rows = table.find_all('tr', recursive=True)
+  table_rows_header = table.find_all('tr')[0].find_all('th')
 
-  return table
+  df = pd.DataFrame()
+  index = 0
+
+  for header in table_rows_header:
+    df.insert(index,header.text,[],True)
+    index+=1
+
+  #Get rows of data.
+  for tr in table_rows:
+      tds = tr.find_all('td', recursive=True)
+      if(tds):
+        temp_row = []
+        for td in tds:
+          temp_row.append(td.text.strip())        
+
+        df.loc[len(df.index)] = temp_row
+
+  import pdb; pdb.set_trace()
+
+  #TODO: Rename all columns based on current year
+  #TODO: Reorder Columns
+  #TODO: Format Columns
+  
+  return df
 
 def get_api_json_data(url, filename):
 
