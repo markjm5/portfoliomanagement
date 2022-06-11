@@ -14,6 +14,8 @@ from common import check_sheet_exists, create_sheet
 #https://www.marketscreener.com/
 #https://stockrow.com/
 
+debug = True
+
 #################
 ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
@@ -55,22 +57,35 @@ temp_sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
-"""
-url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
-page = get_page_selenium(url_nasdaq)
-soup = BeautifulSoup(page, 'html.parser')
 
-table = soup.find_all('table')
-pe_ratio_table_rows = table[0].find_all('tr', recursive=True)
+if not debug:
+    url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
+    page = get_page_selenium(url_nasdaq)
+    soup = BeautifulSoup(page, 'html.parser')
 
-df_pe_ratios = return_tr_as_df(pe_ratio_table_rows)
+    table = soup.find_all('table')
+    pe_ratio_table_rows = table[0].find_all('tr', recursive=True)
 
-df_nasdaq_company_data = pd.DataFrame()
-df_nasdaq_company_data.loc[ticker, 'PE_F0-1_ACTUAL'] = df_pe_ratios.iloc[0,0]
-df_nasdaq_company_data.loc[ticker, 'PE_F0_ESTIMATE'] = df_pe_ratios.iloc[0,1]
-df_nasdaq_company_data.loc[ticker, 'PE_F1_ESTIMATE'] = df_pe_ratios.iloc[0,2]
-df_nasdaq_company_data.loc[ticker, 'PE_F2_ESTIMATE'] = df_pe_ratios.iloc[0,3]
-"""
+    df_pe_ratios = return_tr_as_df(pe_ratio_table_rows)
+
+    df_nasdaq_company_data = pd.DataFrame()
+    df_nasdaq_company_data.loc[ticker, 'PE_F0-1_ACTUAL'] = df_pe_ratios.iloc[0,0]
+    df_nasdaq_company_data.loc[ticker, 'PE_F0_ESTIMATE'] = df_pe_ratios.iloc[0,1]
+    df_nasdaq_company_data.loc[ticker, 'PE_F1_ESTIMATE'] = df_pe_ratios.iloc[0,2]
+    df_nasdaq_company_data.loc[ticker, 'PE_F2_ESTIMATE'] = df_pe_ratios.iloc[0,3]
+
+    df_nasdaq_company_data = df_nasdaq_company_data.reset_index()
+    df_nasdaq_company_data = df_nasdaq_company_data.rename(columns = {'index':'TICKER'})
+
+    df_nasdaq_company_data['PE_F0-1_ACTUAL'] = pd.to_numeric(df_nasdaq_company_data['PE_F0-1_ACTUAL'])
+    df_nasdaq_company_data['PE_F0_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F0_ESTIMATE'])
+    df_nasdaq_company_data['PE_F1_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F1_ESTIMATE'])
+    df_nasdaq_company_data['PE_F2_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F2_ESTIMATE'])
+else:
+    #hard code values in debug mode so that we don't spend time waiting for selenium to load page
+    data = [['AAPL',24.44,22.44,20.65,19.31]]
+    df_nasdaq_company_data = pd.DataFrame(data, columns=['TICKER','PE_F0-1_ACTUAL','PE_F0_ESTIMATE','PE_F1_ESTIMATE','PE_F2_ESTIMATE'])
+
 #fmpcloud urls:
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
@@ -96,16 +111,13 @@ if not check_sheet_exists(excel_file_path,sheet_name):
 #TODO: Populate ticker sheet with company and stock data
 
 row = 2
-column = 3
-value = "test"
+column = 2
+value = ticker
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
-
-print(df_zacks_stock_data)
-print(df_finwiz_stock_data)
+#print(df_zacks_stock_data)
+#print(df_finwiz_stock_data)
 #print(df_nasdaq_company_data)
-
-import pdb; pdb.set_trace()
 
 """
 Company Name
