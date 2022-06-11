@@ -90,6 +90,10 @@ else:
 df_stockrow_data = get_stockrow_stock_data(ticker)
 import pdb; pdb.set_trace()
 
+# Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
+# Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
+# Competitors: https://www.marketwatch.com/investing/stock/crm
+
 #fmpcloud urls:
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 #url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
