@@ -21,6 +21,8 @@ df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_she
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
 
+import pdb; pdb.set_trace()
+
 todays_date = date.today()
 one_year_ago = dt(todays_date.year - 1, 12, 31)
 two_year_ago = dt(todays_date.year - 2, 12, 31)

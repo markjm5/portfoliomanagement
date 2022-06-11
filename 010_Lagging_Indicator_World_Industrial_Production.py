@@ -156,7 +156,11 @@ sheet_name = 'Data World GDP'
 #Get Capital Investment Data for the following countries
 country_list = ['USA','CHN','CEB','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
 #'EUN',
-df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, mrv=1) # most recent 1 year
+df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, labels=True, mrv=1) # most recent 1 year
+
+df_capital_investment['Country'] = df_capital_investment['Country'].map({'Korea, Rep.': 'South Korea', 'Russian Federation': 'Russia'})
+#df_capital_investment.loc[df_capital_investment["Country"] == "Korea, Rep."].Country = "South Korea"
+#df_capital_investment.loc[df_capital_investment["Country"] == "Russian Federation"].Country = "Russia"
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
@@ -164,29 +168,34 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False
 df_capital_investment.reset_index(level=0, inplace=True)
 
 # Rename columns in df_capital_investment
-df_capital_investment = df_capital_investment.rename(columns={'economy': 'Code', 'NE.GDI.TOTL.ZS': 'Investment_Percentage'})
+df_capital_investment = df_capital_investment.rename(columns={'economy': 'CODE','Country': 'COUNTRY','NE.GDI.TOTL.ZS': 'INVESTMENT_PERCENTAGE'})
 
 # Combine df_original with df_capital_investment
-df_updated = df_original.merge(df_capital_investment, on='Code')
+#df_updated = df_original.merge(df_capital_investment, on='CODE')
+df_updated = combine_df_on_index(df_original, df_capital_investment, 'CODE')
 
-df_updated = df_updated.drop(['Investment_Percentage_x'], axis=1)
-df_updated = df_updated.rename(columns={'Investment_Percentage_y': 'Investment_Percentage'})
+#df_updated = df_updated.drop(['Investment_Percentage_x'], axis=1)
+#df_updated = df_updated.rename(columns={'Investment_Percentage_y': 'Investment_Percentage'})
 
 df_world_gdp = scrape_world_gdp_table("https://tradingeconomics.com/matrix")
 
 #Drop unnecessary columns
-col_drop = ['GDP YoY','GDP QoQ','Interest rate','Inflation rate','Jobless rate','Gov. Budget','Debt/GDP','Current Account','Currency','Population']
+#col_drop = ['GDP YoY','GDP QoQ','Interest Rate','Inflation Rate','Jobless Rate','Gov. Budget','Debt/GDP','Current Account','Population']
+col_drop = ['GDP YOY','GDP QOQ','INTEREST RATE','INFLATION RATE','JOBLESS RATE','GOV. BUDGET','DEBT/GDP','CURRENT ACCOUNT','POPULATION']
+
+df_world_gdp.columns = map(str.upper, df_world_gdp.columns)
 df_world_gdp = df_world_gdp.drop(col_drop, axis=1)
 
 #Fix datatypes of df_world_gdp
 df_world_gdp['GDP'] = pd.to_numeric(df_world_gdp['GDP'])
-df_updated = pd.merge(df_updated,df_world_gdp,"right", on='Country')
+
+df_updated = pd.merge(df_updated,df_world_gdp,"right", on='COUNTRY')
 
 #Drop unnecessary columns
 df_updated_1 = df_updated.drop(columns='GDP_x', axis=1)
 df_updated_2 = df_updated_1.rename(columns={'GDP_y': 'GDP'})
 
-column_names = ["Country", "GDP", "Investment_Percentage", "Code"]
+column_names = ["COUNTRY", "GDP", "INVESTMENT_PERCENTAGE", "CODE"]
 
 df_updated_3 = df_updated_2.reindex(columns=column_names)
 

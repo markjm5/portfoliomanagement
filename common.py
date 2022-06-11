@@ -402,10 +402,10 @@ def scrape_world_gdp_table(url):
 
   soup = BeautifulSoup(page.content, 'html.parser')
   table = soup.find('table')
-  table_rows = table.find_all('tr', attrs={'align':'center'})
+  #table_rows = table.find_all('tr', attrs={'align':'center'})
+  table_rows = table.find_all('tr')
   table_rows_header = table.find_all('tr')[0].find_all('th')
   df = pd.DataFrame()
-
   index = 0
   for header in table_rows_header:
     if(index == 0):
@@ -422,21 +422,21 @@ def scrape_world_gdp_table(url):
     first_col = True
 
     td = tr.find_all('td')
-    for obs in td:
-      if(first_col):
-        text = ''.join(e for e in obs.text if e.isalnum())
-        text = re.sub("([A-Z])", " \\1", text).strip()
-      else:
-        if(obs.text.find('%') < 0):
-          text = obs.text
+    if len(td) > 0:
+      for obs in td:
+        if(first_col):
+          text = ''.join(e for e in obs.text if e.isalnum())
+          text = re.sub("([A-Z])", " \\1", text).strip()
         else:
-          text = obs.text.strip('%')
-          text = float(text.strip('%'))/100
+          if(obs.text.find('%') < 0):
+            text = obs.text
+          else:
+            text = obs.text.strip('%')
+            text = float(text.strip('%'))/100
+        temp_row.append(text)        
+        first_col = False
 
-      temp_row.append(text)        
-      first_col = False
-
-    df.loc[len(df.index)] = temp_row
+      df.loc[len(df.index)] = temp_row
 
   return df
 
