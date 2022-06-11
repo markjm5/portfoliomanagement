@@ -44,7 +44,7 @@ def get_page_selenium(url):
 
   driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
   driver.get(url)
-
+  time.sleep(1)
   html = driver.page_source
   driver.close()
 
@@ -335,6 +335,15 @@ def get_finwiz_stock_data(ticker):
     df_company_data.loc[ticker, 'CURRENT_RATIO'] = emptyDict['Current Ratio']
 
     return df_company_data
+
+def get_stockrow_stock_data(ticker):
+  page = get_page_selenium('https://stockrow.com/%s' % (ticker))
+  soup = BeautifulSoup(page, 'html.parser')
+  table = soup.find_all('table')[0]
+
+  #TODO: Turn table into a dataframe, and return dataframe
+
+  return table
 
 def get_api_json_data(url, filename):
 

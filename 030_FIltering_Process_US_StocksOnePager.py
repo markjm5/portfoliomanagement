@@ -4,9 +4,10 @@ from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
-from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import get_api_json_data,get_page, get_finwiz_stock_data, get_api_json_data_no_file, get_page_selenium, combine_df_on_index, write_value_to_cell_excel
-from common import check_sheet_exists, create_sheet
+from common import get_oecd_data, convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
+from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_api_json_data_no_file
+from common import get_page_selenium, combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
+
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -85,6 +86,9 @@ else:
     #hard code values in debug mode so that we don't spend time waiting for selenium to load page
     data = [['AAPL',24.44,22.44,20.65,19.31]]
     df_nasdaq_company_data = pd.DataFrame(data, columns=['TICKER','PE_F0-1_ACTUAL','PE_F0_ESTIMATE','PE_F1_ESTIMATE','PE_F2_ESTIMATE'])
+
+df_stockrow_data = get_stockrow_stock_data(ticker)
+import pdb; pdb.set_trace()
 
 #fmpcloud urls:
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
