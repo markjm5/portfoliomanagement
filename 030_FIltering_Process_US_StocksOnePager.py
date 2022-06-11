@@ -92,15 +92,15 @@ import pdb; pdb.set_trace()
 
 #fmpcloud urls:
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
-url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
+#url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
-url_company_income_statement = "https://fmpcloud.io/api/v3/income-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
-url_company_balance_sheet = "https://fmpcloud.io/api/v3/balance-sheet-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
-url_company_cash_flow_statement = "https://fmpcloud.io/api/v3/cash-flow-statement/%s?limit=120&apikey=1%s" % (ticker,fmpcloud_account_key)
-url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?limit=20&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_income_statement = "https://fmpcloud.io/api/v3/income-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_balance_sheet = "https://fmpcloud.io/api/v3/balance-sheet-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_cash_flow_statement = "https://fmpcloud.io/api/v3/cash-flow-statement/%s?limit=120&apikey=1%s" % (ticker,fmpcloud_account_key)
+#url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?limit=20&apikey=%s" % (ticker,fmpcloud_account_key)
 
 #Excel file where we will create our one pager
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'

@@ -365,7 +365,7 @@ def get_stockrow_stock_data(ticker):
 
   #TODO: Rename all columns based on current year
   #TODO: Reorder Columns
-  #TODO: Format Columns
+  #TODO: Format Columns (transform parenthesis into negative numbers)
   
   return df
 

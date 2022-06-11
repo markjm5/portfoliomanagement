@@ -8,7 +8,6 @@ from common import get_api_json_data,combine_df_on_index, write_value_to_cell_ex
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
 
-#fmpcloud_account_key = '14afe305132a682a2742743df532707d'
 nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 
 todays_date = date.today()
@@ -57,15 +56,6 @@ df_etf = df_etf.rename(columns={"Close": '^GSPC'})
 
 sp_price = df_etf.iloc[1]['^GSPC']
 sp_price = "{:.2f}".format(sp_price)
-
-"""
-url = "https://fmpcloud.io/api/v3/quotes/index?apikey=%s" % (fmpcloud_account_key)
-data_sp_price = get_api_json_data(url,'030_SP500_details.json')
-sp_price = ""
-for index in data_sp_price:
-    if index['symbol'] == '^GSPC':
-        sp_price = index['price']
-"""
 
 row = 2
 column = 3
@@ -176,17 +166,6 @@ df_us_sectors = df_us_sectors.rename(columns={"SECTOR": "Sector", "EPS_F0_CONSEN
 "PE_TTM": "P/E Trailing 12 Months","PE_F1": "P/E F1 Consensus","PE_F2": "P/E F2 Consensus","NET_MARGIN_PERCENTAGE": "Net Margin %","OPERATING_MARGIN_12_MO": "Operating Margin 12 Months"
 })
 
-"""
-# Sectors PE Ratio: https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
-url = "https://fmpcloud.io/api/v4/sector_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
-data_sector_pe_ratio = get_api_json_data(url,'030_sector_pe_ratio.json')
-
-df_sector_pe_ratio = pd.DataFrame()
-
-for index in data_sector_pe_ratio:   
-    df_sector_pe_ratio = df_sector_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "SECTOR": index['sector'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
-"""
-
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_us_sectors, False, -1, True)
 
@@ -216,17 +195,6 @@ df_us_industries = df_us_industries[df_us_industries.INDUSTRY != 'Unclassified']
 df_us_industries = df_us_industries.rename(columns={"SECTOR": "Sector", "EPS_F0_CONSENSUS": "EPS F0 Consensus", "EPS_F1_CONSENSUS": "EPS F1 Consensus", "EPS_F2_CONSENSUS": "EPS F2 Consensus", 
 "PE_TTM": "P/E Trailing 12 Months","PE_F1": "P/E F1 Consensus","PE_F2": "P/E F2 Consensus","NET_MARGIN_PERCENTAGE": "Net Margin %","OPERATING_MARGIN_12_MO": "Operating Margin 12 Months"
 })
-
-"""
-# Industries PE Ratio: https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=2021-05-07&exchange=NYSE&apikey=14afe305132a682a2742743df532707d
-url = "https://fmpcloud.io/api/v4/industry_price_earning_ratio?date=%s&exchange=NYSE&apikey=%s" % (todays_date_formatted, fmpcloud_account_key)
-data_industry_pe_ratio = get_api_json_data(url,'030_industry_pe_ratio.json')
-
-df_industry_pe_ratio = pd.DataFrame()
-
-for index in data_industry_pe_ratio:   
-    df_industry_pe_ratio = df_industry_pe_ratio.append({"DATE": dt.strptime(index['date'],"%Y-%m-%d"), "INDUSTRY": index['industry'],"PE": pd.to_numeric(index['pe'])}, ignore_index=True)
-"""
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_us_industries, False, -1, True)
