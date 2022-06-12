@@ -339,6 +339,7 @@ def get_finwiz_stock_data(ticker):
 def get_stockrow_stock_data(ticker):
   page = get_page_selenium('https://stockrow.com/%s' % (ticker))
   soup = BeautifulSoup(page, 'html.parser')
+
   table = soup.find_all('table')[0]
 
   table_rows = table.find_all('tr', recursive=True)
@@ -361,12 +362,17 @@ def get_stockrow_stock_data(ticker):
 
         df.loc[len(df.index)] = temp_row
 
-  import pdb; pdb.set_trace()
+  df.rename(columns={ df.columns[13]: "METRIC" }, inplace = True)
 
-  #TODO: Rename all columns based on current year
-  #TODO: Reorder Columns
-  #TODO: Format Columns (transform parenthesis into negative numbers)
-  
+  # get a list of columns
+  cols = list(df)
+
+  # move the column to head of list using index, pop and insert
+  cols.insert(0, cols.pop(cols.index('METRIC')))
+
+  # reorder
+  df = df.loc[:, cols]
+
   return df
 
 def get_api_json_data(url, filename):

@@ -22,7 +22,7 @@ ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
-nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
+#nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 
 #Dates
 todays_date = date.today()
@@ -34,23 +34,6 @@ list_dates.append(one_year_ago)
 list_dates.append(two_year_ago)
 list_dates.append(three_year_ago)
 
-def return_tr_as_df(table_rows):
-    df = pd.DataFrame()
-    index = 0
-    #Get rows of data.
-    for tr in table_rows:
-
-        key = tr.th.text.strip()
-        try:
-            value = tr.td.text.strip()
-        except AttributeError as e:
-            value = ""
-
-        if(value):
-            df.insert(index,key,[value],True)
-            index+=1
-    return df
-
 temp_excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
 temp_sheet_name = 'Database US Companies'
 
@@ -58,53 +41,14 @@ temp_sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
-
-if not debug:
-    url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
-    page = get_page_selenium(url_nasdaq)
-    soup = BeautifulSoup(page, 'html.parser')
-
-    table = soup.find_all('table')
-    pe_ratio_table_rows = table[0].find_all('tr', recursive=True)
-
-    df_pe_ratios = return_tr_as_df(pe_ratio_table_rows)
-
-    df_nasdaq_company_data = pd.DataFrame()
-    df_nasdaq_company_data.loc[ticker, 'PE_F0-1_ACTUAL'] = df_pe_ratios.iloc[0,0]
-    df_nasdaq_company_data.loc[ticker, 'PE_F0_ESTIMATE'] = df_pe_ratios.iloc[0,1]
-    df_nasdaq_company_data.loc[ticker, 'PE_F1_ESTIMATE'] = df_pe_ratios.iloc[0,2]
-    df_nasdaq_company_data.loc[ticker, 'PE_F2_ESTIMATE'] = df_pe_ratios.iloc[0,3]
-
-    df_nasdaq_company_data = df_nasdaq_company_data.reset_index()
-    df_nasdaq_company_data = df_nasdaq_company_data.rename(columns = {'index':'TICKER'})
-
-    df_nasdaq_company_data['PE_F0-1_ACTUAL'] = pd.to_numeric(df_nasdaq_company_data['PE_F0-1_ACTUAL'])
-    df_nasdaq_company_data['PE_F0_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F0_ESTIMATE'])
-    df_nasdaq_company_data['PE_F1_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F1_ESTIMATE'])
-    df_nasdaq_company_data['PE_F2_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F2_ESTIMATE'])
-else:
-    #hard code values in debug mode so that we don't spend time waiting for selenium to load page
-    data = [['AAPL',24.44,22.44,20.65,19.31]]
-    df_nasdaq_company_data = pd.DataFrame(data, columns=['TICKER','PE_F0-1_ACTUAL','PE_F0_ESTIMATE','PE_F1_ESTIMATE','PE_F2_ESTIMATE'])
-
 df_stockrow_data = get_stockrow_stock_data(ticker)
-import pdb; pdb.set_trace()
 
-# Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
-# Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
-# Competitors: https://www.marketwatch.com/investing/stock/crm
-
-#fmpcloud urls:
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_income_statement = "https://fmpcloud.io/api/v3/income-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_balance_sheet = "https://fmpcloud.io/api/v3/balance-sheet-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_cash_flow_statement = "https://fmpcloud.io/api/v3/cash-flow-statement/%s?limit=120&apikey=1%s" % (ticker,fmpcloud_account_key)
-#url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?limit=20&apikey=%s" % (ticker,fmpcloud_account_key)
+
+import pdb;pdb.set_trace()
 
 #Excel file where we will create our one pager
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
@@ -123,11 +67,55 @@ column = 2
 value = ticker
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
+"""
+Company:
+Sales
+EBITDA
+Operating Profit (EBIT)
+Net income
+P/E ratio
+EPS
+Debt /EBITDA
+Cash Flow per share
+Book Value per share
+
+Competition:
+Mkt Cap
+EV
+P/E
+EV/EBITDA
+EV/EBIT
+EV/Revenues
+PB
+EBITDA margin
+EBIT margin
+Net margin
+Dividend Yield
+ROE
+
+
+# Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
+# Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
+# Competitors: https://www.marketwatch.com/investing/stock/crm
+
+#fmpcloud urls:
+url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_income_statement = "https://fmpcloud.io/api/v3/income-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_balance_sheet = "https://fmpcloud.io/api/v3/balance-sheet-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
+#url_company_cash_flow_statement = "https://fmpcloud.io/api/v3/cash-flow-statement/%s?limit=120&apikey=1%s" % (ticker,fmpcloud_account_key)
+#url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?limit=20&apikey=%s" % (ticker,fmpcloud_account_key)
+
+
 #print(df_zacks_stock_data)
 #print(df_finwiz_stock_data)
 #print(df_nasdaq_company_data)
 
-"""
+
 Company Name
 Ticker
 Description of company
@@ -236,3 +224,50 @@ data_earnings_surprises = get_api_json_data_no_file(url)
 """
 
 print("Done!")
+
+"""
+def return_tr_as_df(table_rows):
+    df = pd.DataFrame()
+    index = 0
+    #Get rows of data.
+    for tr in table_rows:
+
+        key = tr.th.text.strip()
+        try:
+            value = tr.td.text.strip()
+        except AttributeError as e:
+            value = ""
+
+        if(value):
+            df.insert(index,key,[value],True)
+            index+=1
+    return df
+
+if not debug:
+    url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
+    page = get_page_selenium(url_nasdaq)
+    soup = BeautifulSoup(page, 'html.parser')
+
+    table = soup.find_all('table')
+    pe_ratio_table_rows = table[0].find_all('tr', recursive=True)
+
+    df_pe_ratios = return_tr_as_df(pe_ratio_table_rows)
+
+    df_nasdaq_company_data = pd.DataFrame()
+    df_nasdaq_company_data.loc[ticker, 'PE_F0-1_ACTUAL'] = df_pe_ratios.iloc[0,0]
+    df_nasdaq_company_data.loc[ticker, 'PE_F0_ESTIMATE'] = df_pe_ratios.iloc[0,1]
+    df_nasdaq_company_data.loc[ticker, 'PE_F1_ESTIMATE'] = df_pe_ratios.iloc[0,2]
+    df_nasdaq_company_data.loc[ticker, 'PE_F2_ESTIMATE'] = df_pe_ratios.iloc[0,3]
+
+    df_nasdaq_company_data = df_nasdaq_company_data.reset_index()
+    df_nasdaq_company_data = df_nasdaq_company_data.rename(columns = {'index':'TICKER'})
+
+    df_nasdaq_company_data['PE_F0-1_ACTUAL'] = pd.to_numeric(df_nasdaq_company_data['PE_F0-1_ACTUAL'])
+    df_nasdaq_company_data['PE_F0_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F0_ESTIMATE'])
+    df_nasdaq_company_data['PE_F1_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F1_ESTIMATE'])
+    df_nasdaq_company_data['PE_F2_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F2_ESTIMATE'])
+else:
+    #hard code values in debug mode so that we don't spend time waiting for selenium to load page
+    data = [['AAPL',24.44,22.44,20.65,19.31]]
+    df_nasdaq_company_data = pd.DataFrame(data, columns=['TICKER','PE_F0-1_ACTUAL','PE_F0_ESTIMATE','PE_F1_ESTIMATE','PE_F2_ESTIMATE'])
+"""
