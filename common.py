@@ -1,10 +1,12 @@
 import sys
+import stat
 import requests
 import time
 import os.path
 import pandas as pd
 import xml.etree.ElementTree as ET
 import openpyxl
+import zipfile
 import re
 import yfinance as yf
 import investpy as invest
@@ -804,6 +806,28 @@ def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date
 
   book.save(excel_file_path)
   book.close()
+
+def download_file(url, save_path, chunk_size=128):
+    filepath = os.path.realpath(__file__)
+    excel_file_path = filepath[:filepath.rfind('/')] + save_path
+
+    r = requests.get(url, stream=True)
+    with open(excel_file_path, 'wb') as fd:
+        for chunk in r.iter_content(chunk_size=chunk_size):
+            fd.write(chunk)
+
+def unzip_file(zip_file_path, zip_file, chunk_size=128):
+
+    filepath = os.path.realpath(__file__)
+    zip_file_path = filepath[:filepath.rfind('/')] + zip_file_path
+    zip_file = filepath[:filepath.rfind('/')] + zip_file
+
+    with zipfile.ZipFile(zip_file, 'r') as zip_ref:
+      zip_ref.extractall(zip_file_path)
+
+    os.remove(zip_file)
+
+    print("The file has been deleted successfully")
 
 def write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value):
   filepath = os.path.realpath(__file__)

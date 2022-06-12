@@ -1,4 +1,5 @@
 import pandas as pd
+import requests
 from pandas.tseries.offsets import BDay
 from bs4 import BeautifulSoup
 from datetime import date
@@ -7,13 +8,18 @@ from dateutil.relativedelta import relativedelta
 from common import get_oecd_data, convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
 from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_api_json_data_no_file
 from common import get_page_selenium, combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
-
+from common import download_file, unzip_file
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
 #https://www.marketwatch.com/
 #https://www.marketscreener.com/
 #https://stockrow.com/
+
+# Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
+# Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
+# Competitors: https://www.marketwatch.com/investing/stock/crm
+
 
 debug = True
 
@@ -22,7 +28,6 @@ ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
-#nasdaq_data_api_key = "u4udsfUDYFey58cp_4Gg"
 
 #Dates
 todays_date = date.today()
@@ -45,11 +50,21 @@ df_stockrow_data = get_stockrow_stock_data(ticker)
 
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
-url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
+#url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
+
+#TODO: Get FMPCloud data for company profile and company peers
+#TODO: Retrieve company peers metrics
+
+#Download SEC Filings
+save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
+save_file_directory = '/CompanySECFilings/%s' % (ticker)
+download_file(url_company_sec_filings, save_file_name)
+unzip_file(save_file_directory,save_file_name)
 
 import pdb;pdb.set_trace()
 
+#Now that we have retrieved all the data, lets start writing them to the excel template
 #Excel file where we will create our one pager
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
 
