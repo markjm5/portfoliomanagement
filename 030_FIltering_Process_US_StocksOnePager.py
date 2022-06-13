@@ -20,7 +20,6 @@ from common import download_file, unzip_file
 # Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
 # Competitors: https://www.marketwatch.com/investing/stock/crm
 
-
 debug = True
 
 #################
@@ -50,10 +49,10 @@ df_stockrow_data = get_stockrow_stock_data(ticker)
 
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
-#url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
+url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
 
-#TODO: Get FMPCloud data for company profile and company peers
+#TODO: Get FMPCloud data for company profile,company peers and company earnings surprises
 #TODO: Retrieve company peers metrics
 
 #Download SEC Filings

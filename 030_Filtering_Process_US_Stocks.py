@@ -27,12 +27,45 @@ list_dates.append(three_year_ago)
 sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME", "Ticker": "TICKER", "Market Cap (mil)": "MARKET_CAP", "Last EPS Surprise (%)": "LAST_EPS_SURPRISE_PERCENTAGE", "Div. Yield %": "DIVIDEND_YIELD_PERCENTAGE", "Exchange": "EXCHANGE", "Industry": "INDUSTRY", 
-"Sector": "SECTOR", "Month of Fiscal Yr End": "MONTH_OF_FISCAL_YR_END","F0 Consensus Est.": "EPS_F0_CONSENSUS","F1 Consensus Est.": "EPS_F1_CONSENSUS",
-"F2 Consensus Est.": "EPS_F2_CONSENSUS","P/E (Trailing 12 Months)": "PE_TTM","P/E (F1)": "PE_F1","P/E (F2)": "PE_F2","PEG Ratio": "PEG_RATIO",
-"Next EPS Report Date  (yyyymmdd)": "NEXT_EPS_REPORT_DATE","Current ROE (TTM)": "CURRENT_ROE_TTM","5 Yr Historical Sales Growth": "5Y_HISTORICAL_SALES_GROWTH","F(1) Consensus Sales Est. ($mil)": "F1_CONSENSUS_SALES_ESTIMATE","Annual Sales ($mil)": "ANNUAL_SALES(MILLION)",
-"Price/Sales": "PRICE_SALES_RATIO", "Price/Book": "PRICE_BOOK_RATIO","Net Margin %": "NET_MARGIN_PERCENTAGE",
-"Operating Margin 12 Mo %": "OPERATING_MARGIN_12_MO","Debt/Total Capital": "DEBT_TOTAL_CAPITAL","Debt/Equity Ratio": "DEBT_EQUITY_RATIO","Current Ratio": "CURRENT_RATIO","Quick Ratio": "QUICK_RATIO"
+df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME", 
+    "Ticker": "TICKER", 
+    "Market Cap (mil)": "MARKET_CAP", 
+    "Last EPS Surprise (%)": "LAST_EPS_SURPRISE_PERCENTAGE", 
+    "Div. Yield %": "DIVIDEND_YIELD_PERCENTAGE", 
+    "Exchange": "EXCHANGE", 
+    "Industry": "INDUSTRY", 
+    "Sector": "SECTOR", 
+    "Month of Fiscal Yr End": "MONTH_OF_FISCAL_YR_END",
+    "F0 Consensus Est.": "EPS_F0_CONSENSUS",
+    "F1 Consensus Est.": "EPS_F1_CONSENSUS",
+    "F2 Consensus Est.": "EPS_F2_CONSENSUS",
+    "P/E (Trailing 12 Months)": "PE_TTM",
+    "P/E (F1)": "PE_F1",
+    "P/E (F2)": "PE_F2",
+    "PEG Ratio": "PEG_RATIO",
+    "Next EPS Report Date  (yyyymmdd)": "NEXT_EPS_REPORT_DATE",
+    "Current ROE (TTM)": "CURRENT_ROE_TTM",
+    "5 Yr Historical Sales Growth": "5Y_HISTORICAL_SALES_GROWTH",
+    "F(1) Consensus Sales Est. ($mil)": "F1_CONSENSUS_SALES_ESTIMATE",
+    "Annual Sales ($mil)": "ANNUAL_SALES(MILLION)",
+    "Price/Sales": "PRICE_SALES_RATIO", 
+    "Price/Book": "PRICE_BOOK_RATIO",
+    "Net Margin %": "NET_MARGIN_PERCENTAGE",
+    "Operating Margin 12 Mo %": "OPERATING_MARGIN_12_MO",
+    "Debt/Total Capital": "DEBT_TOTAL_CAPITAL",
+    "Debt/Equity Ratio": "DEBT_EQUITY_RATIO",
+    "Current Ratio": "CURRENT_RATIO",
+    "Quick Ratio": "QUICK_RATIO",
+
+    "52 Week High": "52_WEEK_HIGH",
+    "52 Week Low": "52_WEEK_LOW",
+    "Beta": "BETA",
+    "% Price Change (YTD)": "PERCENT_PRICE_CHANGE_YTD",
+    "Price/Cash Flow": "PRICE_CASH_FLOW_RATIO",
+    "EBITDA ($mil)": "EBITDA_MIL",	
+    "EBIT ($mil)": "EBIT_MIL",	
+    "Avg Volume": "AVG_VOLUME",	
+    "Dividend ": "DIVIDEND"
 })
 
 # Write the updated df back to the excel sheet
@@ -45,16 +78,16 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_us_companies, False, 0)
 sheet_name = 'Data S&P 500'
 
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
-yesterday_date = dt(todays_date.year, todays_date.month, todays_date.day - 1)
-date_yesterday_str = "%s-%s-%s" % (yesterday_date.year, yesterday_date.month, yesterday_date.day)
+start_date = dt(todays_date.year, todays_date.month, todays_date.day - 5)
+start_date_str = "%s-%s-%s" % (start_date.year, start_date.month, start_date.day)
 
-df_etf = get_yf_data('^GSPC', "1d", date_yesterday_str, date_str)
+df_etf = get_yf_data('^GSPC', "1d", start_date_str, date_str)
 
 #Remove unnecessary columns and rename columns
 df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
 df_etf = df_etf.rename(columns={"Close": '^GSPC'})
 
-sp_price = df_etf.iloc[1]['^GSPC']
+sp_price = df_etf['^GSPC'].iloc[-1]
 sp_price = "{:.2f}".format(sp_price)
 
 row = 2

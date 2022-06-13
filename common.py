@@ -340,6 +340,7 @@ def get_finwiz_stock_data(ticker):
 
 def get_stockrow_stock_data(ticker):
   page = get_page_selenium('https://stockrow.com/%s' % (ticker))
+
   soup = BeautifulSoup(page, 'html.parser')
 
   table = soup.find_all('table')[0]
