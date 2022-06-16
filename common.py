@@ -290,53 +290,100 @@ def get_yf_data(ticker, interval, start, end):
 
   return df_yf
 
-def get_finwiz_stock_data(ticker):
-    df_company_data = pd.DataFrame()
-    url_finviz = "https://finviz.com/quote.ashx?t=%s" % (ticker)
-    page = get_page(url_finviz)
+def get_yf_key_stats(ticker):
+  df_company_data = pd.DataFrame()
+  url = "https://finance.yahoo.com/quote/%s/key-statistics?p=%s" % (ticker, ticker)
 
-    soup = BeautifulSoup(page.content, 'html.parser')
+  page = get_page(url)
 
-    table = soup.find_all('table')
-    table_rows = table[8].find_all('tr', recursive=False)
+  soup = BeautifulSoup(page.content, 'html.parser')
 
+  tables = soup.find_all('table')
+  statsDict = {}
+
+  for table in tables:
+    table_rows = table.find_all('tr', recursive=True)
     emptyDict = {}
 
     #Get rows of data.
     for tr in table_rows:
-        tds = tr.find_all('td')
-        boolKey = True
-        keyValueSet = False
-        for td in tds:
-            if boolKey:
-                key = td.text.strip()
-                boolKey = False                
-            else:
-                value = td.text.strip()
-                boolKey = True
-                keyValueSet = True                
+      tds = tr.find_all('td')
+      boolKey = True
+      keyValueSet = False
 
-            if keyValueSet:
-                emptyDict[key] = value
-                keyValueSet = False
+      for td in tds:
+          if boolKey:
+              key = td.text.strip()
+              boolKey = False                
+          else:
+              value = td.text.strip()
+              boolKey = True
+              keyValueSet = True                
 
-    df_company_data.loc[ticker, 'PE'] = emptyDict['P/E']
-    df_company_data.loc[ticker, 'EPS_TTM'] = emptyDict['EPS (ttm)']
-    df_company_data.loc[ticker, 'PE_FORWARD'] = emptyDict['Forward P/E']
-    df_company_data.loc[ticker, 'EPS_Y1'] = emptyDict['EPS next Y']
-    df_company_data.loc[ticker, 'PEG'] = emptyDict['PEG']
-    df_company_data.loc[ticker, 'EPS_Y0'] = emptyDict['EPS this Y']
-    df_company_data.loc[ticker, 'PRICE_BOOK'] = emptyDict['P/B']
-    df_company_data.loc[ticker, 'PRICE_BOOK'] = emptyDict['P/B']
-    df_company_data.loc[ticker, 'PRICE_SALES'] = emptyDict['P/S']
-    df_company_data.loc[ticker, 'TARGET_PRICE'] = emptyDict['Target Price']
-    df_company_data.loc[ticker, 'ROE'] = emptyDict['ROE']
-    df_company_data.loc[ticker, '52W_RANGE'] = emptyDict['52W Range']
-    df_company_data.loc[ticker, 'QUICK_RATIO'] = emptyDict['Quick Ratio']
-    df_company_data.loc[ticker, 'GROSS_MARGIN'] = emptyDict['Gross Margin']
-    df_company_data.loc[ticker, 'CURRENT_RATIO'] = emptyDict['Current Ratio']
+          if keyValueSet:
+              emptyDict[key] = value
+              keyValueSet = False
+    statsDict.update(emptyDict)
 
-    return df_company_data
+  df_company_data.loc[ticker, 'MARKET_CAP'] = statsDict['Market Cap (intraday)']
+  df_company_data.loc[ticker, 'EV'] = statsDict['Enterprise Value']
+  df_company_data.loc[ticker, 'AVG_VOL_3M'] = statsDict['Avg Vol (3 month) 3']
+  df_company_data.loc[ticker, 'AVG_VOL_10D'] = statsDict['Avg Vol (10 day) 3']
+  df_company_data.loc[ticker, '50_DAY_MOVING_AVG'] = statsDict['50-Day Moving Average 3']
+  df_company_data.loc[ticker, '200_DAY_MOVING_AVG'] = statsDict['200-Day Moving Average 3']
+  df_company_data.loc[ticker, 'EV_REVENUE'] = statsDict['Enterprise Value/Revenue']
+  df_company_data.loc[ticker, 'EV_EBITDA'] = statsDict['Enterprise Value/EBITDA']
+  df_company_data.loc[ticker, 'PRICE_BOOK'] = statsDict['Price/Book (mrq)']
+
+  return df_company_data
+
+def get_finwiz_stock_data(ticker):
+  df_company_data = pd.DataFrame()
+  url_finviz = "https://finviz.com/quote.ashx?t=%s" % (ticker)
+  page = get_page(url_finviz)
+
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  table = soup.find_all('table')
+  table_rows = table[8].find_all('tr', recursive=False)
+
+  emptyDict = {}
+
+  #Get rows of data.
+  for tr in table_rows:
+      tds = tr.find_all('td')
+      boolKey = True
+      keyValueSet = False
+      for td in tds:
+          if boolKey:
+              key = td.text.strip()
+              boolKey = False                
+          else:
+              value = td.text.strip()
+              boolKey = True
+              keyValueSet = True                
+
+          if keyValueSet:
+              emptyDict[key] = value
+              keyValueSet = False
+
+  df_company_data.loc[ticker, 'PE'] = emptyDict['P/E']
+  df_company_data.loc[ticker, 'EPS_TTM'] = emptyDict['EPS (ttm)']
+  df_company_data.loc[ticker, 'PE_FORWARD'] = emptyDict['Forward P/E']
+  df_company_data.loc[ticker, 'EPS_Y1'] = emptyDict['EPS next Y']
+  df_company_data.loc[ticker, 'PEG'] = emptyDict['PEG']
+  df_company_data.loc[ticker, 'EPS_Y0'] = emptyDict['EPS this Y']
+  df_company_data.loc[ticker, 'PRICE_BOOK'] = emptyDict['P/B']
+  df_company_data.loc[ticker, 'PRICE_BOOK'] = emptyDict['P/B']
+  df_company_data.loc[ticker, 'PRICE_SALES'] = emptyDict['P/S']
+  df_company_data.loc[ticker, 'TARGET_PRICE'] = emptyDict['Target Price']
+  df_company_data.loc[ticker, 'ROE'] = emptyDict['ROE']
+  df_company_data.loc[ticker, '52W_RANGE'] = emptyDict['52W Range']
+  df_company_data.loc[ticker, 'QUICK_RATIO'] = emptyDict['Quick Ratio']
+  df_company_data.loc[ticker, 'GROSS_MARGIN'] = emptyDict['Gross Margin']
+  df_company_data.loc[ticker, 'CURRENT_RATIO'] = emptyDict['Current Ratio']
+
+  return df_company_data
 
 def get_stockrow_stock_data(ticker):
   page = get_page_selenium('https://stockrow.com/%s' % (ticker))

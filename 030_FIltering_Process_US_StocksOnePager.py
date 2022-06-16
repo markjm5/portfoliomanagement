@@ -8,7 +8,7 @@ from dateutil.relativedelta import relativedelta
 from common import get_oecd_data, convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
 from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_api_json_data_no_file
 from common import get_page_selenium, combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
-from common import download_file, unzip_file
+from common import download_file, unzip_file, get_yf_key_stats
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -19,6 +19,22 @@ from common import download_file, unzip_file
 # Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
 # Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
 # Competitors: https://www.marketwatch.com/investing/stock/crm
+
+# https://finance.yahoo.com/quote/CRM/key-statistics?p=CRM
+
+# Available modules: - 'assetProfile', - 'summaryProfile', - 'summaryDetail', 
+# - 'esgScores', - 'price', - 'incomeStatementHistory', 
+# - 'incomeStatementHistoryQuarterly', - 'balanceSheetHistory', 
+# - 'balanceSheetHistoryQuarterly', - 'cashflowStatementHistory', 
+# - 'cashflowStatementHistoryQuarterly', - 'defaultKeyStatistics', 
+# - 'financialData', - 'calendarEvents', - 'secFilings', - 'recommendationTrend', 
+# - 'upgradeDowngradeHistory', - 'institutionOwnership', - 'fundOwnership', 
+# - 'majorDirectHolders', - 'majorHoldersBreakdown', - 'insiderTransactions', 
+# - 'insiderHolders', - 'netSharePurchaseActivity', - 'earnings', 
+# - 'earningsHistory', - 'earningsTrend', - 'industryTrend', - 'indexTrend', 
+# - 'sectorTrend'
+
+# https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=assetProfile,financialData,defaultKeyStatistics,calendarEvents
 
 debug = True
 
@@ -47,10 +63,19 @@ df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker)
 
+url_yf_asset_profile = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile" % (ticker) #sector, industry, website, business summary
+url_yf_financial_data = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=financialData" % (ticker) #last price, target price
+df_yf_key_statistics = get_yf_key_stats(ticker)
+
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
+
+url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
+url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
+
+import pdb;pdb.set_trace()
 
 #TODO: Get FMPCloud data for company profile,company peers and company earnings surprises
 #TODO: Retrieve company peers metrics
@@ -61,7 +86,6 @@ save_file_directory = '/CompanySECFilings/%s' % (ticker)
 download_file(url_company_sec_filings, save_file_name)
 unzip_file(save_file_directory,save_file_name)
 
-import pdb;pdb.set_trace()
 
 #Now that we have retrieved all the data, lets start writing them to the excel template
 #Excel file where we will create our one pager
