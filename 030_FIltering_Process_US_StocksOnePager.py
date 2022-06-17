@@ -71,6 +71,7 @@ json_yf_financial_data = json.loads(get_page(url_yf_financial_data).content)
 
 df_yf_key_statistics = get_yf_key_stats(ticker)
 
+# Get FMPCloud data for company company peers and company earnings surprises
 #url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
 json_fmpcloud_company_peers = json.loads(get_page(url_company_peers).content)
@@ -81,17 +82,16 @@ json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surp
 #url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 
-#TODO: Get FMPCloud data for company profile,company peers and company earnings surprises
+# Get FMPCloud data for company company peers and company earnings surprises
 #TODO: Retrieve company peers metrics
-import pdb; pdb.set_trace()
+
 #Download SEC Filings
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-
+#import pdb; pdb.set_trace()
 save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
 save_file_directory = '/CompanySECFilings/%s' % (ticker)
 download_file(url_company_sec_filings, save_file_name)
 unzip_file(save_file_directory,save_file_name)
-
 
 #Now that we have retrieved all the data, lets start writing them to the excel template
 #Excel file where we will create our one pager
@@ -105,11 +105,121 @@ if not check_sheet_exists(excel_file_path,sheet_name):
     create_sheet(excel_file_path, sheet_name, sheet_template)
 
 #TODO: Populate ticker sheet with company and stock data
-
+##Ticker
 row = 2
 column = 2
 value = ticker
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Last
+row = 4
+column = 3
+value = json_yf_financial_data['quoteSummary']['result'][0]['financialData']['currentPrice']['raw']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##52 Week High
+row = 6
+column = 3
+value = df_zacks_stock_data['52_WEEK_HIGH'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##52 Week Low
+row = 7
+column = 3
+value = df_zacks_stock_data['52_WEEK_LOW'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##YTD Change %
+row = 8
+column = 3
+value = df_zacks_stock_data['PERCENT_PRICE_CHANGE_YTD'].values[0]/100
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Mkt Cap
+row = 9
+column = 3
+value = df_zacks_stock_data['MARKET_CAP'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+#TODO: EV, Days to Cover
+
+##Target Price
+row = 12
+column = 3
+value = json_yf_financial_data['quoteSummary']['result'][0]['financialData']['targetMeanPrice']['raw']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Trailing PE
+row = 6
+column = 6
+value = df_zacks_stock_data['PE_TTM'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Forward PE
+row = 7
+column = 6
+value = df_zacks_stock_data['PE_F1'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##PEG
+row = 8
+column = 6
+value = df_zacks_stock_data['PEG_RATIO'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+#TODO: Dividend TTM, Div. yield
+
+##Beta
+row = 11
+column = 6
+value = df_zacks_stock_data['BETA'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Company Name
+row = 2
+column = 7
+value = df_zacks_stock_data['COMPANY_NAME'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+#TODO: PB
+
+##ROE
+row = 7
+column = 8
+value = json_yf_financial_data['quoteSummary']['result'][0]['financialData']['returnOnEquity']['raw']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Exchange
+row = 8
+column = 8
+value = df_zacks_stock_data['EXCHANGE'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Sector
+row = 9
+column = 8
+value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['sector']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Industry
+row = 10
+column = 8
+value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['industry']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Website
+row = 11
+column = 8
+value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['website']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Company Description
+row = 44
+column = 10
+value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['longBusinessSummary']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+print("Done!")
 
 """
 Company:
@@ -265,11 +375,7 @@ data_fundamentals = get_api_json_data_no_file(url)
 
 url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/ES.json?api_key=%s" % (nasdaq_data_api_key)
 data_earnings_surprises = get_api_json_data_no_file(url)
-"""
 
-print("Done!")
-
-"""
 def return_tr_as_df(table_rows):
     df = pd.DataFrame()
     index = 0
