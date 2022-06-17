@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import date
 from bs4 import BeautifulSoup
 from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, get_page
+from common import combine_df_on_index, get_yf_historical_stock_data, get_page
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
@@ -131,7 +131,7 @@ todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
 # Get EUR/USD close day intervals using above date range
-df_EURUSD = get_yf_data("EURUSD=X", "1d", "2000-12-28", date_str)
+df_EURUSD = get_yf_historical_stock_data("EURUSD=X", "1d", "2000-12-28", date_str)
 
 #Remove unnecessary columns from df_EUR_USD and rename columns
 df_EURUSD = df_EURUSD.drop(['Open', 'High', 'Low', 'Volume'], axis=1)

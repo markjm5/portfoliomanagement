@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import date
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data
+from common import combine_df_on_index, get_yf_historical_stock_data
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/001_Lagging_Indicator_YoY_Asset_Class_Performance.xlsm'
 
@@ -25,7 +25,7 @@ etfs = [ 'RXI','XLP','XLY','XLE','XLF','XLV','XLI','XLK','XLB','XLRE','XLC','XLU
 
 for etf in etfs:
     print("Getting Data For: %s" % (etf,))
-    df_etf = get_yf_data(etf, "1d", "2007-01-01", date_str)
+    df_etf = get_yf_historical_stock_data(etf, "1d", "2007-01-01", date_str)
 
     #Remove unnecessary columns and rename columns
     df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)

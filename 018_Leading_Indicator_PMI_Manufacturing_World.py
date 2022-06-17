@@ -3,7 +3,7 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data, get_data_fred,get_oecd_data
+from common import combine_df_on_index, get_yf_historical_stock_data, get_data_fred,get_oecd_data
 from common import get_ism_manufacturing_content, scrape_ism_manufacturing_headline_index, get_page
 
 excel_file_path = '/Trading_Excel_Files/03_Leading_Indicators/018_Leading_Indicator_PMI_Manufacturing_World.xlsm'
@@ -137,7 +137,7 @@ date_str = "%s-%s-01" % (todays_date.year, todays_date.month)
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
 # Get EUR/USD close day intervals using above date range
-df_ACWI = get_yf_data("ACWI", "1mo", "2010-10-01", date_str)
+df_ACWI = get_yf_historical_stock_data("ACWI", "1mo", "2010-10-01", date_str)
 
 #Remove unnecessary columns from df_ACWI and rename columns
 df_ACWI = df_ACWI.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
@@ -148,7 +148,7 @@ df_ACWI = df_ACWI.dropna()
 df_updated = combine_df_on_index(df_original, df_ACWI, 'DATE')
 
 # Get EZU close monthly intervals
-df_EZU = get_yf_data("EZU", "1mo", "2004-12-01", date_str)
+df_EZU = get_yf_historical_stock_data("EZU", "1mo", "2004-12-01", date_str)
 #Remove unnecessary columns from df_EZU and rename columns
 df_EZU = df_EZU.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
 df_EZU = df_EZU.rename(columns={"Close": "EZU"})
@@ -158,7 +158,7 @@ df_EZU = df_EZU.dropna()
 df_updated = combine_df_on_index(df_updated, df_EZU, 'DATE')
 
 # Get EWU close monthly intervals
-df_EWU = get_yf_data("EWU", "1mo", "2004-12-01", date_str)
+df_EWU = get_yf_historical_stock_data("EWU", "1mo", "2004-12-01", date_str)
 #Remove unnecessary columns from df_EWU and rename columns
 df_EWU = df_EWU.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
 df_EWU = df_EWU.rename(columns={"Close": "EWU"})

@@ -1,6 +1,6 @@
 from datetime import date
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data
+from common import combine_df_on_index, get_yf_historical_stock_data
 from common import append_two_df
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/012_Central_Banks.xlsm'
@@ -66,7 +66,7 @@ todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
 # Get Nikkei 225 close monthly intervals
-df_NIKKEI = get_yf_data("^N225", "1mo", "1998-04-01", date_str)
+df_NIKKEI = get_yf_historical_stock_data("^N225", "1mo", "1998-04-01", date_str)
 
 # Format JPNNGDP series so that the DATE is monthly rather than quarterly
 df_JPNNGDP['JPNNGDP'] = df_JPNNGDP['JPNNGDP'] * 10

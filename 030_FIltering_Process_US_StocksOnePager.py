@@ -5,9 +5,9 @@ from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
-from common import get_oecd_data, convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
+from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
 from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_api_json_data_no_file
-from common import get_page_selenium, combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
+from common import combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
 from common import download_file, unzip_file, get_yf_key_stats
 #Sources:
 #https://finance.yahoo.com/
@@ -61,10 +61,14 @@ temp_sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
-df_stockrow_data = get_stockrow_stock_data(ticker)
+#df_stockrow_data = get_stockrow_stock_data(ticker)
 
 url_yf_asset_profile = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile" % (ticker) #sector, industry, website, business summary
+json_yf_asset_profile = get_api_json_data_no_file(url_yf_asset_profile)
 url_yf_financial_data = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=financialData" % (ticker) #last price, target price
+json_yf_financial_data = get_api_json_data_no_file(url_yf_financial_data)
+get_api_json_data_no_file(url_yf_financial_data)
+
 df_yf_key_statistics = get_yf_key_stats(ticker)
 
 url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)

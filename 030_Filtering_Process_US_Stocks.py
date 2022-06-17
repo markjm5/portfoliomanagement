@@ -4,7 +4,7 @@ from pandas.tseries.offsets import BDay
 from datetime import date
 from datetime import datetime as dt
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import get_api_json_data,combine_df_on_index, write_value_to_cell_excel, get_yf_data
+from common import get_api_json_data,combine_df_on_index, write_value_to_cell_excel, get_yf_historical_stock_data
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
 
@@ -81,7 +81,7 @@ date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 start_date = dt(todays_date.year, todays_date.month, todays_date.day - 5)
 start_date_str = "%s-%s-%s" % (start_date.year, start_date.month, start_date.day)
 
-df_etf = get_yf_data('^GSPC', "1d", start_date_str, date_str)
+df_etf = get_yf_historical_stock_data('^GSPC', "1d", start_date_str, date_str)
 
 #Remove unnecessary columns and rename columns
 df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)

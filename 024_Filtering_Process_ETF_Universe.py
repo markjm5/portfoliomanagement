@@ -1,7 +1,7 @@
 import pandas as pd
 from datetime import date
 from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_data
+from common import combine_df_on_index, get_yf_historical_stock_data
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/024_Filtering_Process_ETF_Universe.xlsm'
 
@@ -21,7 +21,7 @@ def get_etf_data(etfs):
     #Get the raw data
     for etf in etfs:
         print("Getting Data For: %s" % (etf,))
-        df_etf = get_yf_data(etf, "1d", "2007-01-01", date_str)
+        df_etf = get_yf_historical_stock_data(etf, "1d", "2007-01-01", date_str)
 
         #Remove unnecessary columns and rename columns
         df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)

@@ -95,7 +95,7 @@ df_SP500 = get_sp500_monthly_prices()
 #date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, "01")
 
 # Get S&P500 close month intervals using above date range
-#df_SP500 = get_yf_data("^GSPC", "1mo", "1959-01-01", date_str)
+#df_SP500 = get_yf_historical_stock_data("^GSPC", "1mo", "1959-01-01", date_str)
 
 #Remove unnecessary columns from df_SP500 and rename columns
 #df_SP500 = df_SP500.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
