@@ -335,6 +335,9 @@ def get_yf_key_stats(ticker):
   df_company_data.loc[ticker, 'EV_EBITDA'] = statsDict['Enterprise Value/EBITDA']
   df_company_data.loc[ticker, 'PRICE_BOOK'] = statsDict['Price/Book (mrq)']
 
+  df_company_data = dataframe_convert_to_numeric(df_company_data, '50_DAY_MOVING_AVG')
+  df_company_data = dataframe_convert_to_numeric(df_company_data, '200_DAY_MOVING_AVG')
+
   return df_company_data
 
 def get_finwiz_stock_data(ticker):

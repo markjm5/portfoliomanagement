@@ -289,6 +289,66 @@ for column in df_historical_eps:
     write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
     column_start = column_start+1
 
+# Historical and Estimated Total Debt
+df_historical_debt = df_stockrow_data.iloc[-6:]['TOTAL_DEBT']
+df_historical_debt = df_historical_debt.to_frame()
+df_historical_debt = df_historical_debt.T
+
+row = 32
+column_start = 3
+for column in df_historical_debt:
+    value = df_historical_debt[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
+# Historical and Estimated Cash Flow Per Share
+df_historical_cash_flow_per_share = df_stockrow_data.iloc[-6:]['CASH_FLOW_PER_SHARE']
+df_historical_cash_flow_per_share = df_historical_cash_flow_per_share.to_frame()
+df_historical_cash_flow_per_share = df_historical_cash_flow_per_share.T
+
+row = 35
+column_start = 3
+for column in df_historical_cash_flow_per_share:
+    value = df_historical_cash_flow_per_share[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
+# Historical and Estimated Book Value Per Share
+df_historical_book_value_per_share = df_stockrow_data.iloc[-6:]['BOOK_VALUE_PER_SHARE']
+df_historical_book_value_per_share = df_historical_book_value_per_share.to_frame()
+df_historical_book_value_per_share = df_historical_book_value_per_share.T
+
+row = 36
+column_start = 3
+for column in df_historical_book_value_per_share:
+    value = df_historical_book_value_per_share[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
+## Average Volume 10 days
+row = 39
+column = 3
+value = df_yf_key_statistics['AVG_VOL_10D'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+## Average Volume 3 months
+row = 40
+column = 3
+value = df_yf_key_statistics['AVG_VOL_3M'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+## 50 Day Moving Average
+row = 38
+column = 7
+value = df_yf_key_statistics['50_DAY_MOVING_AVG'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+## 50 Day Moving Average
+row = 39
+column = 7
+value = df_yf_key_statistics['200_DAY_MOVING_AVG'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
 print("Done!")
 
 """
