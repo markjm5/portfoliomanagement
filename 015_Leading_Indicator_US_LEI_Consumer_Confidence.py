@@ -35,19 +35,25 @@ def scrape_conference_board_lei():
   lei_date = article_date - relativedelta.relativedelta(months=1)
 
   paragraph = "" #The para that contains the LEI monthly value
-  lei_month_string = lei_date.strftime("%B") #The month before article_date
+  #lei_month_string = lei_date.strftime("%B") #The month before article_date
   lei_value = "" # The LEI value that is extracted from the para
+
+  pattern_regex = re.compile(r'(^The Conference Board Leading Economic Index® +[(]LEI[)]+[A-Za-z,&;\s,0-9.]+to +[0-9.]*)')  
+  #pattern_regex1 = re.compile(r'(^The Conference Board Leading Economic Index® +[(]LEI[)]*)')
 
   #get all paragraphs
   paras = soup.find_all("p", attrs={'class': None})
 
   for para in paras:
-    #Get the specific paragraph that contains the LEI value based on whether the month name exists in the para
-    if(para.text.startswith('The Conference Board Leading Economic Index® (LEI)') and para.text.find(lei_month_string + ' to') > -1):
-        paragraph = para.text
+    lei_string = re.search(pattern_regex,para.text)
+    if lei_string:
+      paragraph = lei_string.string
 
+  #import pdb; pdb.set_trace()
   #Extract LEI value from the paragraph using the Month string
-  lei_value = paragraph[paragraph.find(lei_month_string) + len(lei_month_string):paragraph.find(' (2016')].split(' ')[2]  
+  pattern_regex = re.compile(r'((?<=to ).[0-9.][^ (]*)')
+
+  lei_value = re.search(pattern_regex,paragraph).group(0) #paragraph[paragraph.find(lei_month_string) + len(lei_month_string):paragraph.find(' (2016')].split(' ')[2]  
 
   df_lei = pd.DataFrame()
   df_lei.insert(0,"DATE",[],True)
