@@ -240,6 +240,55 @@ for column in df_historical_sales:
     write_value_to_cell_excel(excel_file_path,sheet_name, 16, column_start, value2)
     column_start = column_start+1
 
+
+# Historical and Estimated EBIT
+df_historical_ebit = df_stockrow_data.iloc[-6:]['EBIT']
+df_historical_ebit = df_historical_ebit.to_frame()
+df_historical_ebit = df_historical_ebit.T
+
+row = 20
+column_start = 3
+for column in df_historical_ebit:
+    value = df_historical_ebit[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
+# Historical and Estimated Net Income
+df_historical_net_income = df_stockrow_data.iloc[-6:]['NET_INCOME']
+df_historical_net_income = df_historical_net_income.to_frame()
+df_historical_net_income = df_historical_net_income.T
+
+row = 22
+column_start = 3
+for column in df_historical_net_income:
+    value = df_historical_net_income[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
+# Historical and Estimated PE Ratio
+df_historical_pe_ratio = df_stockrow_data.iloc[-6:]['PE_RATIO']
+df_historical_pe_ratio = df_historical_pe_ratio.to_frame()
+df_historical_pe_ratio = df_historical_pe_ratio.T
+
+row = 25
+column_start = 3
+for column in df_historical_pe_ratio:
+    value = df_historical_pe_ratio[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
+# Historical and Estimated Earnings Per Share
+df_historical_eps = df_stockrow_data.iloc[-6:]['EARNINGS_PER_SHARE']
+df_historical_eps = df_historical_eps.to_frame()
+df_historical_eps = df_historical_eps.T
+
+row = 26
+column_start = 3
+for column in df_historical_eps:
+    value = df_historical_eps[column].values[0]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+    column_start = column_start+1
+
 print("Done!")
 
 """
