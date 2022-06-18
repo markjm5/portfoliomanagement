@@ -40,6 +40,17 @@ from common import download_file, unzip_file, get_yf_key_stats
 
 debug = True
 
+def write_multiple_value(row, column_start, col_name):
+    # Historical and Estimated data
+    df = df_stockrow_data.iloc[-6:][col_name]
+    df = df.to_frame()
+    df = df.T
+
+    for column in df:
+        value = df[column].values[0]
+        write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
+        column_start = column_start+1
+
 #################
 ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
@@ -263,90 +274,46 @@ for column in df_historical_sales:
     write_value_to_cell_excel(excel_file_path,sheet_name, 16, column_start, value2)
     column_start = column_start+1
 
-
 # Historical and Estimated EBIT
-df_historical_ebit = df_stockrow_data.iloc[-6:]['EBIT']
-df_historical_ebit = df_historical_ebit.to_frame()
-df_historical_ebit = df_historical_ebit.T
-
 row = 20
 column_start = 3
-for column in df_historical_ebit:
-    value = df_historical_ebit[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
-
-# Historical and Estimated Net Income
-df_historical_net_income = df_stockrow_data.iloc[-6:]['NET_INCOME']
-df_historical_net_income = df_historical_net_income.to_frame()
-df_historical_net_income = df_historical_net_income.T
+col_name = 'EBIT'
+write_multiple_value(row, column_start, col_name)
 
 row = 22
 column_start = 3
-for column in df_historical_net_income:
-    value = df_historical_net_income[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
+col_name = 'NET_INCOME'
+write_multiple_value(row, column_start, col_name)
 
 # Historical and Estimated PE Ratio
-df_historical_pe_ratio = df_stockrow_data.iloc[-6:]['PE_RATIO']
-df_historical_pe_ratio = df_historical_pe_ratio.to_frame()
-df_historical_pe_ratio = df_historical_pe_ratio.T
-
 row = 25
 column_start = 3
-for column in df_historical_pe_ratio:
-    value = df_historical_pe_ratio[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
+col_name = 'PE_RATIO'
+write_multiple_value(row, column_start, col_name)
 
 # Historical and Estimated Earnings Per Share
-df_historical_eps = df_stockrow_data.iloc[-6:]['EARNINGS_PER_SHARE']
-df_historical_eps = df_historical_eps.to_frame()
-df_historical_eps = df_historical_eps.T
-
 row = 26
 column_start = 3
-for column in df_historical_eps:
-    value = df_historical_eps[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
+col_name = 'EARNINGS_PER_SHARE'
+write_multiple_value(row, column_start, col_name)
 
 # Historical and Estimated Total Debt
-df_historical_debt = df_stockrow_data.iloc[-6:]['TOTAL_DEBT']
-df_historical_debt = df_historical_debt.to_frame()
-df_historical_debt = df_historical_debt.T
-
 row = 32
 column_start = 3
-for column in df_historical_debt:
-    value = df_historical_debt[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
+col_name = 'TOTAL_DEBT'
+write_multiple_value(row, column_start, col_name)
 
 # Historical and Estimated Cash Flow Per Share
-df_historical_cash_flow_per_share = df_stockrow_data.iloc[-6:]['CASH_FLOW_PER_SHARE']
-df_historical_cash_flow_per_share = df_historical_cash_flow_per_share.to_frame()
-df_historical_cash_flow_per_share = df_historical_cash_flow_per_share.T
-
 row = 35
 column_start = 3
-for column in df_historical_cash_flow_per_share:
-    value = df_historical_cash_flow_per_share[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
+col_name = 'CASH_FLOW_PER_SHARE'
+write_multiple_value(row, column_start, col_name)
 
 # Historical and Estimated Book Value Per Share
-df_historical_book_value_per_share = df_stockrow_data.iloc[-6:]['BOOK_VALUE_PER_SHARE']
-df_historical_book_value_per_share = df_historical_book_value_per_share.to_frame()
-df_historical_book_value_per_share = df_historical_book_value_per_share.T
-
 row = 36
 column_start = 3
-for column in df_historical_book_value_per_share:
-    value = df_historical_book_value_per_share[column].values[0]
-    write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
-    column_start = column_start+1
+col_name = 'BOOK_VALUE_PER_SHARE'
+write_multiple_value(row, column_start, col_name)
 
 ## Average Volume 10 days
 row = 38
