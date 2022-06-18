@@ -67,8 +67,18 @@ df_stockrow_data = get_stockrow_stock_data(ticker, debug)
 
 url_yf_asset_profile = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile" % (ticker) #sector, industry, website, business summary
 json_yf_asset_profile = json.loads(get_page(url_yf_asset_profile).content)
+
 url_yf_financial_data = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=financialData" % (ticker) #last price, target price
 json_yf_financial_data = json.loads(get_page(url_yf_financial_data).content)
+
+url_yf_summary_detail = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryDetail" % (ticker) #sector, industry, website, business summary
+json_yf_summary_detail = json.loads(get_page(url_yf_summary_detail).content)
+
+url_yf_price = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=price" % (ticker) #sector, industry, website, business summary
+json_yf_price = json.loads(get_page(url_yf_price).content)
+
+url_yf_default_key_statistics = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=defaultKeyStatistics" % (ticker)
+json_yf_default_key_statistics = json.loads(get_page(url_yf_default_key_statistics).content)
 
 df_yf_key_statistics = get_yf_key_stats(ticker)
 
@@ -139,10 +149,16 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ##Mkt Cap
 row = 9
 column = 3
-value = df_zacks_stock_data['MARKET_CAP'].values[0]
+value = json_yf_price['quoteSummary']['result'][0]['price']['marketCap']['raw']
+value = int(str(value)[:-6])
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 #TODO: EV, Days to Cover
+row = 10
+column = 3
+value = json_yf_default_key_statistics['quoteSummary']['result'][0]['defaultKeyStatistics']['enterpriseValue']['raw']
+value = int(str(value)[:-6])
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Target Price
 row = 12
@@ -169,6 +185,15 @@ value = df_zacks_stock_data['PEG_RATIO'].values[0]
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 #TODO: Dividend TTM, Div. yield
+row = 9
+column = 5
+value = "Dividend %s" % (todays_date.year)
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+row = 9
+column = 6
+value = json_yf_summary_detail['quoteSummary']['result'][0]['summaryDetail']['trailingAnnualDividendRate']['raw']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Beta
 row = 11
@@ -179,10 +204,8 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ##Company Name
 row = 2
 column = 7
-value = df_zacks_stock_data['COMPANY_NAME'].values[0]
+value = json_yf_price['quoteSummary']['result'][0]['price']['longName']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
-
-#TODO: PB
 
 ##ROE
 row = 7
@@ -324,6 +347,12 @@ for column in df_historical_book_value_per_share:
     value = df_historical_book_value_per_share[column].values[0]
     write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
     column_start = column_start+1
+
+## Average Volume 10 days
+row = 38
+column = 3
+value = json_yf_summary_detail['quoteSummary']['result'][0]['summaryDetail']['volume']['raw']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ## Average Volume 10 days
 row = 39
