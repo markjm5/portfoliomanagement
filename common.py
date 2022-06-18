@@ -414,7 +414,7 @@ def get_stockrow_stock_data(ticker, debug):
         ['ROIC','38.76%','30.64%','26.95%','31.33%','25.33%','21.84%','28.53%','40.79%','42.87%','49.71%','–','–','–'],
         ['ROE','42.84%','30.64%','33.61%','46.25%','36.90%','36.87%','49.36%','55.92%','73.69%','147.44%','156.00%','151.00%','141.00%']     
     ]
-    df = pd.DataFrame(data, columns=['METRIC','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'])
+    df = pd.DataFrame(data, columns=['YEAR','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'])
   else:
     page = get_page_selenium('https://stockrow.com/%s' % (ticker))
 
@@ -442,18 +442,73 @@ def get_stockrow_stock_data(ticker, debug):
 
           df.loc[len(df.index)] = temp_row
 
-    df.rename(columns={ df.columns[13]: "METRIC" }, inplace = True)
+    df.rename(columns={ df.columns[13]: "YEAR" }, inplace = True)
 
     # get a list of columns
     cols = list(df)
 
     # move the column to head of list using index, pop and insert
-    cols.insert(0, cols.pop(cols.index('METRIC')))
+    cols.insert(0, cols.pop(cols.index('YEAR')))
 
     # reorder
     df = df.loc[:, cols]
 
-  return df
+  #format the df
+  df_transposed = df.T
+  new_header = df_transposed.iloc[0] #grab the first row for the header
+  df_transposed = df_transposed[1:] #take the data less the header row
+  df_transposed.columns = new_header #set the header row as the df header
+
+  df_transposed = df_transposed.rename(columns={
+    "Revenue":"SALES",          
+    "Gross Margin":"GROSS_MARGIN",      
+    "EBT":"EBIT",               
+    "EBT Margin":"EBIT_MARGIN",        
+    "Net Income":"NET_INCOME",        
+    "PE Ratio":"PE_RATIO",          
+    "PS Ratio":"PS_RATIO",          
+    "PB Ratio":"PB_RATIO",          
+    "EV/Sales":"EV_TO_SALES",          
+    "EV/FCF":"EV_TO_FCF",            
+    "Revenue/Sh":"REVENUE_PER_SHARE",        
+    "Earnings/Sh":"EARNINGS_PER_SHARE",       
+    "Cash Flow/Sh":"CASH_FLOW_PER_SHARE",      
+    "Capex/Sh":"CAPEX_PER_SHARE",          
+    "Book Value/Sh":"BOOK_VALUE_PER_SHARE",     
+    "Shares":"SHARES",            
+    "Op' Cash Flow":"OPERATING_CASH_FLOW",     
+    "Capex":"CAPEX",             
+    "FCF":"FREE_CASH_FLOW",               
+    "Working Cap":"WORKING_CAPITAL",       
+    "Total Debt":"TOTAL_DEBT",        
+    "Sh' Equity":"SHAREHOLDERS_EQUITY",        
+    "ROA":"ROA",               
+    "ROIC":"ROIC",              
+    "ROE":"ROE"               
+    })  
+
+  #format numeric values in dataframe
+  df_transposed = df_transposed.squeeze()
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'SALES')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EBIT')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'NET_INCOME')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'PE_RATIO')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'PS_RATIO')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'PB_RATIO')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EV_TO_SALES')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EV_TO_FCF')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'REVENUE_PER_SHARE')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EARNINGS_PER_SHARE')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'CASH_FLOW_PER_SHARE')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'BOOK_VALUE_PER_SHARE')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'SHARES')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'OPERATING_CASH_FLOW')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'WORKING_CAPITAL')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'TOTAL_DEBT')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'FREE_CASH_FLOW')
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'SHAREHOLDERS_EQUITY')
+
+  return df_transposed
 
 def get_api_json_data(url, filename):
 
@@ -1035,3 +1090,12 @@ def _transform_data(excel_file_path, sheet_name_original, sheet_name_new):
 def _util_check_diff_list(li1, li2):
   # Python code to get difference of two lists
   return list(set(li1) - set(li2))
+
+def dataframe_convert_to_numeric(df, column):
+
+  #TODO: Deal with percentages and negative values in brackets
+
+  df[column] = df[column].str.replace(',','').replace('–','0.00')
+  df[column] = pd.to_numeric(df[column])
+
+  return df

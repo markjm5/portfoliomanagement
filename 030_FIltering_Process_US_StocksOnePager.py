@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+#import calendar
 import requests
 from pandas.tseries.offsets import BDay
 from bs4 import BeautifulSoup
@@ -64,6 +65,7 @@ df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
 
+import pdb; pdb.set_trace()
 url_yf_asset_profile = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile" % (ticker) #sector, industry, website, business summary
 json_yf_asset_profile = json.loads(get_page(url_yf_asset_profile).content)
 url_yf_financial_data = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=financialData" % (ticker) #last price, target price
@@ -81,7 +83,7 @@ json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surp
 
 #url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
-
+import pdb; pdb.set_trace()
 # Get FMPCloud data for company company peers and company earnings surprises
 #TODO: Retrieve company peers metrics
 
@@ -218,6 +220,16 @@ row = 44
 column = 10
 value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['longBusinessSummary']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+##Fiscal Year End
+row = 14
+column = 8
+value = df_zacks_stock_data['MONTH_OF_FISCAL_YR_END'].values[0]
+value = date(1900, value, 1).strftime('%B')
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+# Select the ones you want
+df_historical_data = df_stockrow_data[[0]]
 
 print("Done!")
 
