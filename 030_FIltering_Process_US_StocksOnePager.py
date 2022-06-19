@@ -41,7 +41,7 @@ from common import download_file, unzip_file, get_yf_key_stats
 debug = False
 
 #################
-ticker = "CRM" # COMPANY TICKER - CHANGE HERE
+ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
 
 #Dates
@@ -101,7 +101,7 @@ json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surp
 
 #Download SEC Filings
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-
+#import pdb; pdb.set_trace()
 save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
 save_file_directory = '/CompanySECFilings/%s' % (ticker)
 download_file(url_company_sec_filings, save_file_name)
@@ -156,11 +156,17 @@ value = json_yf_modules['quoteSummary']['result'][0]['price']['marketCap']['raw'
 value = int(str(value)[:-6])
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
-#TODO: EV, Days to Cover
+#EV
 row = 10
 column = 3
 value = json_yf_modules['quoteSummary']['result'][0]['defaultKeyStatistics']['enterpriseValue']['raw']
 value = int(str(value)[:-6])
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+#Days to Cover (short ratio)
+row = 11
+column = 3
+value = json_yf_modules['quoteSummary']['result'][0]['defaultKeyStatistics']['shortRatio']['raw']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Target Price
