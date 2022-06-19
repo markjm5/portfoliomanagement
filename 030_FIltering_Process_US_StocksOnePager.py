@@ -36,9 +36,9 @@ from common import download_file, unzip_file, get_yf_key_stats
 # - 'earningsHistory', - 'earningsTrend', - 'industryTrend', - 'indexTrend', 
 # - 'sectorTrend'
 
-# https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=assetProfile,financialData,defaultKeyStatistics,calendarEvents
+# https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=financialData
 
-debug = True
+debug = False
 
 def write_multiple_value(row, column_start, col_name):
     # Historical and Estimated data
@@ -75,21 +75,10 @@ df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_she
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
+#df_wsj_ebitda = get_wsj_ebitda(ticker)
 
-url_yf_asset_profile = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile" % (ticker) #sector, industry, website, business summary
-json_yf_asset_profile = json.loads(get_page(url_yf_asset_profile).content)
-
-url_yf_financial_data = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=financialData" % (ticker) #last price, target price
-json_yf_financial_data = json.loads(get_page(url_yf_financial_data).content)
-
-url_yf_summary_detail = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryDetail" % (ticker) #sector, industry, website, business summary
-json_yf_summary_detail = json.loads(get_page(url_yf_summary_detail).content)
-
-url_yf_price = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=price" % (ticker) #sector, industry, website, business summary
-json_yf_price = json.loads(get_page(url_yf_price).content)
-
-url_yf_default_key_statistics = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=defaultKeyStatistics" % (ticker)
-json_yf_default_key_statistics = json.loads(get_page(url_yf_default_key_statistics).content)
+url_yf_modules = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile,financialData,summaryDetail,price,defaultKeyStatistics" % (ticker)
+json_yf_modules = json.loads(get_page(url_yf_modules).content)
 
 df_yf_key_statistics = get_yf_key_stats(ticker)
 
@@ -109,7 +98,7 @@ json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surp
 
 #Download SEC Filings
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-#import pdb; pdb.set_trace()
+
 save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
 save_file_directory = '/CompanySECFilings/%s' % (ticker)
 download_file(url_company_sec_filings, save_file_name)
@@ -136,7 +125,7 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ##Last
 row = 4
 column = 3
-value = json_yf_financial_data['quoteSummary']['result'][0]['financialData']['currentPrice']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['financialData']['currentPrice']['raw']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##52 Week High
@@ -160,21 +149,21 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ##Mkt Cap
 row = 9
 column = 3
-value = json_yf_price['quoteSummary']['result'][0]['price']['marketCap']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['price']['marketCap']['raw']
 value = int(str(value)[:-6])
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 #TODO: EV, Days to Cover
 row = 10
 column = 3
-value = json_yf_default_key_statistics['quoteSummary']['result'][0]['defaultKeyStatistics']['enterpriseValue']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['defaultKeyStatistics']['enterpriseValue']['raw']
 value = int(str(value)[:-6])
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Target Price
 row = 12
 column = 3
-value = json_yf_financial_data['quoteSummary']['result'][0]['financialData']['targetMeanPrice']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['financialData']['targetMeanPrice']['raw']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Trailing PE
@@ -203,7 +192,7 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 row = 9
 column = 6
-value = json_yf_summary_detail['quoteSummary']['result'][0]['summaryDetail']['trailingAnnualDividendRate']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['summaryDetail']['trailingAnnualDividendRate']['raw']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Beta
@@ -215,13 +204,13 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ##Company Name
 row = 2
 column = 7
-value = json_yf_price['quoteSummary']['result'][0]['price']['longName']
+value = json_yf_modules['quoteSummary']['result'][0]['price']['longName']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##ROE
 row = 7
 column = 8
-value = json_yf_financial_data['quoteSummary']['result'][0]['financialData']['returnOnEquity']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['financialData']['returnOnEquity']['raw']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Exchange
@@ -233,25 +222,25 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ##Sector
 row = 9
 column = 8
-value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['sector']
+value = json_yf_modules['quoteSummary']['result'][0]['summaryProfile']['sector']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Industry
 row = 10
 column = 8
-value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['industry']
+value = json_yf_modules['quoteSummary']['result'][0]['summaryProfile']['industry']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Website
 row = 11
 column = 8
-value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['website']
+value = json_yf_modules['quoteSummary']['result'][0]['summaryProfile']['website']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Company Description
 row = 44
 column = 10
-value = json_yf_asset_profile['quoteSummary']['result'][0]['summaryProfile']['longBusinessSummary']
+value = json_yf_modules['quoteSummary']['result'][0]['summaryProfile']['longBusinessSummary']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Fiscal Year End
@@ -273,6 +262,12 @@ for column in df_historical_sales:
     write_value_to_cell_excel(excel_file_path,sheet_name, 15, column_start, value1)
     write_value_to_cell_excel(excel_file_path,sheet_name, 16, column_start, value2)
     column_start = column_start+1
+
+# Historical and Estimated EBITDA
+row = 18
+column_start = 3
+col_name = 'EBITDA'
+write_multiple_value(row, column_start, col_name)
 
 # Historical and Estimated EBIT
 row = 20
@@ -318,7 +313,7 @@ write_multiple_value(row, column_start, col_name)
 ## Average Volume 10 days
 row = 38
 column = 3
-value = json_yf_summary_detail['quoteSummary']['result'][0]['summaryDetail']['volume']['raw']
+value = json_yf_modules['quoteSummary']['result'][0]['summaryDetail']['volume']['raw']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ## Average Volume 10 days

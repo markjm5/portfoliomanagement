@@ -46,7 +46,8 @@ def get_page_selenium(url):
 
   driver = webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
   driver.get(url)
-  time.sleep(1)
+  driver.implicitly_wait(10)  
+  time.sleep(5)
   html = driver.page_source
   driver.close()
 
@@ -289,6 +290,92 @@ def get_yf_historical_stock_data(ticker, interval, start, end):
   df_yf = df_yf.rename(columns={"Date": "DATE"})
 
   return df_yf
+""" TODO
+def get_wsj_data(ticker):
+  df_company_data = pd.DataFrame()
+  url = "https://www.wsj.com/market-data/quotes/%s/financials/annual/income-statement" % (ticker)
+
+  page = get_page(url)
+
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  tables = soup.find_all('table')
+
+  table_rows = tables[0].find_all('tr', recursive=True)
+  emptyDict = {}
+
+  #Get rows of data.
+  for tr in table_rows:
+    tds = tr.find_all('td')
+    import pdb; pdb.set_trace()
+
+
+def get_yf_data(ticker):
+  company = yf.Ticker(ticker)
+  import pdb; pdb.set_trace()
+  # get stock info
+  company.info
+
+  # get historical market data
+  hist = company.history(period="max")
+
+  # show actions (dividends, splits)
+  company.actions
+
+  # show dividends
+  company.dividends
+
+  # show splits
+  company.splits
+
+  # show financials
+  company.financials
+  company.quarterly_financials
+
+  # show major holders
+  company.major_holders
+
+  # show institutional holders
+  company.institutional_holders
+
+  # show balance sheet
+  company.balance_sheet
+  company.quarterly_balance_sheet
+
+  # show cashflow
+  company.cashflow
+  company.quarterly_cashflow
+
+  # show earnings
+  company.earnings
+  company.quarterly_earnings
+
+  # show sustainability
+  company.sustainability
+
+  # show analysts recommendations
+  company.recommendations
+
+  # show next event (earnings, etc)
+  company.calendar
+
+  # show all earnings dates
+  company.earnings_dates
+
+  # show ISIN code - *experimental*
+  # ISIN = International Securities Identification Number
+  company.isin
+
+  # show options expirations
+  company.options
+
+  # show news
+  company.news
+
+  # get option chain for specific expiration
+  opt = company.option_chain('YYYY-MM-DD')
+  # data available via: opt.calls, opt.puts
+"""
 
 def get_yf_key_stats(ticker):
   df_company_data = pd.DataFrame()
@@ -339,7 +426,57 @@ def get_yf_key_stats(ticker):
   df_company_data = dataframe_convert_to_numeric(df_company_data, '200_DAY_MOVING_AVG')
 
   return df_company_data
+"""
+def get_yf_financials(ticker):
+  df_company_data = pd.DataFrame()
+  url = "https://finance.yahoo.com/quote/%s/financials/" % (ticker)
 
+  page = get_page(url)
+
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  tables = soup.find_all('table')
+  statsDict = {}
+  import pdb; pdb.set_trace()
+  for table in tables:
+    table_rows = table.find_all('tr', recursive=True)
+    emptyDict = {}
+
+    #Get rows of data.
+    for tr in table_rows:
+      tds = tr.find_all('td')
+      boolKey = True
+      keyValueSet = False
+
+      for td in tds:
+          if boolKey:
+              key = td.text.strip()
+              boolKey = False                
+          else:
+              value = td.text.strip()
+              boolKey = True
+              keyValueSet = True                
+
+          if keyValueSet:
+              emptyDict[key] = value
+              keyValueSet = False
+    statsDict.update(emptyDict)
+
+  df_company_data.loc[ticker, 'MARKET_CAP'] = statsDict['Market Cap (intraday)']
+  df_company_data.loc[ticker, 'EV'] = statsDict['Enterprise Value']
+  df_company_data.loc[ticker, 'AVG_VOL_3M'] = statsDict['Avg Vol (3 month) 3']
+  df_company_data.loc[ticker, 'AVG_VOL_10D'] = statsDict['Avg Vol (10 day) 3']
+  df_company_data.loc[ticker, '50_DAY_MOVING_AVG'] = statsDict['50-Day Moving Average 3']
+  df_company_data.loc[ticker, '200_DAY_MOVING_AVG'] = statsDict['200-Day Moving Average 3']
+  df_company_data.loc[ticker, 'EV_REVENUE'] = statsDict['Enterprise Value/Revenue']
+  df_company_data.loc[ticker, 'EV_EBITDA'] = statsDict['Enterprise Value/EBITDA']
+  df_company_data.loc[ticker, 'PRICE_BOOK'] = statsDict['Price/Book (mrq)']
+
+  df_company_data = dataframe_convert_to_numeric(df_company_data, '50_DAY_MOVING_AVG')
+  df_company_data = dataframe_convert_to_numeric(df_company_data, '200_DAY_MOVING_AVG')
+
+  return df_company_data
+"""
 def get_finwiz_stock_data(ticker):
   df_company_data = pd.DataFrame()
   url_finviz = "https://finviz.com/quote.ashx?t=%s" % (ticker)
@@ -415,7 +552,8 @@ def get_stockrow_stock_data(ticker, debug):
         ['Sh\' Equity','118,210.00','123,549.00','111,547.00','119,355.00','128,249.00','134,047.00','107,147.00','90,488.00','65,339.00','63,090.00','–','–','–'],
         ['ROA','28.54%','19.34%','18.01%','20.45%','14.93%','13.87%','16.07%','15.69%','17.33%','28.06%','28.40%','27.70%','27.00%'],
         ['ROIC','38.76%','30.64%','26.95%','31.33%','25.33%','21.84%','28.53%','40.79%','42.87%','49.71%','–','–','–'],
-        ['ROE','42.84%','30.64%','33.61%','46.25%','36.90%','36.87%','49.36%','55.92%','73.69%','147.44%','156.00%','151.00%','141.00%']     
+        ['ROE','42.84%','30.64%','33.61%','46.25%','36.90%','36.87%','49.36%','55.92%','73.69%','147.44%','156.00%','151.00%','141.00%'],     
+        ['EBITDA','0.00','0.00','0.00','0.00','0.00','69,428','80,342','74,542','76,395','120,233','0.00','0.00','0.00']
     ]
     df = pd.DataFrame(data, columns=['YEAR','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'])
   else:
@@ -423,7 +561,10 @@ def get_stockrow_stock_data(ticker, debug):
 
     soup = BeautifulSoup(page, 'html.parser')
 
-    table = soup.find_all('table')[0]
+    try:
+      table = soup.find_all('table')[0]
+    except IndexError as e:
+       raise Exception("Did not load table from stockrow. Try again")
 
     table_rows = table.find_all('tr', recursive=True)
     table_rows_header = table.find_all('tr')[0].find_all('th')
@@ -437,13 +578,15 @@ def get_stockrow_stock_data(ticker, debug):
 
     #Get rows of data.
     for tr in table_rows:
-        tds = tr.find_all('td', recursive=True)
-        if(tds):
-          temp_row = []
-          for td in tds:
-            temp_row.append(td.text.strip())        
+      if(tr.find_all('td')):
+        if(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip() in ['Revenue','EBT','Net Income','PE Ratio','Earnings/Sh','Total Debt','Cash Flow/Sh','Book Value/Sh']):
+          tds = tr.find_all('td', recursive=True)
+          if(tds):
+            temp_row = []
+            for td in tds:
+              temp_row.append(td.text.strip())        
 
-          df.loc[len(df.index)] = temp_row
+            df.loc[len(df.index)] = temp_row
 
     df.rename(columns={ df.columns[13]: "YEAR" }, inplace = True)
 
@@ -456,61 +599,83 @@ def get_stockrow_stock_data(ticker, debug):
     # reorder
     df = df.loc[:, cols]
 
+    page = get_page_selenium("https://www.wsj.com/market-data/quotes/%s/financials/annual/income-statement" % (ticker))
+
+    soup = BeautifulSoup(page, 'html.parser')
+    tables = soup.find_all('table')
+    try:
+      table_rows = tables[0].find_all('tr', recursive=True)
+    except IndexError as e:
+       raise Exception("Did not load table from wsj. Try again")
+
+    table_rows_header = tables[0].find_all('tr')[0].find_all('th')
+
+    #TODO: Get EBITDA from table
+    
+    df2 = pd.DataFrame()
+    index = 0
+    for header in table_rows_header:
+      if(index == 0):
+        df2.insert(0,"YEAR",[],True)
+      else:
+        df2.insert(index,header.text,[],True)
+      index+=1
+    
+    #drop the last column has it does not contain any data but rather is a graphic of the trend
+    df2 = df2.iloc[: , :-1]
+    
+    #Insert New Row. Format the data to show percentage as float
+
+    for tr in table_rows:
+
+      if(tr.find_all('td')):
+        if(tr.find_all('td')[0].text in ['EBITDA']):
+          temp_row = []
+
+          td = tr.find_all('td')
+          for obs in td:
+            if(len(obs.text.strip()) > 0):
+              text = obs.text
+              temp_row.append(text)        
+
+          df2.loc[len(df2.index)] = temp_row
+          break
+
+    df = df.append(df2,ignore_index = True)    
+
   #format the df
   df_transposed = df.T
   new_header = df_transposed.iloc[0] #grab the first row for the header
   df_transposed = df_transposed[1:] #take the data less the header row
   df_transposed.columns = new_header #set the header row as the df header
-
+  
   df_transposed = df_transposed.rename(columns={
     "Revenue":"SALES",          
-    "Gross Margin":"GROSS_MARGIN",      
     "EBT":"EBIT",               
-    "EBT Margin":"EBIT_MARGIN",        
     "Net Income":"NET_INCOME",        
     "PE Ratio":"PE_RATIO",          
-    "PS Ratio":"PS_RATIO",          
-    "PB Ratio":"PB_RATIO",          
-    "EV/Sales":"EV_TO_SALES",          
-    "EV/FCF":"EV_TO_FCF",            
-    "Revenue/Sh":"REVENUE_PER_SHARE",        
     "Earnings/Sh":"EARNINGS_PER_SHARE",       
     "Cash Flow/Sh":"CASH_FLOW_PER_SHARE",      
-    "Capex/Sh":"CAPEX_PER_SHARE",          
     "Book Value/Sh":"BOOK_VALUE_PER_SHARE",     
-    "Shares":"SHARES",            
-    "Op' Cash Flow":"OPERATING_CASH_FLOW",     
-    "Capex":"CAPEX",             
-    "FCF":"FREE_CASH_FLOW",               
-    "Working Cap":"WORKING_CAPITAL",       
     "Total Debt":"TOTAL_DEBT",        
-    "Sh' Equity":"SHAREHOLDERS_EQUITY",        
-    "ROA":"ROA",               
-    "ROIC":"ROIC",              
-    "ROE":"ROE"               
+    "EBITDA": "EBITDA"                   
     })  
 
+  df_transposed['EBITDA'] = df_transposed['EBITDA'].fillna("–")
+  print(df_transposed)
+
   #format numeric values in dataframe
-  df_transposed = df_transposed.squeeze()
+  #df_transposed = df_transposed.squeeze()
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'SALES')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'EBIT')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'NET_INCOME')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'PE_RATIO')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'PS_RATIO')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'PB_RATIO')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EV_TO_SALES')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EV_TO_FCF')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'REVENUE_PER_SHARE')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'EARNINGS_PER_SHARE')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'CASH_FLOW_PER_SHARE')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'BOOK_VALUE_PER_SHARE')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'SHARES')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'OPERATING_CASH_FLOW')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'WORKING_CAPITAL')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'TOTAL_DEBT')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'FREE_CASH_FLOW')
-  df_transposed = dataframe_convert_to_numeric(df_transposed, 'SHAREHOLDERS_EQUITY')
-
+  df_transposed = dataframe_convert_to_numeric(df_transposed, 'EBITDA')
+  
   return df_transposed
 
 def get_api_json_data(url, filename):
@@ -1095,10 +1260,14 @@ def _util_check_diff_list(li1, li2):
   return list(set(li1) - set(li2))
 
 def dataframe_convert_to_numeric(df, column):
-
   #TODO: Deal with percentages and negative values in brackets
 
-  df[column] = df[column].str.replace(',','').replace('–','0.00')
+  try:
+    df[column] = df[column].str.replace(',','').replace('–','0.00')
+  except KeyError as e:
+    print(df)
+    print(column)
+
   df[column] = pd.to_numeric(df[column])
 
   return df
