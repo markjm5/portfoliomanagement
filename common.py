@@ -548,12 +548,13 @@ def get_stockrow_stock_data(ticker, debug):
 
       if(tr.find_all('td')):
         print(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip())
-        if(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip() in ['Revenue','EBT','Net Income','PE Ratio','Earnings/Sh','Total Debt','Cash Flow/Sh','Book Value/Sh']):
+        row_heading = tr.find_all('td')[len(tr.find_all('td'))-1].text.strip().replace("Created with Highcharts 8.2.2foo","")   
+        if(row_heading in ['Revenue','EBT','Net Income','PE Ratio','Earnings/Sh','Total Debt','Cash Flow/Sh','Book Value/Sh']):
           tds = tr.find_all('td', recursive=True)
           if(tds):
             temp_row = []
             for td in tds:
-              temp_row.append(td.text.strip())        
+              temp_row.append(td.text.strip().replace("Created with Highcharts 8.2.2foo",""))        
 
             df.loc[len(df.index)] = temp_row
 
@@ -648,7 +649,24 @@ def get_stockrow_stock_data(ticker, debug):
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'BOOK_VALUE_PER_SHARE')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'TOTAL_DEBT')
   df_transposed = dataframe_convert_to_numeric(df_transposed, 'EBITDA')
-  
+
+  todays_date = date.today()
+  one_year_ago = dt(todays_date.year - 1, 12, 31)
+  two_year_ago = dt(todays_date.year - 2, 12, 31)
+  three_year_ago = dt(todays_date.year - 3, 12, 31)
+  one_year_future = dt(todays_date.year + 1, 12, 31)
+  two_year_future = dt(todays_date.year + 2, 12, 31)
+
+  list_dates = []
+  list_dates.append(str(three_year_ago.year))
+  list_dates.append(str(two_year_ago.year))
+  list_dates.append(str(one_year_ago.year))
+  list_dates.append(str(todays_date.year))
+  list_dates.append(str(one_year_future.year))
+  list_dates.append(str(two_year_future.year))
+
+  df_transposed = df_transposed.loc[list_dates]
+
   return df_transposed
 
 def get_api_json_data(url, filename):
@@ -1236,8 +1254,8 @@ def dataframe_convert_to_numeric(df, column):
   #TODO: Deal with percentages and negative values in brackets
   try:
     df[column] = df[column].str.replace(',','').replace('–','0.00')
-    df[column] = df[column].str.replace('(','-')
-    df[column] = df[column].str.replace(')','')
+    df[column] = df[column].str.replace('(','-', regex=True)
+    df[column] = df[column].str.replace(')','', regex=True)
   except KeyError as e:
     print(df)
     print(column)

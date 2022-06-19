@@ -40,6 +40,10 @@ from common import download_file, unzip_file, get_yf_key_stats
 
 debug = False
 
+#################
+ticker = "CRM" # COMPANY TICKER - CHANGE HERE
+#################
+
 #Dates
 todays_date = date.today()
 one_year_ago = dt(todays_date.year - 1, 12, 31)
@@ -63,10 +67,6 @@ def write_multiple_value(row, column_start, col_name):
         value = df[column].values[0]
         write_value_to_cell_excel(excel_file_path,sheet_name, row, column_start, value)
         column_start = column_start+1
-
-#################
-ticker = "CRM" # COMPANY TICKER - CHANGE HERE
-#################
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
 
