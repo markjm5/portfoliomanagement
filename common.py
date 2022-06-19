@@ -290,26 +290,8 @@ def get_yf_historical_stock_data(ticker, interval, start, end):
   df_yf = df_yf.rename(columns={"Date": "DATE"})
 
   return df_yf
-""" TODO
-def get_wsj_data(ticker):
-  df_company_data = pd.DataFrame()
-  url = "https://www.wsj.com/market-data/quotes/%s/financials/annual/income-statement" % (ticker)
 
-  page = get_page(url)
-
-  soup = BeautifulSoup(page.content, 'html.parser')
-
-  tables = soup.find_all('table')
-
-  table_rows = tables[0].find_all('tr', recursive=True)
-  emptyDict = {}
-
-  #Get rows of data.
-  for tr in table_rows:
-    tds = tr.find_all('td')
-    import pdb; pdb.set_trace()
-
-
+"""
 def get_yf_data(ticker):
   company = yf.Ticker(ticker)
   import pdb; pdb.set_trace()
@@ -527,32 +509,16 @@ def get_finwiz_stock_data(ticker):
 
 def get_stockrow_stock_data(ticker, debug):
   if debug:
+    'Revenue','EBT','Net Income','PE Ratio','Earnings/Sh','Total Debt','Cash Flow/Sh','Book Value/Sh'
     data = [
         ['Revenue','156,508.00','170,910.00','182,795.00','233,715.00','215,639.00','228,572.00','265,809.00','259,968.00','274,150.00','365,817.00','393,914.00','415,323.00','431,853.00'], 
-        ['Gross Margin','43.87%','37.62%','38.59%','40.06%','39.08%','38.01%','38.37%','37.58%','37.94%','41.78%','–','–','–'],
         ['EBT','55,763.00','50,155.00','53,483.00','72,515.00','61,372.00','64,089.00','72,903.00','65,737.00','67,091.00','109,207.00','119,189.00','124,010.00','127,381.00'],
-        ['EBT Margin','35.63%','29.35%','29.26%','31.03%','28.46%','28.04%','27.43%','25.29%','24.47%','29.85%','30.26%','29.86%','29.50%'],
         ['Net Income','41,733.00','37,037.00','39,510.00','53,394.00','45,687.00','48,351.00','59,531.00','55,256.00','57,411.00','94,680.00','99,856.00','103,545.00','106,156.00'],
         ['PE Ratio','14.76','11.95','15.56','11.93','13.59','16.63','18.99','18.76','35.12','25.09','21.20','19.90','18.90'],
-        ['PS Ratio','3.94','2.58','3.35','2.72','2.87','3.50','4.24','3.98','7.32','6.37','5.34','5.07','4.87'],
-        ['PB Ratio','5.21','3.57','5.50','5.32','4.82','5.99','10.51','11.43','30.76','36.98','35.23','31.71','26.97'],
-        ['EV/Sales','3.75','2.44','3.41','2.81','2.96','3.68','4.42','4.00','7.40','6.57','5.18','4.85','4.59'],
-        ['EV/FCF','14.17','9.37','12.49','9.42','12.00','16.30','18.31','17.68','27.68','25.89','–','–','–'],
-        ['Revenue/Sh','5.98','6.60','7.51','10.16','9.85','10.95','13.41','14.07','15.80','21.90','24.34','25.66','26.68'],
         ['Earnings/Sh','1.59','1.43','1.62','2.32','2.09','2.30','2.98','2.97','3.28','5.61','6.14','6.53','6.89'],
         ['Cash Flow/Sh','1.94','2.07','2.45','3.53','3.03','3.05','3.91','3.76','4.65','6.23','7.14','7.60','8.58'],
-        ['Capex/Sh','(0.36)','(0.35)','(0.40)','(0.50)','(0.60)','(0.60)','(0.67)','(0.57)','(0.42)','(0.66)','(0.66)','(0.76)','(0.80)'],
         ['Book Value/Sh','4.52','4.77','4.58','5.19','5.86','6.42','5.41','4.90','3.77','3.78','3.69','4.10','4.82'],
-        ['Shares','26,174.90','25,909.28','24,342.29','23,013.68','21,883.28','20,869.00','19,822.00','18,471.00','17,352.00','16,701.00','16,185.18','16,185.18','16,185.18'],
-        ['Op\' Cash Flow','50,856.00','53,666.00','59,713.00','81,266.00','66,231.00','63,598.00','77,434.00','69,391.00','80,674.00','104,038.00','119,241.00','124,529.00','133,033.00'],
-        ['Capex','(9,402.00)','(9,076.00)','(9,813.00)','(11,488.00)','(13,031.00)','(12,451.00)','(13,313.00)','(10,495.00)','(7,309.00)','(11,085.00)','(10,735.00)','(12,244.00)','(12,913.00)'],
-        ['FCF','41,454.00','44,590.00','49,900.00','69,778.00','53,200.00','51,147.00','64,121.00','58,896.00','73,365.00','92,953.00','108,506.00','112,285.00','120,120.00'],
-        ['Working Cap','19,111.00','29,628.00','5,083.00','8,768.00','27,863.00','27,831.00','14,473.00','57,101.00','38,321.00','9,355.00','–','–','–'],
         ['Total Debt','–','16,960.00','35,295.00','64,328.00','87,032.00','115,680.00','114,483.00','108,047.00','122,278.00','136,522.00','–','–','–'],
-        ['Sh\' Equity','118,210.00','123,549.00','111,547.00','119,355.00','128,249.00','134,047.00','107,147.00','90,488.00','65,339.00','63,090.00','–','–','–'],
-        ['ROA','28.54%','19.34%','18.01%','20.45%','14.93%','13.87%','16.07%','15.69%','17.33%','28.06%','28.40%','27.70%','27.00%'],
-        ['ROIC','38.76%','30.64%','26.95%','31.33%','25.33%','21.84%','28.53%','40.79%','42.87%','49.71%','–','–','–'],
-        ['ROE','42.84%','30.64%','33.61%','46.25%','36.90%','36.87%','49.36%','55.92%','73.69%','147.44%','156.00%','151.00%','141.00%'],     
         ['EBITDA','0.00','0.00','0.00','0.00','0.00','69,428','80,342','74,542','76,395','120,233','0.00','0.00','0.00']
     ]
     df = pd.DataFrame(data, columns=['YEAR','2012','2013','2014','2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'])
@@ -575,10 +541,13 @@ def get_stockrow_stock_data(ticker, debug):
     for header in table_rows_header:
       df.insert(index,header.text,[],True)
       index+=1
-
+    print("did we get any rows?")
+    print(table_rows)
     #Get rows of data.
     for tr in table_rows:
+
       if(tr.find_all('td')):
+        print(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip())
         if(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip() in ['Revenue','EBT','Net Income','PE Ratio','Earnings/Sh','Total Debt','Cash Flow/Sh','Book Value/Sh']):
           tds = tr.find_all('td', recursive=True)
           if(tds):
@@ -598,7 +567,8 @@ def get_stockrow_stock_data(ticker, debug):
 
     # reorder
     df = df.loc[:, cols]
-
+    print("df before df2 is populated. Does it contain data?")
+    print(df)
     page = get_page_selenium("https://www.wsj.com/market-data/quotes/%s/financials/annual/income-statement" % (ticker))
 
     soup = BeautifulSoup(page, 'html.parser')
@@ -642,7 +612,9 @@ def get_stockrow_stock_data(ticker, debug):
           break
 
     df = df.append(df2,ignore_index = True)    
-
+  #import pdb; pdb.set_trace()
+  print("df after merge")
+  print(df)
   #format the df
   df_transposed = df.T
   new_header = df_transposed.iloc[0] #grab the first row for the header
@@ -662,6 +634,7 @@ def get_stockrow_stock_data(ticker, debug):
     })  
 
   df_transposed['EBITDA'] = df_transposed['EBITDA'].fillna("–")
+  print("df_transposed before numeric conversion")
   print(df_transposed)
 
   #format numeric values in dataframe
@@ -1261,9 +1234,10 @@ def _util_check_diff_list(li1, li2):
 
 def dataframe_convert_to_numeric(df, column):
   #TODO: Deal with percentages and negative values in brackets
-
   try:
     df[column] = df[column].str.replace(',','').replace('–','0.00')
+    df[column] = df[column].str.replace('(','-')
+    df[column] = df[column].str.replace(')','')
   except KeyError as e:
     print(df)
     print(column)

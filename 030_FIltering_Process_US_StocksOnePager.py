@@ -42,6 +42,9 @@ debug = False
 
 def write_multiple_value(row, column_start, col_name):
     # Historical and Estimated data
+
+    #TODO: Rather than getting last 6 columns, look at current year, and get +2 projections, and -3 historical
+
     df = df_stockrow_data.iloc[-6:][col_name]
     df = df.to_frame()
     df = df.T
@@ -52,7 +55,7 @@ def write_multiple_value(row, column_start, col_name):
         column_start = column_start+1
 
 #################
-ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
+ticker = "CRM" # COMPANY TICKER - CHANGE HERE
 #################
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
