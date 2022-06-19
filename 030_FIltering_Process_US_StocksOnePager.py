@@ -40,6 +40,16 @@ from common import download_file, unzip_file, get_yf_key_stats
 
 debug = False
 
+#Dates
+todays_date = date.today()
+one_year_ago = dt(todays_date.year - 1, 12, 31)
+two_year_ago = dt(todays_date.year - 2, 12, 31)
+three_year_ago = dt(todays_date.year - 3, 12, 31)
+list_dates = []
+list_dates.append(one_year_ago)
+list_dates.append(two_year_ago)
+list_dates.append(three_year_ago)
+
 def write_multiple_value(row, column_start, col_name):
     # Historical and Estimated data
 
@@ -59,16 +69,6 @@ ticker = "CRM" # COMPANY TICKER - CHANGE HERE
 #################
 
 fmpcloud_account_key = '14afe305132a682a2742743df532707d'
-
-#Dates
-todays_date = date.today()
-one_year_ago = dt(todays_date.year - 1, 12, 31)
-two_year_ago = dt(todays_date.year - 2, 12, 31)
-three_year_ago = dt(todays_date.year - 3, 12, 31)
-list_dates = []
-list_dates.append(one_year_ago)
-list_dates.append(two_year_ago)
-list_dates.append(three_year_ago)
 
 temp_excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
 temp_sheet_name = 'Database US Companies'
