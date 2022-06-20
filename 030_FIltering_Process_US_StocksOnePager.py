@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta
 from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
 from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_api_json_data_no_file
 from common import combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
-from common import download_file, unzip_file, get_yf_key_stats
+from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -36,7 +36,13 @@ from common import download_file, unzip_file, get_yf_key_stats
 # - 'earningsHistory', - 'earningsTrend', - 'industryTrend', - 'indexTrend', 
 # - 'sectorTrend'
 
-# https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=financialData
+# TODO: Get Share Buyback for Quarter: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=cashflowStatementHistoryQuarterly
+# TODO: Get Share Buyback For Year: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=cashflowStatementHistory
+
+# TODO: Get Historical Quarterly Revenue Actual: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=incomeStatementHistoryQuarterly
+# TODO: Get Historical Quarterly Revenue Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsTrend
+
+# TODO: Get Historical Quarterly EPS Actual + Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsHistory
 
 debug = False
 
@@ -78,7 +84,7 @@ df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_she
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
-#df_wsj_ebitda = get_wsj_ebitda(ticker)
+#df_wsj_ebitda = get_yf_analysis(ticker)
 
 url_yf_modules = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/%s?modules=summaryProfile,financialData,summaryDetail,price,defaultKeyStatistics" % (ticker)
 json_yf_modules = json.loads(get_page(url_yf_modules).content)
@@ -99,7 +105,7 @@ json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surp
 # Get FMPCloud data for company company peers and company earnings surprises
 #TODO: Retrieve company peers metrics
 
-#Download SEC Filings
+#Download SEC Filings from FMPCLOUD
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
 #import pdb; pdb.set_trace()
 save_file_name = '/CompanySECFilings/%s.zip' % (ticker)

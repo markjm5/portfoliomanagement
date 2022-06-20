@@ -291,8 +291,7 @@ def get_yf_historical_stock_data(ticker, interval, start, end):
 
   return df_yf
 
-"""
-def get_yf_data(ticker):
+def get_yf_analysis(ticker):
   company = yf.Ticker(ticker)
   import pdb; pdb.set_trace()
   # get stock info
@@ -357,7 +356,6 @@ def get_yf_data(ticker):
   # get option chain for specific expiration
   opt = company.option_chain('YYYY-MM-DD')
   # data available via: opt.calls, opt.puts
-"""
 
 def get_yf_key_stats(ticker):
   df_company_data = pd.DataFrame()
