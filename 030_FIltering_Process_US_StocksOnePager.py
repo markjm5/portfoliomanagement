@@ -85,7 +85,7 @@ df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_she
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
 df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
-df_next_earnings_release, df_earnings_surprises, df_sales_surprises = get_zacks_earnings_surprises(ticker)
+df_zacks_next_earnings_release, df_zacks_earnings_surprises, df_zacks_sales_surprises = get_zacks_earnings_surprises(ticker)
 df_zacks_product_line, df_zacks_geography = get_zacks_product_line_geography(ticker)
 
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
