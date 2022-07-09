@@ -95,18 +95,34 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 # Get FMPCloud data for company company peers and company earnings surprises
 #url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
 url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
+#TODO: Replace with https://www.zacks.com/stock/research/AAPL/industry-comparison
 json_fmpcloud_company_peers = json.loads(get_page(url_company_peers).content)
 
 url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
+#TODO: Replace with https://www.zacks.com/stock/research/CRM/earnings-calendar
 json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surprises).content)
 
 #url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 
-# Get FMPCloud data for company company peers and company earnings surprises
+# Get FMPCloud data for company company peers 
 #TODO: Retrieve company peers metrics
 
+# Mkt Cap - df_zacks_stock_data['MARKET_CAP'].values[0]
+# EV - Can be calculated?
+# P/E - df_zacks_stock_data['PE_TTM'].values[0]
+# EV/EBITDA - Can be calculated using EBITDA? df_zacks_stock_data['EBITDA_MIL'].values[0]
+# EV/EBIT - Can be calculated using EBIT? df_zacks_stock_data['EBIT_MIL'].values[0]
+# EV/Revenues - Can be calculated?
+# PB - df_zacks_stock_data['PRICE_BOOK_RATIO'].values[0]
+# EBITDA margin - Can be calculated using EBITDA?
+# EBIT margin - Can be calculated using EBIT?
+# Net margin - df_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]
+# Dividend Yield - df_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
+# ROE - df_zacks_stock_data['CURRENT_ROE_TTM'].values[0]  
+
 #Download SEC Filings from FMPCLOUD
+#TODO: Add company sales by product line and geographic region: https://www.zacks.com/stock/research/CRM/key-company-metrics-details
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
 #import pdb; pdb.set_trace()
 save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
@@ -374,6 +390,10 @@ row = 42
 column = 8
 value = df_zacks_balance_sheet_shares_quarterly.iloc[0]['Treasury Stock']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+
+#TODO: Peer Compari
+
 
 print("Done!")
 
