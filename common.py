@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 import openpyxl
 import zipfile
 import json
+import copy
 import re
 import yfinance as yf
 import investpy as invest
@@ -821,12 +822,40 @@ def get_zacks_product_line_geography(ticker):
   table = soup.find_all('table')
 
   table_product_line_geography = soup.find_all('table')[2]
+  table_rows = table_product_line_geography.find_all('tr')
   
-  #TODO: Extract separate tables for "Revenue - Line of Business Segments" and "Revenue - Geographic Segments"
+  file_dict = {}
+  df = pd.DataFrame()
 
-  df_product_line_geography = convert_html_table_to_df(table_product_line_geography,False)
+  #Insert New Row. Format the data to show percentage as float
+  for tr in table_rows:
+    temp_row = []
+    table_rows_header = tr.find_all('th')
 
-  df_product_line_geography = df_product_line_geography.drop(['YR Estimate'], axis=1)
+    if(len(table_rows_header) > 0):
+      if(df.shape[0] > 0):
+        file_dict[header_text] = copy.copy(df)     
+        df = pd.DataFrame()
+      index = 0
+
+      for header in table_rows_header:
+        df.insert(index,str(header.text).strip(),[],True)
+        index+=1
+      header_text = table_rows_header[0].text
+      table_rows_header = []
+    else:
+      td = tr.find_all('td')
+      for obs in td:      
+        text = str(obs.text).strip()
+        temp_row.append(text)        
+
+      if(len(temp_row) == len(df.columns)):
+        df.loc[len(df.index)] = temp_row
+
+  df_product_line = file_dict['Revenue - Line of Business Segments']
+  df_geography = file_dict['Revenue - Geographic Segments']
+
+  #TODO: Clean up dataframes
 
   import pdb; pdb.set_trace()
 

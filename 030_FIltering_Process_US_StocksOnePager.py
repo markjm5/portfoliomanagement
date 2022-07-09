@@ -48,7 +48,7 @@ from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 debug = False
 
 #################
-ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
+ticker = "CRM" # COMPANY TICKER - CHANGE HERE
 #################
 
 #Dates
@@ -375,13 +375,13 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 ## Buyback Year
 row = 41
 column = 8
-value = df_zacks_balance_sheet_shares_annual.iloc[0]['Treasury Stock']
+value = df_zacks_balance_sheet_shares_annual.iloc[0]['TREASURY_STOCK']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ## Buyback Quarter
 row = 42
 column = 8
-value = df_zacks_balance_sheet_shares_quarterly.iloc[0]['Treasury Stock']
+value = df_zacks_balance_sheet_shares_quarterly.iloc[0]['TREASURY_STOCK']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 
