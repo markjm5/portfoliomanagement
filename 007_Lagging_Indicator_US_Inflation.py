@@ -14,7 +14,6 @@ def get_newyorkfed_target_rate(type, dimensions):
 
   resp = get_page(url)
   #resp = requests.get(url=url)
-
   json = resp.json() 
 
   df = pd.DataFrame(columns=["DATE",dimensions[0].upper()])

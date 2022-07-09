@@ -8,7 +8,7 @@ from datetime import date
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
 from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
-from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_api_json_data_no_file
+from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares, get_api_json_data_no_file
 from common import combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
 from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 #Sources:
@@ -82,6 +82,7 @@ temp_sheet_name = 'Database US Companies'
 #Get company data from various sources
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
+df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
 #df_wsj_ebitda = get_yf_analysis(ticker)
@@ -353,6 +354,25 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 row = 39
 column = 7
 value = df_yf_key_statistics['200_DAY_MOVING_AVG'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+
+## 50 Day Moving Average
+row = 39
+column = 7
+value = df_yf_key_statistics['200_DAY_MOVING_AVG'].values[0]
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+## Buyback Year
+row = 41
+column = 8
+value = df_zacks_balance_sheet_shares_annual.iloc[0]['Treasury Stock']
+write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+## Buyback Quarter
+row = 42
+column = 8
+value = df_zacks_balance_sheet_shares_quarterly.iloc[0]['Treasury Stock']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 print("Done!")

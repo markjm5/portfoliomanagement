@@ -615,10 +615,13 @@ def get_stockrow_stock_data(ticker, debug):
   print("df after merge")
   print(df)
   #format the df
-  df_transposed = df.T
-  new_header = df_transposed.iloc[0] #grab the first row for the header
-  df_transposed = df_transposed[1:] #take the data less the header row
-  df_transposed.columns = new_header #set the header row as the df header
+
+  df_transposed = transpose_df(df)
+
+  #df_transposed = df.T
+  #new_header = df_transposed.iloc[0] #grab the first row for the header
+  #df_transposed = df_transposed[1:] #take the data less the header row
+  #df_transposed.columns = new_header #set the header row as the df header
   
   df_transposed = df_transposed.rename(columns={
     "Revenue":"SALES",          
@@ -666,6 +669,28 @@ def get_stockrow_stock_data(ticker, debug):
   df_transposed = df_transposed.loc[list_dates]
 
   return df_transposed
+
+def get_zacks_balance_sheet_shares(ticker):
+  df_balance_sheet_annual = pd.DataFrame()
+  df_balance_sheet_quarterly = pd.DataFrame()
+
+  #only balance sheet that shows treasury stock line item
+  page = get_page('https://www.zacks.com/stock/quote/%s/balance-sheet' % (ticker))
+
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  table = soup.find_all('table')
+
+  table_annual = table[4]
+  table_quarterly = table[7]
+
+  df_balance_sheet_annual = convert_html_table_to_df(table_annual,False)
+  df_balance_sheet_quarterly = convert_html_table_to_df(table_quarterly,False)
+
+  df_balance_sheet_annual = transpose_df(df_balance_sheet_annual)
+  df_balance_sheet_quarterly = transpose_df(df_balance_sheet_quarterly)
+
+  return df_balance_sheet_annual, df_balance_sheet_quarterly
 
 def get_api_json_data(url, filename):
 
@@ -1261,3 +1286,12 @@ def dataframe_convert_to_numeric(df, column):
   df[column] = pd.to_numeric(df[column])
 
   return df
+
+def transpose_df(df):
+  df = df.T
+  new_header = df.iloc[0] #grab the first row for the header
+  df = df[1:] #take the data less the header row
+  df.columns = new_header #set the header row as the df header
+
+  return df
+
