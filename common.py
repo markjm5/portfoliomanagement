@@ -689,8 +689,57 @@ def get_zacks_balance_sheet_shares(ticker):
   df_balance_sheet_quarterly = convert_html_table_to_df(table_quarterly,False)
 
   df_balance_sheet_annual = transpose_df(df_balance_sheet_annual)
-  df_balance_sheet_quarterly = transpose_df(df_balance_sheet_quarterly)
 
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Preferred Stock":"PREFERRED_STOCK"})                        
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Common Stock (Par)":"COMMON_STOCK_PAR"})                          
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Capital Surplus":"CAPITAL_SURPLUS"})                             
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Retained Earnings":"RETAINED_EARNINGS"})                           
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Other Equity":"OTHER_EQUITY"})                                
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Treasury Stock":"TREASURY_STOCK"})                              
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Total Shareholder's Equity":"TOTAL_SHAREHOLDERS_EQUITY"})                  
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Total Liabilities & Shareholder's Equity":"TOTAL_LIABILITIES_SHAREHOLDERS_EQUITY"})    
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Total Common Equity":"TOTAL_COMMON_EQUITY"})                         
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Shares Outstanding":"SHARES_OUTSTANDING"})                          
+  df_balance_sheet_annual = df_balance_sheet_annual.rename(columns={"Book Value Per Share":"BOOK_VALUE_PER_SHARE"})  
+
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'PREFERRED_STOCK')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'COMMON_STOCK_PAR')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'CAPITAL_SURPLUS')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'RETAINED_EARNINGS')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'OTHER_EQUITY')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'TREASURY_STOCK')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'TOTAL_SHAREHOLDERS_EQUITY')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'TOTAL_LIABILITIES_SHAREHOLDERS_EQUITY')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'TOTAL_COMMON_EQUITY')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'SHARES_OUTSTANDING')
+  df_balance_sheet_annual = dataframe_convert_to_numeric(df_balance_sheet_annual,'BOOK_VALUE_PER_SHARE')
+
+  df_balance_sheet_quarterly = transpose_df(df_balance_sheet_quarterly)
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Preferred Stock":"PREFERRED_STOCK"})                        
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Common Stock (Par)":"COMMON_STOCK_PAR"})                          
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Capital Surplus":"CAPITAL_SURPLUS"})                             
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Retained Earnings":"RETAINED_EARNINGS"})                           
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Other Equity":"OTHER_EQUITY"})                                
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Treasury Stock":"TREASURY_STOCK"})                              
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Total Shareholder's Equity":"TOTAL_SHAREHOLDERS_EQUITY"})                  
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Total Liabilities & Shareholder's Equity":"TOTAL_LIABILITIES_SHAREHOLDERS_EQUITY"})    
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Total Common Equity":"TOTAL_COMMON_EQUITY"})                         
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Shares Outstanding":"SHARES_OUTSTANDING"})                          
+  df_balance_sheet_quarterly = df_balance_sheet_quarterly.rename(columns={"Book Value Per Share":"BOOK_VALUE_PER_SHARE"})  
+
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'PREFERRED_STOCK')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'COMMON_STOCK_PAR')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'CAPITAL_SURPLUS')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'RETAINED_EARNINGS')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'OTHER_EQUITY')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'TREASURY_STOCK')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'TOTAL_SHAREHOLDERS_EQUITY')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'TOTAL_LIABILITIES_SHAREHOLDERS_EQUITY')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'TOTAL_COMMON_EQUITY')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'SHARES_OUTSTANDING')
+  df_balance_sheet_quarterly = dataframe_convert_to_numeric(df_balance_sheet_quarterly,'BOOK_VALUE_PER_SHARE')
+
+  import pdb;pdb.set_trace()
   return df_balance_sheet_annual, df_balance_sheet_quarterly
 
 def get_zacks_peer_comparison(ticker):
@@ -712,7 +761,7 @@ def get_zacks_peer_comparison(ticker):
   return df_peer_comparison
 
 def get_zacks_earnings_surprises(ticker):
-  df_next_earnings_release = pd.DataFrame()
+  df_earnings_release_date = pd.DataFrame()
   df_earnings_surprises = pd.DataFrame()
   df_sales_surprises = pd.DataFrame()
 
@@ -724,6 +773,9 @@ def get_zacks_earnings_surprises(ticker):
   #Get Earnings Release Date
   table_earnings_release_date = soup.find_all('table')[2]
   df_earnings_release_date = convert_html_table_to_df(table_earnings_release_date,True)
+  df_earnings_release_date['Release Date'] = df_earnings_release_date['Report Date'].str[:10]
+  df_earnings_release_date = df_earnings_release_date.drop(['Zacks Consensus Estimate', 'Earnings ESP','Report Date'], axis=1)
+  df_earnings_release_date['Release Date'] = pd.to_datetime(df_earnings_release_date['Release Date'],format='%m/%d/%Y')
 
   #Need to extract Earnings and Sales Surprises data from json object in javascript on page
   scripts = soup.find_all('script')[29]
@@ -738,12 +790,20 @@ def get_zacks_earnings_surprises(ticker):
   list_earnings_announcements_sales = json_object['earnings_announcements_sales_table']
 
   df_earnings_surprises = convert_list_to_df(list_earnings_announcements_earnings)
-  df_sales_surprises = convert_list_to_df(list_earnings_announcements_sales)
+  df_earnings_surprises = df_earnings_surprises.drop(df_earnings_surprises.iloc[:, 4:7],axis = 1)
+  df_earnings_surprises.rename(columns={ df_earnings_surprises.columns[0]: "Date",df_earnings_surprises.columns[1]: "Period",df_earnings_surprises.columns[2]: "Estimate",df_earnings_surprises.columns[3]: "Reported" }, inplace = True)
+  df_earnings_surprises['Date'] = pd.to_datetime(df_earnings_surprises['Date'],format='%m/%d/%y')
+  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'Estimate')
+  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'Reported')
 
-  #TODO: Format all data frames
-  import pdb; pdb.set_trace()
-  
-  return df_next_earnings_release, df_earnings_surprises, df_sales_surprises
+  df_sales_surprises = convert_list_to_df(list_earnings_announcements_sales)
+  df_sales_surprises = df_sales_surprises.drop(df_sales_surprises.iloc[:, 4:7],axis = 1)
+  df_sales_surprises.rename(columns={ df_sales_surprises.columns[0]: "Date",df_sales_surprises.columns[1]: "Period",df_sales_surprises.columns[2]: "Estimate",df_sales_surprises.columns[3]: "Reported" }, inplace = True)
+  df_sales_surprises['Date'] = pd.to_datetime(df_sales_surprises['Date'],format='%m/%d/%y')
+  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'Estimate')
+  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'Reported')
+
+  return df_earnings_release_date, df_earnings_surprises, df_sales_surprises
 
 def get_zacks_product_line_geography(ticker):
   df_product_line= pd.DataFrame()
@@ -1349,6 +1409,9 @@ def _util_check_diff_list(li1, li2):
 def dataframe_convert_to_numeric(df, column):
   #TODO: Deal with percentages and negative values in brackets
   try:
+    df[column] = df[column].str.replace('NA','')
+    df[column] = df[column].str.replace('$','')
+    df[column] = df[column].str.replace('--','')
     df[column] = df[column].str.replace(',','').replace('–','0.00')
     df[column] = df[column].str.replace('(','-', regex=True)
     df[column] = df[column].str.replace(')','', regex=True)
