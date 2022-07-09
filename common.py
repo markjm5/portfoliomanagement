@@ -7,6 +7,7 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 import openpyxl
 import zipfile
+import json
 import re
 import yfinance as yf
 import investpy as invest
@@ -692,6 +693,72 @@ def get_zacks_balance_sheet_shares(ticker):
 
   return df_balance_sheet_annual, df_balance_sheet_quarterly
 
+def get_zacks_peer_comparison(ticker):
+  df_peer_comparison = pd.DataFrame()
+  url = "https://www.zacks.com/stock/research/%s/industry-comparison" % (ticker)
+
+  page = get_page(url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+  table = soup.find_all('table')
+
+  table_peer_comparison = table[2]
+
+  df_peer_comparison = convert_html_table_to_df(table_peer_comparison,True)
+  new = df_peer_comparison["Symbol"].str.split(' ',n=1,expand=True)
+  df_peer_comparison["Ticker"] = new[0]
+
+  df_peer_comparison = df_peer_comparison.drop(['Zacks Rank', 'Symbol'], axis=1)
+
+  return df_peer_comparison
+
+def get_zacks_earnings_surprises(ticker):
+  df_next_earnings_release = pd.DataFrame()
+  df_earnings_surprises = pd.DataFrame()
+  df_sales_surprises = pd.DataFrame()
+
+  url = "https://www.zacks.com/stock/research/%s/earnings-calendar" % (ticker)
+
+  page = get_page(url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+
+  #Get Earnings Release Date
+  table_earnings_release_date = soup.find_all('table')[2]
+  df_earnings_release_date = convert_html_table_to_df(table_earnings_release_date,True)
+
+  #Need to extract Earnings and Sales Surprises data from json object in javascript on page
+  scripts = soup.find_all('script')[29]
+  match_pattern = re.compile(r'(?<=\= ).*\}')
+  match_string = scripts.text.strip().replace('\n','')
+  matches = match_pattern.findall(match_string)
+  match_string = matches[0]
+
+  json_object = json.loads(match_string)
+
+  list_earnings_announcements_earnings = json_object['earnings_announcements_earnings_table']
+  list_earnings_announcements_sales = json_object['earnings_announcements_sales_table']
+
+  df_earnings_surprises = convert_list_to_df(list_earnings_announcements_earnings)
+  df_sales_surprises = convert_list_to_df(list_earnings_announcements_sales)
+
+  #TODO: Format all data frames
+  import pdb; pdb.set_trace()
+  
+  return df_next_earnings_release, df_earnings_surprises, df_sales_surprises
+
+def get_zacks_product_line_geography(ticker):
+  df_product_line= pd.DataFrame()
+  df_geography = pd.DataFrame()
+
+  url = "https://www.zacks.com/stock/research/%s/key-company-metrics-details" % (ticker)
+
+  page = get_page(url)
+  soup = BeautifulSoup(page.content, 'html.parser')
+  table = soup.find_all('table')
+
+  import pdb; pdb.set_trace()
+
+  return df_product_line, df_geography
+
 def get_api_json_data(url, filename):
 
     #check if current file has todays system date, and if it does load from current file. Otherwise, continue to call the api
@@ -1247,6 +1314,12 @@ def convert_html_table_to_df(table, contains_th):
     if(len(temp_row) == len(df.columns)):
       df.loc[len(df.index)] = temp_row
   
+  return df
+
+def convert_list_to_df(list):
+
+  df = pd.DataFrame(list)
+
   return df
 
 #Util function for transforming ISM data on sheet 016

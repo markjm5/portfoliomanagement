@@ -9,6 +9,7 @@ from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
 from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
 from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares, get_api_json_data_no_file
+from common import get_zacks_peer_comparison, get_zacks_earnings_surprises, get_zacks_product_line_geography
 from common import combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
 from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 #Sources:
@@ -83,6 +84,10 @@ temp_sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
+df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
+df_zacks_earnings_surprises = get_zacks_earnings_surprises(ticker)
+df_zacks_product_line, df_zacks_geography = get_zacks_product_line_geography(ticker)
+
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
 #df_wsj_ebitda = get_yf_analysis(ticker)
@@ -92,20 +97,9 @@ json_yf_modules = json.loads(get_page(url_yf_modules).content)
 
 df_yf_key_statistics = get_yf_key_stats(ticker)
 
-# Get FMPCloud data for company company peers and company earnings surprises
-#url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
-url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
-#TODO: Replace with https://www.zacks.com/stock/research/AAPL/industry-comparison
-json_fmpcloud_company_peers = json.loads(get_page(url_company_peers).content)
-
-url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
-#TODO: Replace with https://www.zacks.com/stock/research/CRM/earnings-calendar
-json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surprises).content)
-
 #url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 
-# Get FMPCloud data for company company peers 
 #TODO: Retrieve company peers metrics
 
 # Mkt Cap - df_zacks_stock_data['MARKET_CAP'].values[0]
@@ -122,9 +116,8 @@ json_fmpcloud_earnings_surprises = json.loads(get_page(url_company_earnings_surp
 # ROE - df_zacks_stock_data['CURRENT_ROE_TTM'].values[0]  
 
 #Download SEC Filings from FMPCLOUD
-#TODO: Add company sales by product line and geographic region: https://www.zacks.com/stock/research/CRM/key-company-metrics-details
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-#import pdb; pdb.set_trace()
+
 save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
 save_file_directory = '/CompanySECFilings/%s' % (ticker)
 download_file(url_company_sec_filings, save_file_name)
@@ -392,153 +385,15 @@ value = df_zacks_balance_sheet_shares_quarterly.iloc[0]['Treasury Stock']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 
-#TODO: Peer Compari
-
-
 print("Done!")
 
 """
-Company:
-Sales
-EBITDA
-Operating Profit (EBIT)
-Net income
-P/E ratio
-EPS
-Debt /EBITDA
-Cash Flow per share
-Book Value per share
-
-Competition:
-Mkt Cap
-EV
-P/E
-EV/EBITDA
-EV/EBIT
-EV/Revenues
-PB
-EBITDA margin
-EBIT margin
-Net margin
-Dividend Yield
-ROE
-
-
 # Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
 # Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
 # Competitors: https://www.marketwatch.com/investing/stock/crm
 
-#fmpcloud urls:
-url_company_profile = "https://fmpcloud.io/api/v3/profile/%s?apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_key_metrics = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s"  % (ticker,fmpcloud_account_key)
-url_company_peers = "https://fmpcloud.io/api/v4/stock_peers?symbol=%s&apikey=%s"  % (ticker,fmpcloud_account_key)
-url_company_earnings_surprises = "https://fmpcloud.io/api/v3/earnings-surpises/%s?apikey=%s"  % (ticker,fmpcloud_account_key)
-url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_income_statement = "https://fmpcloud.io/api/v3/income-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_balance_sheet = "https://fmpcloud.io/api/v3/balance-sheet-statement/%s?limit=120&apikey=%s" % (ticker,fmpcloud_account_key)
-#url_company_cash_flow_statement = "https://fmpcloud.io/api/v3/cash-flow-statement/%s?limit=120&apikey=1%s" % (ticker,fmpcloud_account_key)
-#url_company_financial_growth = "https://fmpcloud.io/api/v3/financial-growth/%s?limit=20&apikey=%s" % (ticker,fmpcloud_account_key)
-
-
-#print(df_zacks_stock_data)
-#print(df_finwiz_stock_data)
-#print(df_nasdaq_company_data)
-
-
-Company Name
-Ticker
-Description of company
-Sector
-Industry
-5y historical sales growth
-Sales Growth Current Year (F1)
-Earnings Growth Current Year (F1)
-Projected Earnings Growth Next Year (F2)
-Dividend Yield %
-Operating Margin 12 Month %
-Net Martin %
-Quick Ratio
-Current Ratio
-Debt/Equity Ratio
-Debt/Total Capital
-Price/Sales
-Price/Book
-Current ROE
-
-Last
-52 week high
-52 week low
-YTD change/%
-Mkt Cap
-EV
-Days to Cover
-Target Price
-Trailing P/E
-Forward P/E
-PEG
-Dividend 2019
-Div. yield
-Beta
-Price to book
-ROE
-Exchange
-Sector
-Industry
-Website
-
-Current, Y-1, Y-2, Y+1(E), Y+2(E), Y+3(E)
--------------------------
-Sales
-yoy
-EBITDA
-EBITDA margin
-Operating Profit (EBIT)
-EBIT margin
-Net income
-Net Margin
-P/E ratio
-EPS
-yoy
-EV/EBITDA
-EV/EBIT
-EV/Revenues
-Debt
-EBITDA
-Debt /EBITDA
-Cash Flow per share
-Book Value per share
-----------------------
-
-Volume
-Avg Vol 10 days
-Avg Vol 3Months
-
-50 MAV
-200 MAV
-
-Buyback Year
-Buyback Quarter
-
-Sales Per Region
-
-Competitors x4
----------------
-Mkt Cap
-EV
-P/E
-EV/EBITDA
-EV/EBIT
-EV/Revenues
-PB
-EBITDA margin
-EBIT margin
-Net margin
-Dividend Yield
-ROE
-
 Historical Earnings Surprises
-
+url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
 #nasdaq urls:
 url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/EE.json?api_key=%s" % (nasdaq_data_api_key)
 data_earnings_estimates = get_api_json_data_no_file(url)
