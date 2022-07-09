@@ -820,6 +820,14 @@ def get_zacks_product_line_geography(ticker):
   soup = BeautifulSoup(page.content, 'html.parser')
   table = soup.find_all('table')
 
+  table_product_line_geography = soup.find_all('table')[2]
+  
+  #TODO: Extract separate tables for "Revenue - Line of Business Segments" and "Revenue - Geographic Segments"
+
+  df_product_line_geography = convert_html_table_to_df(table_product_line_geography,False)
+
+  df_product_line_geography = df_product_line_geography.drop(['YR Estimate'], axis=1)
+
   import pdb; pdb.set_trace()
 
   return df_product_line, df_geography
@@ -1415,7 +1423,7 @@ def dataframe_convert_to_numeric(df, column):
   #TODO: Deal with percentages and negative values in brackets
   try:
     df[column] = df[column].str.replace('NA','')
-    df[column] = df[column].str.replace('$','')
+    df[column] = df[column].str.replace('$','', regex=False)
     df[column] = df[column].str.replace('--','')
     df[column] = df[column].str.replace(',','').replace('–','0.00')
     df[column] = df[column].str.replace('(','-', regex=True)
