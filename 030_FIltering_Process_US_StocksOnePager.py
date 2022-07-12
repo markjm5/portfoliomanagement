@@ -48,7 +48,7 @@ from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 debug = True
 
 #################
-ticker = "CRM" # COMPANY TICKER - CHANGE HERE
+ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
 
 #Dates

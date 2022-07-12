@@ -859,16 +859,18 @@ def get_zacks_product_line_geography(ticker):
   df_product_line = file_dict['Revenue - Line of Business Segments']
   df_geography = file_dict['Revenue - Geographic Segments']
 
-  #TODO: Clean up dataframes
+  # Clean up dataframes
   df_product_line = df_product_line.drop(columns='YR Estimate', axis=1)
   df_product_line = df_product_line.iloc[:, 0:2]
   colname = df_product_line.columns[1]
   df_product_line = dataframe_convert_to_numeric(df_product_line,colname)
+  df_product_line = df_product_line.iloc[:4,:]
 
   df_geography = df_geography.drop(columns='YR Estimate', axis=1)
   df_geography = df_geography.iloc[:, 0:2]
   colname = df_geography.columns[1]
   df_geography = dataframe_convert_to_numeric(df_geography,colname)
+  df_geography = df_geography.iloc[:4,:]
 
   return df_product_line, df_geography
 
