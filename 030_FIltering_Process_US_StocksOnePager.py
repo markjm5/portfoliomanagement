@@ -45,10 +45,10 @@ from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 
 # TODO: Get Historical Quarterly EPS Actual + Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsHistory
 
-debug = False
+debug = True
 
 #################
-ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
+ticker = "CRM" # COMPANY TICKER - CHANGE HERE
 #################
 
 #Dates
@@ -87,7 +87,6 @@ df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = 
 df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
 df_zacks_next_earnings_release, df_zacks_earnings_surprises, df_zacks_sales_surprises = get_zacks_earnings_surprises(ticker)
 df_zacks_product_line, df_zacks_geography = get_zacks_product_line_geography(ticker)
-import pdb; pdb.set_trace()
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
 #df_wsj_ebitda = get_yf_analysis(ticker)
@@ -114,7 +113,7 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 # Net margin - df_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]
 # Dividend Yield - df_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
 # ROE - df_zacks_stock_data['CURRENT_ROE_TTM'].values[0]  
-
+"""
 #Download SEC Filings from FMPCLOUD
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
 
@@ -122,7 +121,7 @@ save_file_name = '/CompanySECFilings/%s.zip' % (ticker)
 save_file_directory = '/CompanySECFilings/%s' % (ticker)
 download_file(url_company_sec_filings, save_file_name)
 unzip_file(save_file_directory,save_file_name)
-
+"""
 #Now that we have retrieved all the data, lets start writing them to the excel template
 #Excel file where we will create our one pager
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_StocksOnePager.xlsm'
@@ -264,7 +263,7 @@ write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
 ##Company Description
 row = 44
-column = 10
+column = 12
 value = json_yf_modules['quoteSummary']['result'][0]['summaryProfile']['longBusinessSummary']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
 
@@ -383,6 +382,43 @@ row = 42
 column = 8
 value = df_zacks_balance_sheet_shares_quarterly.iloc[0]['TREASURY_STOCK']
 write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value)
+
+# Sales Per Region
+row_start = 44
+column1 = 3
+column2 = 4
+
+for index, row in df_zacks_geography.iterrows():
+    value1 = row[0]
+    value2 = row[1]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column1, value1)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column2, value2)
+    row_start = row_start+1
+
+# Sales Per Product Line
+#df_zacks_product_line
+row_start = 44
+column1 = 8
+column2 = 9
+
+for index, row in df_zacks_product_line.iterrows():
+    value1 = row[0]
+    value2 = row[1]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column1, value1)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column2, value2)
+    row_start = row_start+1
+
+
+# Competitors
+#df_zacks_peer_comparison
+
+# Competitor Metrics
+
+# Historical Surprises
+#df_zacks_earnings_surprises, df_zacks_sales_surprises
+
+# Upcoming Events
+#df_zacks_next_earnings_release, 
 
 
 print("Done!")
