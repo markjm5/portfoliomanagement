@@ -408,9 +408,18 @@ for index, row in df_zacks_product_line.iterrows():
     write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column2, value2)
     row_start = row_start+1
 
-
 # Competitors
 #df_zacks_peer_comparison
+row_start = 7
+column1 = 11
+column2 = 12
+
+for index, row in df_zacks_peer_comparison.iterrows():
+    value1 = row[0]
+    value2 = row[1]
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column1, value1)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column2, value2)
+    row_start = row_start+1
 
 # Competitor Metrics
 
