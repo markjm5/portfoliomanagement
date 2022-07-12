@@ -765,6 +765,8 @@ def get_zacks_peer_comparison(ticker):
   df_peer_comparison = df_peer_comparison.drop(['Zacks Rank', 'Symbol'], axis=1)
   df_peer_comparison = df_peer_comparison[df_peer_comparison.Ticker != ticker]
 
+  df_peer_comparison = df_peer_comparison.iloc[:4,:]
+
   return df_peer_comparison
 
 def get_zacks_earnings_surprises(ticker):
