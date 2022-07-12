@@ -48,7 +48,7 @@ from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
 debug = False
 
 #################
-ticker = "CRM" # COMPANY TICKER - CHANGE HERE
+ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
 #################
 
 #Dates
@@ -87,7 +87,7 @@ df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = 
 df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
 df_zacks_next_earnings_release, df_zacks_earnings_surprises, df_zacks_sales_surprises = get_zacks_earnings_surprises(ticker)
 df_zacks_product_line, df_zacks_geography = get_zacks_product_line_geography(ticker)
-
+import pdb; pdb.set_trace()
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
 #df_wsj_ebitda = get_yf_analysis(ticker)

@@ -812,8 +812,9 @@ def get_zacks_earnings_surprises(ticker):
   return df_earnings_release_date, df_earnings_surprises, df_sales_surprises
 
 def get_zacks_product_line_geography(ticker):
-  df_product_line= pd.DataFrame()
+  df_product_line = pd.DataFrame()
   df_geography = pd.DataFrame()
+  pd.set_option('display.max_colwidth', None)
 
   url = "https://www.zacks.com/stock/research/%s/key-company-metrics-details" % (ticker)
 
@@ -846,7 +847,10 @@ def get_zacks_product_line_geography(ticker):
     else:
       td = tr.find_all('td')
       for obs in td:      
-        text = str(obs.text).strip()
+        if(obs.p):
+          text = obs.p.attrs['title']
+        else:
+          text = str(obs.text).strip()
         temp_row.append(text)        
 
       if(len(temp_row) == len(df.columns)):
@@ -856,8 +860,15 @@ def get_zacks_product_line_geography(ticker):
   df_geography = file_dict['Revenue - Geographic Segments']
 
   #TODO: Clean up dataframes
+  df_product_line = df_product_line.drop(columns='YR Estimate', axis=1)
+  df_product_line = df_product_line.iloc[:, 0:2]
+  colname = df_product_line.columns[1]
+  df_product_line = dataframe_convert_to_numeric(df_product_line,colname)
 
-  import pdb; pdb.set_trace()
+  df_geography = df_geography.drop(columns='YR Estimate', axis=1)
+  df_geography = df_geography.iloc[:, 0:2]
+  colname = df_geography.columns[1]
+  df_geography = dataframe_convert_to_numeric(df_geography,colname)
 
   return df_product_line, df_geography
 
