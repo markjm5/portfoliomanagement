@@ -85,7 +85,7 @@ df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_she
 df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
 df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
-df_zacks_next_earnings_release, df_zacks_earnings_surprises, df_zacks_sales_surprises = get_zacks_earnings_surprises(ticker)
+df_zacks_next_earnings_release, df_zacks_earnings_surprises = get_zacks_earnings_surprises(ticker)
 df_zacks_product_line, df_zacks_geography = get_zacks_product_line_geography(ticker)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
 df_stockrow_data = get_stockrow_stock_data(ticker, debug)
@@ -424,7 +424,29 @@ for index, row in df_zacks_peer_comparison.iterrows():
 # Competitor Metrics
 
 # Historical Surprises
-#df_zacks_earnings_surprises, df_zacks_sales_surprises
+#df_zacks_earnings_surprises
+row_start = 32
+column_period = 10
+column_estimate = 12
+column_reported = 13
+
+for index, row in df_zacks_earnings_surprises.iterrows():
+    period = row[1]
+    eps_estimate = row[2]
+    eps_reported = row[3]
+    sales_estimate = row[4]
+    sales_reported = row[5]
+
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column_period, period)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column_estimate, sales_estimate)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start, column_reported, sales_reported)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start + 1, column_estimate, eps_estimate)
+    write_value_to_cell_excel(excel_file_path,sheet_name, row_start + 1, column_reported, eps_reported)
+
+    row_start = row_start+2
+
+
+
 
 # Upcoming Events
 #df_zacks_next_earnings_release, 

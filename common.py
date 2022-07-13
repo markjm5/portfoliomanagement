@@ -800,19 +800,23 @@ def get_zacks_earnings_surprises(ticker):
 
   df_earnings_surprises = convert_list_to_df(list_earnings_announcements_earnings)
   df_earnings_surprises = df_earnings_surprises.drop(df_earnings_surprises.iloc[:, 4:7],axis = 1)
-  df_earnings_surprises.rename(columns={ df_earnings_surprises.columns[0]: "Date",df_earnings_surprises.columns[1]: "Period",df_earnings_surprises.columns[2]: "Estimate",df_earnings_surprises.columns[3]: "Reported" }, inplace = True)
-  df_earnings_surprises['Date'] = pd.to_datetime(df_earnings_surprises['Date'],format='%m/%d/%y')
-  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'Estimate')
-  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'Reported')
+  df_earnings_surprises.rename(columns={ df_earnings_surprises.columns[0]: "DATE",df_earnings_surprises.columns[1]: "PERIOD",df_earnings_surprises.columns[2]: "EPS_ESTIMATE",df_earnings_surprises.columns[3]: "EPS_REPORTED" }, inplace = True)
+  df_earnings_surprises['DATE'] = pd.to_datetime(df_earnings_surprises['DATE'],format='%m/%d/%y')
+  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'EPS_ESTIMATE')
+  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'EPS_REPORTED')
 
   df_sales_surprises = convert_list_to_df(list_earnings_announcements_sales)
   df_sales_surprises = df_sales_surprises.drop(df_sales_surprises.iloc[:, 4:7],axis = 1)
-  df_sales_surprises.rename(columns={ df_sales_surprises.columns[0]: "Date",df_sales_surprises.columns[1]: "Period",df_sales_surprises.columns[2]: "Estimate",df_sales_surprises.columns[3]: "Reported" }, inplace = True)
-  df_sales_surprises['Date'] = pd.to_datetime(df_sales_surprises['Date'],format='%m/%d/%y')
-  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'Estimate')
-  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'Reported')
+  df_sales_surprises.rename(columns={ df_sales_surprises.columns[0]: "DATE",df_sales_surprises.columns[1]: "PERIOD",df_sales_surprises.columns[2]: "SALES_ESTIMATE",df_sales_surprises.columns[3]: "SALES_REPORTED" }, inplace = True)
+  df_sales_surprises['DATE'] = pd.to_datetime(df_sales_surprises['DATE'],format='%m/%d/%y')
+  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'SALES_ESTIMATE')
+  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'SALES_REPORTED')
 
-  return df_earnings_release_date, df_earnings_surprises, df_sales_surprises
+  new_df_earnings = pd.merge(df_earnings_surprises, df_sales_surprises,  how='left', left_on=['DATE','PERIOD'], right_on = ['DATE','PERIOD'])
+
+  new_df_earnings = new_df_earnings.iloc[:4,:]
+
+  return df_earnings_release_date, new_df_earnings
 
 def get_zacks_product_line_geography(ticker):
   df_product_line = pd.DataFrame()
