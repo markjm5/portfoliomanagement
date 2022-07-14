@@ -56,7 +56,6 @@ df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME"
     "Debt/Equity Ratio": "DEBT_EQUITY_RATIO",
     "Current Ratio": "CURRENT_RATIO",
     "Quick Ratio": "QUICK_RATIO",
-
     "52 Week High": "52_WEEK_HIGH",
     "52 Week Low": "52_WEEK_LOW",
     "Beta": "BETA",
@@ -65,7 +64,10 @@ df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME"
     "EBITDA ($mil)": "EBITDA_MIL",	
     "EBIT ($mil)": "EBIT_MIL",	
     "Avg Volume": "AVG_VOLUME",	
-    "Dividend ": "DIVIDEND"
+    "Dividend ": "DIVIDEND",
+    "Current Assets  ($mil)": "CURRENT_ASSETS(MILLION)",	
+    "Current Liabilities ($mil)": "CURRENT_LIABILITIES(MILLION)",	
+    "Long Term Debt ($mil)": "LONG_TERM_DEBT(MILLION)"
 })
 
 # Write the updated df back to the excel sheet

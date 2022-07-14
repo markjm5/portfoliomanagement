@@ -1,17 +1,14 @@
+from json.encoder import py_encode_basestring
+from numpy import subtract
 import pandas as pd
 import json
-#import calendar
-import requests
-from pandas.tseries.offsets import BDay
-from bs4 import BeautifulSoup
 from datetime import date
 from datetime import datetime as dt
-from dateutil.relativedelta import relativedelta
-from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data, write_dataframe_to_excel
-from common import get_api_json_data,get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares, get_api_json_data_no_file
+from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data
+from common import get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares
 from common import get_zacks_peer_comparison, get_zacks_earnings_surprises, get_zacks_product_line_geography
-from common import combine_df_on_index, write_value_to_cell_excel, check_sheet_exists, create_sheet
-from common import download_file, unzip_file, get_yf_key_stats, get_yf_analysis
+from common import write_value_to_cell_excel, check_sheet_exists, create_sheet
+from common import download_file, unzip_file, get_yf_key_stats
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -100,7 +97,7 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 
 df_peer_metrics = pd.DataFrame(columns=['TICKER','MARKET_CAP','EV','PE','EV_EBITDA','EV_EBIT','EV_REVENUE','PB','EBITDA_MARGIN','EBIT_MARGIN','NET_MARGIN','DIVIDEND_YIELD','ROE'])
-#TODO: Retrieve company peers metrics
+#Retrieve company peers metrics
 for row,peer in df_zacks_peer_comparison.iterrows():
     temp_row = []
     peer_ticker = peer[1]
@@ -108,11 +105,35 @@ for row,peer in df_zacks_peer_comparison.iterrows():
     if(len(df_peer_zacks_stock_data) > 0):
 
         peer_market_cap = df_peer_zacks_stock_data['MARKET_CAP'].values[0]
-        peer_ev = 0 # EV - Can be calculated?
+
+        #Calculate EV
+        peer_current_assets = df_peer_zacks_stock_data['CURRENT_ASSETS(MILLION)']
+        peer_current_liabilities = df_peer_zacks_stock_data['CURRENT_LIABILITIES(MILLION)']	
+        peer_long_term_debt = df_peer_zacks_stock_data['LONG_TERM_DEBT(MILLION)']
+
+        try:
+            peer_ev = round(peer_market_cap + ((peer_current_liabilities + peer_long_term_debt) - peer_current_assets),2)            
+
+        except ArithmeticError:
+            peer_ev = 0
+
         peer_pe = df_peer_zacks_stock_data['PE_TTM'].values[0]
-        peer_ev_ebitda = 0 # EV/EBITDA - Can be calculated using EBITDA? df_peer_zacks_stock_data['EBITDA_MIL'].values[0]
-        peer_ev_ebit = 0 # EV/EBIT - Can be calculated using EBIT? df_peer_zacks_stock_data['EBIT_MIL'].values[0]
-        peer_ev_revenue = 0 # EV/Revenues - Can be calculated?
+
+        try:
+            peer_ev_ebitda = round(peer_ev/df_peer_zacks_stock_data['EBITDA_MIL'].values[0],2)
+        except ArithmeticError:
+            peer_ev_ebitda = 0
+
+        try:
+            peer_ev_ebit = round(peer_ev/df_peer_zacks_stock_data['EBIT_MIL'].values[0],2)
+        except ArithmeticError:
+            peer_ev_ebit = 0
+
+        try:
+            peer_ev_revenue = round(peer_ev/df_peer_zacks_stock_data['ANNUAL_SALES(MILLION)'].values[0],2)
+        except ArithmeticError:
+            peer_ev_revenue = 0
+
         peer_pb = df_peer_zacks_stock_data['PRICE_BOOK_RATIO'].values[0]
         peer_ebitda_margin = 0 # EBITDA margin - Can be calculated using EBITDA?
         peer_ebit_margin = 0 # EBIT margin - Can be calculated using EBIT?
@@ -134,9 +155,11 @@ for row,peer in df_zacks_peer_comparison.iterrows():
         temp_row.append(peer_dividend_yield)
         temp_row.append(peer_roe) 
 
-        #TODO: Add row to dataframe
+        #Add row to dataframe
         df_peer_metrics.loc[len(df_peer_metrics.index)] = temp_row   
 
+#TODO: Format dataframe
+import pdb; pdb.set_trace()
 """
 #Download SEC Filings from FMPCLOUD
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
