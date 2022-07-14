@@ -8,7 +8,7 @@ from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data
 from common import get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares
 from common import get_zacks_peer_comparison, get_zacks_earnings_surprises, get_zacks_product_line_geography
 from common import write_value_to_cell_excel, check_sheet_exists, create_sheet
-from common import download_file, unzip_file, get_yf_key_stats
+from common import download_file, unzip_file, get_yf_key_stats,transpose_df
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -107,9 +107,9 @@ for row,peer in df_zacks_peer_comparison.iterrows():
         peer_market_cap = df_peer_zacks_stock_data['MARKET_CAP'].values[0]
 
         #Calculate EV
-        peer_current_assets = df_peer_zacks_stock_data['CURRENT_ASSETS(MILLION)']
-        peer_current_liabilities = df_peer_zacks_stock_data['CURRENT_LIABILITIES(MILLION)']	
-        peer_long_term_debt = df_peer_zacks_stock_data['LONG_TERM_DEBT(MILLION)']
+        peer_current_assets = df_peer_zacks_stock_data['CURRENT_ASSETS(MILLION)'].values[0]
+        peer_current_liabilities = df_peer_zacks_stock_data['CURRENT_LIABILITIES(MILLION)'].values[0]
+        peer_long_term_debt = df_peer_zacks_stock_data['LONG_TERM_DEBT(MILLION)'].values[0]
 
         try:
             peer_ev = round(peer_market_cap + ((peer_current_liabilities + peer_long_term_debt) - peer_current_assets),2)            
@@ -135,8 +135,17 @@ for row,peer in df_zacks_peer_comparison.iterrows():
             peer_ev_revenue = 0
 
         peer_pb = df_peer_zacks_stock_data['PRICE_BOOK_RATIO'].values[0]
-        peer_ebitda_margin = 0 # EBITDA margin - Can be calculated using EBITDA?
-        peer_ebit_margin = 0 # EBIT margin - Can be calculated using EBIT?
+
+        try:
+            peer_ebitda_margin = round(df_peer_zacks_stock_data['EBITDA_MIL'].values[0]/df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0],2) # EBITDA margin - Can be calculated using EBITDA?
+        except ArithmeticError:
+            peer_ebitda_margin = 0
+
+        try:
+            peer_ebit_margin = round(df_peer_zacks_stock_data['EBIT_MIL'].values[0]/df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0],2) # EBITDA margin - Can be calculated using EBITDA?
+        except ArithmeticError:
+            peer_ebit_margin = 0
+
         peer_net_margin = df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]
         peer_dividend_yield = df_peer_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
         peer_roe = df_peer_zacks_stock_data['CURRENT_ROE_TTM'].values[0] 
@@ -155,10 +164,12 @@ for row,peer in df_zacks_peer_comparison.iterrows():
         temp_row.append(peer_dividend_yield)
         temp_row.append(peer_roe) 
 
-        #Add row to dataframe
+    #Add row to dataframe
+    if(len(temp_row) == len(df_peer_metrics.columns)):
         df_peer_metrics.loc[len(df_peer_metrics.index)] = temp_row   
 
-#TODO: Format dataframe
+df_peer_metrics = transpose_df(df_peer_metrics)
+
 import pdb; pdb.set_trace()
 """
 #Download SEC Filings from FMPCLOUD
