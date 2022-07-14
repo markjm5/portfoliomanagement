@@ -82,7 +82,7 @@ temp_sheet_name = 'Database US Companies'
 
 #Get company data from various sources
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
-df_zacks_stock_data = df_company_details = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
+df_zacks_stock_data = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
 df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
 df_zacks_next_earnings_release, df_zacks_earnings_surprises = get_zacks_earnings_surprises(ticker)
@@ -99,20 +99,28 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 #url_company_ratios = "https://fmpcloud.io/api/v3/ratios/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 
+df_peer_metrics = pd.DataFrame(columns=['TICKER','MARKET_CAP','EV','PE','EV_EBITDA','EV_EBIT','EV_REVENUE','PB','EBITDA_MARGIN','EBIT_MARGIN','NET_MARGIN','DIVIDEND_YIELD','ROE'])
 #TODO: Retrieve company peers metrics
+for row,peer in df_zacks_peer_comparison.iterrows():
+    peer_ticker = peer[1]
+    df_peer_zacks_stock_data = df_us_companies.loc[df_us_companies['TICKER'] == peer_ticker].reset_index(drop=True)
+    if(len(df_peer_zacks_stock_data) > 0):
+        import pdb;pdb.set_trace()
+        peer_market_cap = df_peer_zacks_stock_data['MARKET_CAP'].values[0]
+        peer_ev = 0 # EV - Can be calculated?
+        peer_pe = df_peer_zacks_stock_data['PE_TTM'].values[0]
+        peer_ev_ebitda = 0 # EV/EBITDA - Can be calculated using EBITDA? df_peer_zacks_stock_data['EBITDA_MIL'].values[0]
+        peer_ev_ebit = 0 # EV/EBIT - Can be calculated using EBIT? df_peer_zacks_stock_data['EBIT_MIL'].values[0]
+        peer_ev_revenue = 0 # EV/Revenues - Can be calculated?
+        peer_pb = df_peer_zacks_stock_data['PRICE_BOOK_RATIO'].values[0]
+        peer_ebitda_margin = 0 # EBITDA margin - Can be calculated using EBITDA?
+        peer_ebit_margin = 0 # EBIT margin - Can be calculated using EBIT?
+        peer_net_margin = df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]
+        peer_dividend_yield = df_peer_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
+        peer_roe = df_peer_zacks_stock_data['CURRENT_ROE_TTM'].values[0] 
 
-# Mkt Cap - df_zacks_stock_data['MARKET_CAP'].values[0]
-# EV - Can be calculated?
-# P/E - df_zacks_stock_data['PE_TTM'].values[0]
-# EV/EBITDA - Can be calculated using EBITDA? df_zacks_stock_data['EBITDA_MIL'].values[0]
-# EV/EBIT - Can be calculated using EBIT? df_zacks_stock_data['EBIT_MIL'].values[0]
-# EV/Revenues - Can be calculated?
-# PB - df_zacks_stock_data['PRICE_BOOK_RATIO'].values[0]
-# EBITDA margin - Can be calculated using EBITDA?
-# EBIT margin - Can be calculated using EBIT?
-# Net margin - df_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]
-# Dividend Yield - df_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
-# ROE - df_zacks_stock_data['CURRENT_ROE_TTM'].values[0]  
+        #TODO: Add row to dataframe 
+
 """
 #Download SEC Filings from FMPCLOUD
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
