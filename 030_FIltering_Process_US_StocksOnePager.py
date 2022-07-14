@@ -170,7 +170,10 @@ for row,peer in df_zacks_peer_comparison.iterrows():
 
 df_peer_metrics = transpose_df(df_peer_metrics)
 
-import pdb; pdb.set_trace()
+df_peer_metrics = df_peer_metrics.reset_index()
+df_peer_metrics = df_peer_metrics.rename(columns={"index": "METRIC"}) 
+df_peer_metrics = df_peer_metrics.rename_axis(None, axis=1)
+
 """
 #Download SEC Filings from FMPCLOUD
 url_company_sec_filings = "https://fmpcloud.io/api/v3/financial-statements/%s?datatype=zip&apikey=%s" % (ticker,fmpcloud_account_key)
@@ -480,6 +483,9 @@ for index, row in df_zacks_peer_comparison.iterrows():
     row_start = row_start+1
 
 # Competitor Metrics
+# df_peer_metrics
+import pdb; pdb.set_trace()
+
 
 # Historical Surprises
 #df_zacks_earnings_surprises
