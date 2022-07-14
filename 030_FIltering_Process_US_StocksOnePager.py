@@ -97,13 +97,14 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 #url_company_key_metrics_ttm = "https://fmpcloud.io/api/v3/key-metrics-ttm/%s?limit=40&apikey=%s" % (ticker,fmpcloud_account_key)
 
 df_peer_metrics = pd.DataFrame(columns=['TICKER','MARKET_CAP','EV','PE','EV_EBITDA','EV_EBIT','EV_REVENUE','PB','EBITDA_MARGIN','EBIT_MARGIN','NET_MARGIN','DIVIDEND_YIELD','ROE'])
+peer_ticker_list = []
 #Retrieve company peers metrics
 for row,peer in df_zacks_peer_comparison.iterrows():
     temp_row = []
     peer_ticker = peer[1]
     df_peer_zacks_stock_data = df_us_companies.loc[df_us_companies['TICKER'] == peer_ticker].reset_index(drop=True)
     if(len(df_peer_zacks_stock_data) > 0):
-
+        peer_ticker_list.append(peer_ticker)
         peer_market_cap = df_peer_zacks_stock_data['MARKET_CAP'].values[0]
 
         #Calculate EV
@@ -484,8 +485,53 @@ for index, row in df_zacks_peer_comparison.iterrows():
 
 # Competitor Metrics
 # df_peer_metrics
-import pdb; pdb.set_trace()
+column_start = 11
+for column in df_peer_metrics.loc[:,peer_ticker_list]:
+    ticker = column
+    mkt_cap = df_peer_metrics[column].values[0]
+    ev = df_peer_metrics[column].values[1]
+    pe = df_peer_metrics[column].values[2]
+    ev_ebitda = df_peer_metrics[column].values[3]
+    ev_ebit = df_peer_metrics[column].values[4]
+    ev_revenues = df_peer_metrics[column].values[5]
+    pb = df_peer_metrics[column].values[6]
+    ebitda_margin = df_peer_metrics[column].values[7]
+    ebit_margin = df_peer_metrics[column].values[8]
+    net_margin = df_peer_metrics[column].values[9]
+    dividend_yield = df_peer_metrics[column].values[10]
+    roe = df_peer_metrics[column].values[11]
 
+    write_value_to_cell_excel(excel_file_path,sheet_name, 15, column_start, ticker)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 16, column_start, mkt_cap)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 17, column_start, ev)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 18, column_start, pe)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 19, column_start, ev_ebitda)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 20, column_start, ev_ebit)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 21, column_start, ev_revenues)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 22, column_start, pb)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 23, column_start, ebitda_margin)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 24, column_start, ebit_margin)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 25, column_start, net_margin)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 26, column_start, dividend_yield)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 27, column_start, roe)
+
+    column_start = column_start+1
+
+
+"""
+row_start = 15
+column_start = 11
+for index, row in df_peer_metrics.iterrows():
+    import pdb; pdb.set_trace()
+    value1 = int(column)
+    value2 = df_historical_sales[column].values[0]
+
+    period = row[1]
+    eps_estimate = row[2]
+    eps_reported = row[3]
+    sales_estimate = row[4]
+    sales_reported = row[5]
+"""
 
 # Historical Surprises
 #df_zacks_earnings_surprises
