@@ -102,10 +102,11 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 df_peer_metrics = pd.DataFrame(columns=['TICKER','MARKET_CAP','EV','PE','EV_EBITDA','EV_EBIT','EV_REVENUE','PB','EBITDA_MARGIN','EBIT_MARGIN','NET_MARGIN','DIVIDEND_YIELD','ROE'])
 #TODO: Retrieve company peers metrics
 for row,peer in df_zacks_peer_comparison.iterrows():
+    temp_row = []
     peer_ticker = peer[1]
     df_peer_zacks_stock_data = df_us_companies.loc[df_us_companies['TICKER'] == peer_ticker].reset_index(drop=True)
     if(len(df_peer_zacks_stock_data) > 0):
-        import pdb;pdb.set_trace()
+
         peer_market_cap = df_peer_zacks_stock_data['MARKET_CAP'].values[0]
         peer_ev = 0 # EV - Can be calculated?
         peer_pe = df_peer_zacks_stock_data['PE_TTM'].values[0]
@@ -119,7 +120,22 @@ for row,peer in df_zacks_peer_comparison.iterrows():
         peer_dividend_yield = df_peer_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
         peer_roe = df_peer_zacks_stock_data['CURRENT_ROE_TTM'].values[0] 
 
-        #TODO: Add row to dataframe 
+        temp_row.append(peer_ticker)        
+        temp_row.append(peer_market_cap)        
+        temp_row.append(peer_ev) 
+        temp_row.append(peer_pe)
+        temp_row.append(peer_ev_ebitda)
+        temp_row.append(peer_ev_ebit)
+        temp_row.append(peer_ev_revenue)
+        temp_row.append(peer_pb)
+        temp_row.append(peer_ebitda_margin)
+        temp_row.append(peer_ebit_margin)
+        temp_row.append(peer_net_margin)
+        temp_row.append(peer_dividend_yield)
+        temp_row.append(peer_roe) 
+
+        #TODO: Add row to dataframe
+        df_peer_metrics.loc[len(df_peer_metrics.index)] = temp_row   
 
 """
 #Download SEC Filings from FMPCLOUD
