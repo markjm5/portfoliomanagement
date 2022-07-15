@@ -99,6 +99,7 @@ df_yf_key_statistics = get_yf_key_stats(ticker)
 df_peer_metrics = pd.DataFrame(columns=['TICKER','MARKET_CAP','EV','PE','EV_EBITDA','EV_EBIT','EV_REVENUE','PB','EBITDA_MARGIN','EBIT_MARGIN','NET_MARGIN','DIVIDEND_YIELD','ROE'])
 peer_ticker_list = []
 #Retrieve company peers metrics
+#TODO: Fix percentage metrics that do not make sense
 for row,peer in df_zacks_peer_comparison.iterrows():
     temp_row = []
     peer_ticker = peer[1]
@@ -138,18 +139,29 @@ for row,peer in df_zacks_peer_comparison.iterrows():
         peer_pb = df_peer_zacks_stock_data['PRICE_BOOK_RATIO'].values[0]
 
         try:
-            peer_ebitda_margin = round(df_peer_zacks_stock_data['EBITDA_MIL'].values[0]/df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0],2) # EBITDA margin - Can be calculated using EBITDA?
+            peer_ebitda_margin = round(df_peer_zacks_stock_data['EBITDA_MIL'].values[0]/df_peer_zacks_stock_data['ANNUAL_SALES(MILLION)'].values[0],2) # EBITDA margin - Can be calculated using EBITDA?
         except ArithmeticError:
             peer_ebitda_margin = 0
 
         try:
-            peer_ebit_margin = round(df_peer_zacks_stock_data['EBIT_MIL'].values[0]/df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0],2) # EBITDA margin - Can be calculated using EBITDA?
+            peer_ebit_margin = round(df_peer_zacks_stock_data['EBIT_MIL'].values[0]/df_peer_zacks_stock_data['ANNUAL_SALES(MILLION)'].values[0],2) # EBITDA margin - Can be calculated using EBITDA?
         except ArithmeticError:
             peer_ebit_margin = 0
 
-        peer_net_margin = df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]
-        peer_dividend_yield = df_peer_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]
-        peer_roe = df_peer_zacks_stock_data['CURRENT_ROE_TTM'].values[0] 
+        try:
+            peer_net_margin = df_peer_zacks_stock_data['NET_MARGIN_PERCENTAGE'].values[0]/100
+        except ArithmeticError:
+            peer_net_margin = 0
+
+        try:
+            peer_dividend_yield = df_peer_zacks_stock_data['DIVIDEND_YIELD_PERCENTAGE'].values[0]/100
+        except ArithmeticError:
+            peer_dividend_yield = 0
+
+        try:
+            peer_roe = df_peer_zacks_stock_data['CURRENT_ROE_TTM'].values[0]/100
+        except ArithmeticError:
+            peer_dividend_yield = 0
 
         temp_row.append(peer_ticker)        
         temp_row.append(peer_market_cap)        
@@ -485,6 +497,7 @@ for index, row in df_zacks_peer_comparison.iterrows():
 
 # Competitor Metrics
 # df_peer_metrics
+#TODO: Fix metrics for percentages that do not make sense
 column_start = 11
 for column in df_peer_metrics.loc[:,peer_ticker_list]:
     ticker = column
@@ -518,21 +531,6 @@ for column in df_peer_metrics.loc[:,peer_ticker_list]:
     column_start = column_start+1
 
 
-"""
-row_start = 15
-column_start = 11
-for index, row in df_peer_metrics.iterrows():
-    import pdb; pdb.set_trace()
-    value1 = int(column)
-    value2 = df_historical_sales[column].values[0]
-
-    period = row[1]
-    eps_estimate = row[2]
-    eps_reported = row[3]
-    sales_estimate = row[4]
-    sales_reported = row[5]
-"""
-
 # Historical Surprises
 #df_zacks_earnings_surprises
 row_start = 32
@@ -555,12 +553,8 @@ for index, row in df_zacks_earnings_surprises.iterrows():
 
     row_start = row_start+2
 
-
-
-
 # Upcoming Events
 #df_zacks_next_earnings_release, 
-
 
 print("Done!")
 
