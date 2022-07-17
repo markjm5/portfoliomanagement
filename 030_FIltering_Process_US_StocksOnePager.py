@@ -519,19 +519,19 @@ for column in df_peer_metrics.loc[:,peer_ticker_list]:
     dividend_yield = df_peer_metrics[column].values[10]
     roe = df_peer_metrics[column].values[11]
 
-    write_value_to_cell_excel(excel_file_path,sheet_name, 15, column_start, ticker)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 16, column_start, mkt_cap)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 17, column_start, ev)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 18, column_start, pe)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 19, column_start, ev_ebitda)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 20, column_start, ev_ebit)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 21, column_start, ev_revenues)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 22, column_start, pb)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 23, column_start, ebitda_margin)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 24, column_start, ebit_margin)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 25, column_start, net_margin)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 26, column_start, dividend_yield)
-    write_value_to_cell_excel(excel_file_path,sheet_name, 27, column_start, roe)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 16, column_start, ticker)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 17, column_start, mkt_cap)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 18, column_start, ev)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 19, column_start, pe)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 20, column_start, ev_ebitda)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 21, column_start, ev_ebit)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 22, column_start, ev_revenues)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 23, column_start, pb)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 24, column_start, ebitda_margin)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 25, column_start, ebit_margin)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 26, column_start, net_margin)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 27, column_start, dividend_yield)
+    write_value_to_cell_excel(excel_file_path,sheet_name, 28, column_start, roe)
 
     column_start = column_start+1
 
