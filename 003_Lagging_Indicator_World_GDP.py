@@ -129,6 +129,9 @@ for column in df_world_gdp:
   if(column != 'Country'):
     df_world_gdp[column] = pd.to_numeric(df_world_gdp[column])
 
+df_world_gdp["GDP QoQ"] = df_world_gdp['GDP QoQ']/100
+df_world_gdp["GDP YoY"] = df_world_gdp['GDP YoY']/100
+
 #Combine df_original_world_gdp with df_world_gdp
 df_updated_world_gdp = combine_df_on_index(df_original_world_gdp, df_world_gdp,'Country')
 

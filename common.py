@@ -1397,7 +1397,7 @@ def combine_df_on_index(df1, df2, index_col):
   df1 = df1.set_index(index_col)
   df2 = df2.set_index(index_col)
 
-  return df1.combine_first(df2).reset_index()
+  return df2.combine_first(df1).reset_index()
 
 def convert_html_table_to_df(table, contains_th):
   

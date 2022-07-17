@@ -14,6 +14,18 @@ df_IMPGSC1 = get_stlouisfed_data('IMPGSC1')
 df_JCXFE = get_stlouisfed_data('JCXFE')
 df_PCECC96 = get_stlouisfed_data('PCECC96')
 
+"""
+print(df_DPCCRV1Q225SBEA.tail())
+print(df_EXPGSC1.tail())
+print(df_GCEC1.tail())
+print(df_GDPC1.tail())
+print(df_GDPCTPI.tail())
+print(df_GPDIC1.tail())
+print(df_IMPGSC1.tail())
+print(df_JCXFE.tail())
+print(df_PCECC96.tail()) 
+"""
+
 #Combine all these data frames into a single data frame based on the DATE field
 
 df = combine_df_on_index(df_DPCCRV1Q225SBEA,df_EXPGSC1,"DATE")
