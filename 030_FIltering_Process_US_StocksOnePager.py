@@ -22,7 +22,7 @@ from common import download_file, unzip_file, get_yf_key_stats,transpose_df
 
 # https://finance.yahoo.com/quote/CRM/key-statistics?p=CRM
 
-# Available modules: - 'assetProfile', - 'summaryProfile', - 'summaryDetail', 
+# Available YF modules: - 'assetProfile', - 'summaryProfile', - 'summaryDetail', 
 # - 'esgScores', - 'price', - 'incomeStatementHistory', 
 # - 'incomeStatementHistoryQuarterly', - 'balanceSheetHistory', 
 # - 'balanceSheetHistoryQuarterly', - 'cashflowStatementHistory', 
@@ -36,10 +36,8 @@ from common import download_file, unzip_file, get_yf_key_stats,transpose_df
 
 # TODO: Get Share Buyback for Quarter: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=cashflowStatementHistoryQuarterly
 # TODO: Get Share Buyback For Year: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=cashflowStatementHistory
-
 # TODO: Get Historical Quarterly Revenue Actual: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=incomeStatementHistoryQuarterly
 # TODO: Get Historical Quarterly Revenue Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsTrend
-
 # TODO: Get Historical Quarterly EPS Actual + Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsHistory
 
 debug = True
@@ -81,7 +79,14 @@ temp_sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
 df_zacks_stock_data = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
+
+#TODO: Get peer comparison from here instead?: https://www.marketwatch.com/investing/stock/aapl
 df_zacks_peer_comparison = get_zacks_peer_comparison(ticker)
+
+#TODO: Get next earnings release calendar by scraping these urls:
+#https://www.marketscreener.com/mods_a/search/findRapidSearch.php?objectName=GlobalSearch&addID=&null&company_name=AAPL
+#https://www.marketscreener.com/quote/stock/APPLE-INC-4849/calendar/
+
 df_zacks_next_earnings_release, df_zacks_earnings_surprises = get_zacks_earnings_surprises(ticker)
 df_zacks_product_line, df_zacks_geography = get_zacks_product_line_geography(ticker)
 df_finwiz_stock_data = get_finwiz_stock_data(ticker)
@@ -530,7 +535,6 @@ for column in df_peer_metrics.loc[:,peer_ticker_list]:
 
     column_start = column_start+1
 
-
 # Historical Surprises
 #df_zacks_earnings_surprises
 row_start = 32
@@ -557,69 +561,3 @@ for index, row in df_zacks_earnings_surprises.iterrows():
 #df_zacks_next_earnings_release, 
 
 print("Done!")
-
-"""
-# Company Profile: https://finance.yahoo.com/quote/CRM/profile?p=CRM
-# Company Profile: https://www.marketwatch.com/investing/stock/crm/company-profile
-# Competitors: https://www.marketwatch.com/investing/stock/crm
-
-Historical Earnings Surprises
-url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
-#nasdaq urls:
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/EE.json?api_key=%s" % (nasdaq_data_api_key)
-data_earnings_estimates = get_api_json_data_no_file(url)
-
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/SE.json?api_key=%s" % (nasdaq_data_api_key)
-data_sales_estimates = get_api_json_data_no_file(url)
-
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/FC.json?api_key=%s" % (nasdaq_data_api_key)
-data_fundamentals = get_api_json_data_no_file(url)
-
-url = "https://data.nasdaq.com/api/v3/datatables/ZACKS/ES.json?api_key=%s" % (nasdaq_data_api_key)
-data_earnings_surprises = get_api_json_data_no_file(url)
-
-def return_tr_as_df(table_rows):
-    df = pd.DataFrame()
-    index = 0
-    #Get rows of data.
-    for tr in table_rows:
-
-        key = tr.th.text.strip()
-        try:
-            value = tr.td.text.strip()
-        except AttributeError as e:
-            value = ""
-
-        if(value):
-            df.insert(index,key,[value],True)
-            index+=1
-    return df
-
-if not debug:
-    url_nasdaq = "https://www.nasdaq.com/market-activity/stocks/%s/price-earnings-peg-ratios" % (ticker)
-    page = get_page_selenium(url_nasdaq)
-    soup = BeautifulSoup(page, 'html.parser')
-
-    table = soup.find_all('table')
-    pe_ratio_table_rows = table[0].find_all('tr', recursive=True)
-
-    df_pe_ratios = return_tr_as_df(pe_ratio_table_rows)
-
-    df_nasdaq_company_data = pd.DataFrame()
-    df_nasdaq_company_data.loc[ticker, 'PE_F0-1_ACTUAL'] = df_pe_ratios.iloc[0,0]
-    df_nasdaq_company_data.loc[ticker, 'PE_F0_ESTIMATE'] = df_pe_ratios.iloc[0,1]
-    df_nasdaq_company_data.loc[ticker, 'PE_F1_ESTIMATE'] = df_pe_ratios.iloc[0,2]
-    df_nasdaq_company_data.loc[ticker, 'PE_F2_ESTIMATE'] = df_pe_ratios.iloc[0,3]
-
-    df_nasdaq_company_data = df_nasdaq_company_data.reset_index()
-    df_nasdaq_company_data = df_nasdaq_company_data.rename(columns = {'index':'TICKER'})
-
-    df_nasdaq_company_data['PE_F0-1_ACTUAL'] = pd.to_numeric(df_nasdaq_company_data['PE_F0-1_ACTUAL'])
-    df_nasdaq_company_data['PE_F0_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F0_ESTIMATE'])
-    df_nasdaq_company_data['PE_F1_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F1_ESTIMATE'])
-    df_nasdaq_company_data['PE_F2_ESTIMATE'] = pd.to_numeric(df_nasdaq_company_data['PE_F2_ESTIMATE'])
-else:
-    #hard code values in debug mode so that we don't spend time waiting for selenium to load page
-    data = [['AAPL',24.44,22.44,20.65,19.31]]
-    df_nasdaq_company_data = pd.DataFrame(data, columns=['TICKER','PE_F0-1_ACTUAL','PE_F0_ESTIMATE','PE_F1_ESTIMATE','PE_F2_ESTIMATE'])
-"""
