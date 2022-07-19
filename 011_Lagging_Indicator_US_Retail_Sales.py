@@ -1,7 +1,7 @@
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index
 
-excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/011_Lagging_Indicator_Retail_Sales.xlsm'
+excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/011_Lagging_Indicator_US_Retail_Sales.xlsm'
 sheet_name = 'Database'
 
 df_RSAFS = get_stlouisfed_data('RSAFs')
