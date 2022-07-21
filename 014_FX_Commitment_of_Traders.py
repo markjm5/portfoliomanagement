@@ -58,8 +58,6 @@ df_new = combine_df_on_index(df_new, df_data_gbp, 'DATE')
 df_new = combine_df_on_index(df_new, df_data_rub, 'DATE')
 df_new = combine_df_on_index(df_new, df_data_brl, 'DATE')
 
-#TODO: Double check numbers, especially why CHF keeps having added a new row?
-
 df_updated = combine_df_on_index(df_original, df_new, 'DATE')
 
 # Write the updated df back to the excel sheet
