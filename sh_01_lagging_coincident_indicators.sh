@@ -58,10 +58,10 @@ echo $(date)
 echo "**********************************************"
 echo "* Started 011_Lagging_Indicator_US_Retail_Sales *"
 echo "**********************************************"
-python ~/Documents/PythonProjects/PortfolioManagement/011_Lagging_Indicator_Retail_Sales.py
+python ~/Documents/PythonProjects/PortfolioManagement/011_Lagging_Indicator_US_Retail_Sales.py
 
 echo $(date) 
 echo "***********************************************"
 echo "* Started 011_Lagging_Indicator_US_Durable_Goods *"
 echo "***********************************************"
-python ~/Documents/PythonProjects/PortfolioManagement/011_Lagging_Indicator_Durable_Goods.py
+python ~/Documents/PythonProjects/PortfolioManagement/011_Lagging_Indicator_US_Durable_Goods.py

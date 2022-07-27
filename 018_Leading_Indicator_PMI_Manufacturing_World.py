@@ -179,7 +179,7 @@ cols.insert(4, cols.pop(cols.index('EWU')))
 
 # reorder
 df_updated = df_updated[cols]
-import pdb; pdb.set_trace()
+
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 ############################

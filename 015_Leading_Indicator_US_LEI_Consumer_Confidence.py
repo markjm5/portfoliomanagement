@@ -38,7 +38,8 @@ def scrape_conference_board_lei():
   #lei_month_string = lei_date.strftime("%B") #The month before article_date
   lei_value = "" # The LEI value that is extracted from the para
 
-  pattern_regex = re.compile(r'(^The Conference Board Leading Economic Index® +[(]LEI[)]+[A-Za-z,&;\s,0-9.]+to +[0-9.]*)')  
+  #IMPORTANT: Removed ^ symbol at the start of the below regex because in last months report there was text before the below para started.
+  pattern_regex = re.compile(r'(The Conference Board Leading Economic Index® +[(]LEI[)]+[A-Za-z,&;\s,0-9.]+to +[0-9.]*)')  
   #pattern_regex1 = re.compile(r'(^The Conference Board Leading Economic Index® +[(]LEI[)]*)')
 
   #get all paragraphs
@@ -52,7 +53,6 @@ def scrape_conference_board_lei():
   #import pdb; pdb.set_trace()
   #Extract LEI value from the paragraph using the Month string
   pattern_regex = re.compile(r'((?<=to ).[0-9.][^ (]*)')
-
   lei_value = re.search(pattern_regex,paragraph).group(0) #paragraph[paragraph.find(lei_month_string) + len(lei_month_string):paragraph.find(' (2016')].split(' ')[2]  
 
   df_lei = pd.DataFrame()
