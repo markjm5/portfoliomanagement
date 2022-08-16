@@ -55,13 +55,13 @@ echo "*************************************************************"
 python ~/Documents/PythonProjects/PortfolioManagement/010_Lagging_Indicator_World_Industrial_Production.py
 
 echo $(date) 
-echo "**********************************************"
+echo "*************************************************"
 echo "* Started 011_Lagging_Indicator_US_Retail_Sales *"
-echo "**********************************************"
+echo "*************************************************"
 python ~/Documents/PythonProjects/PortfolioManagement/011_Lagging_Indicator_US_Retail_Sales.py
 
 echo $(date) 
-echo "***********************************************"
+echo "**************************************************"
 echo "* Started 011_Lagging_Indicator_US_Durable_Goods *"
-echo "***********************************************"
+echo "**************************************************"
 python ~/Documents/PythonProjects/PortfolioManagement/011_Lagging_Indicator_US_Durable_Goods.py
