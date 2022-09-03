@@ -23,3 +23,9 @@ echo "**************************************"
 echo "* Started 014_US_Global_Money_Supply *"
 echo "**************************************"
 python ~/Documents/PythonProjects/PortfolioManagement/014_US_Global_Money_Supply.py
+
+echo $(date) 
+echo "****************************************"
+echo "* Started 014_FX_Commitment_of_Traders *"
+echo "****************************************"
+python ~/Documents/PythonProjects/PortfolioManagement/014_FX_Commitment_of_Traders.py
