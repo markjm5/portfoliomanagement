@@ -19,7 +19,7 @@ from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index
 
 #TODO: Preparation: Load data from each country tab from Cell A5 into dataframe, merge based on date, and write to new excel sheet
-excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/014_FX_Commitment_of_Traders.xlsm'
+excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/014_FX_Commitment_of_Traders_History.xlsm'
 
 def return_df(sheet_name):
     df = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
@@ -59,8 +59,8 @@ sheet_name = "BRL"
 df_brl = return_df(sheet_name)
 
 sheet_name_original = "Database"
-
-df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+#import pdb; pdb.set_trace()
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name_original, True)
 
 #Combine new data with original data
 df_original = combine_df_on_index(df_eur, df_cad, 'DATE')
@@ -76,3 +76,5 @@ df_original = combine_df_on_index(df_original, df_brl, 'DATE')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name_original, df_original, False, 0)
+
+print("Done!")

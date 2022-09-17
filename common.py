@@ -963,6 +963,7 @@ def get_invest_data(country_list, bond_year, from_date):
 
     time.sleep(10)
     try:
+
       data = invest.get_bond_historical_data(bond=bond, from_date=from_date, to_date=todays_date_full)
 
       # Transformations to do: 
@@ -980,6 +981,9 @@ def get_invest_data(country_list, bond_year, from_date):
 
     except RuntimeError as e:
       print("NO %s-Y DATA FOR: %s" % (bond_year, country,))
+    except ConnectionError as e:
+      print("COULD NOT CONNECT")
+      sys.exit(1)
 
   df = df.sort_values(by='DATE', ignore_index=True)
 
