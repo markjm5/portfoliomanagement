@@ -101,23 +101,38 @@ def scrape_table_marketscreener_economic_calendar():
     return df
 
 def scrape_table_earningswhispers_earnings_calendar():
-    url = "https://www.earningswhispers.com/calendar?sb=c&d=1&t=all"
+    for x in range(1, 10):
+        earnings_whispers_day = scrape_earningswhispers_day(x)
+        print(earnings_whispers_day)
 
     #TODO: Get earnings for the next fortnight
+    import pdb; pdb.set_trace()
+    return None
 
-    return url
+def scrape_earningswhispers_day(day):
+    url = "https://www.earningswhispers.com/calendar?sb=c&d=%s&t=all" % (day,)
+
+    page = get_page(url)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    date_str = soup.find('div', attrs={"id":"calbox"})
+    date_str = date_str.text.strip().replace('for ','')
+
+    df = pd.DataFrame()
+    return date_str
+    #import pdb; pdb.set_trace()
 
 sheet_name = 'Spin Off'
-df_spin_off = scrape_table_sec()
+#df_spin_off = scrape_table_sec()
 
 # Write the updated df to the excel sheet, and overwrite what was there before
-write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0, True)
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0, True)
 
 sheet_name = 'Economic Calendar'
-df_economic_calendar = scrape_table_marketscreener_economic_calendar()
+#df_economic_calendar = scrape_table_marketscreener_economic_calendar()
 
 # Write the updated df to the excel sheet, and overwrite what was there before
-write_dataframe_to_excel(excel_file_path, sheet_name, df_economic_calendar, False, 0, True)
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_economic_calendar, False, 0, True)
 
 
 sheet_name = 'Earnings Calendar'
