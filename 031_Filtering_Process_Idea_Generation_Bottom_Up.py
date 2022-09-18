@@ -101,11 +101,11 @@ def scrape_table_marketscreener_economic_calendar():
     return df
 
 def scrape_table_earningswhispers_earnings_calendar():
+    #TODO: Get earnings for the next fortnight
     for x in range(1, 10):
         earnings_whispers_day = scrape_earningswhispers_day(x)
         print(earnings_whispers_day)
 
-    #TODO: Get earnings for the next fortnight
     import pdb; pdb.set_trace()
     return None
 
@@ -119,8 +119,11 @@ def scrape_earningswhispers_day(day):
     date_str = date_str.text.strip().replace('for ','')
 
     df = pd.DataFrame()
-    return date_str
+
+    #TODO: Get the remaining data and put it all into a dataframe or row
     #import pdb; pdb.set_trace()
+
+    return date_str
 
 sheet_name = 'Spin Off'
 #df_spin_off = scrape_table_sec()
