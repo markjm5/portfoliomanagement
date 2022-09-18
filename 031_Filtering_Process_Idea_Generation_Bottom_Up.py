@@ -1,5 +1,6 @@
 from unittest import skip
 import pandas as pd
+import re
 from datetime import date
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_page,convert_html_table_to_df
@@ -26,9 +27,9 @@ def scrape_table_sec():
     df_sec = df_sec.drop(columns='Format', axis=1)
     df_sec = df_sec.drop(columns='Size', axis=1)
 
-    df_sec = df_sec.rename(columns={"Company": "COMPANY","Form Type":"FORM_TYPE", "Filing Date": "FILING_DATE"})
+    #df_sec = df_sec.rename(columns={"Company": "COMPANY","Form Type":"FORM_TYPE", "Filing Date": "FILING_DATE"})
 
-    df_sec['FILING_DATE'] = pd.to_datetime(df_sec['FILING_DATE'],format='%m/%d/%Y')
+    df_sec['Filing Date'] = pd.to_datetime(df_sec['Filing Date'],format='%m/%d/%Y')
 
     return df_sec
 
@@ -72,11 +73,16 @@ def scrape_table_marketscreener_economic_calendar():
         for obs in td:  
             text = str(obs.text).strip()
             if(text == ''):
+                #Maybe this is the country field, which means that the country is represented by a flag image
                 try:
                     if(obs.attrs['class'][0] == 'pays'):
                         if(obs.findChild('img')):
                             text = obs.findChild('img').attrs['src']
-                            #TODO: Format text to remove image and convert into country
+                            # Format text to remove image and convert into country
+                            pattern_regex = re.compile(r'([a-z]*(?=[.]png))')                            
+                            text = re.search(pattern_regex,text).group(0)
+                            text = text.upper()
+
                         else:
                             text = str(obs.text).strip()
                 except KeyError as e:
@@ -89,51 +95,35 @@ def scrape_table_marketscreener_economic_calendar():
                     df.loc[len(df.index)] = temp_row
                
         skip_first = False
+    df['Session'] = df['Session'].str.replace('\n\n','|')
+    df['Session'] = df['Session'].str.replace('\n','|')
 
-    import pdb; pdb.set_trace()
+    return df
 
-    #Drop unnecessary columns
-    df_economic_calendar = df_economic_calendar.drop(columns='No.', axis=1)
-    df_economic_calendar = df_economic_calendar.drop(columns='Format', axis=1)
-    df_economic_calendar = df_economic_calendar.drop(columns='Size', axis=1)
+def scrape_table_earningswhispers_earnings_calendar():
+    url = "https://www.earningswhispers.com/calendar?sb=c&d=1&t=all"
 
-    df_economic_calendar = df_economic_calendar.rename(columns={"Company": "COMPANY","Form Type":"FORM_TYPE", "Filing Date": "FILING_DATE"})
+    #TODO: Get earnings for the next fortnight
 
-    df_economic_calendar['FILING_DATE'] = pd.to_datetime(df_economic_calendar['FILING_DATE'],format='%m/%d/%Y')
-
-    return df_economic_calendar
-
+    return url
 
 sheet_name = 'Spin Off'
-#df_spin_off = scrape_table_sec()
+df_spin_off = scrape_table_sec()
 
 # Write the updated df to the excel sheet, and overwrite what was there before
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0, True)
 
-#sheet_name = 'Economic Calendar Weekly'
-#https://www.marketscreener.com/stock-exchange/calendar/economic/
-
+sheet_name = 'Economic Calendar'
 df_economic_calendar = scrape_table_marketscreener_economic_calendar()
 
+# Write the updated df to the excel sheet, and overwrite what was there before
+write_dataframe_to_excel(excel_file_path, sheet_name, df_economic_calendar, False, 0, True)
 
-#sheet_name = 'Earnings Calendar'
-#https://www.earningswhispers.com/calendar?sb=c&d=1&t=all
 
-#df_PERMIT = get_stlouisfed_data('PERMIT')
-#df_HOUST = get_stlouisfed_data('HOUST')
-#df_COMPUTSA = get_stlouisfed_data('COMPUTSA')
+sheet_name = 'Earnings Calendar'
+df_earnings_calendar = scrape_table_earningswhispers_earnings_calendar()
 
-#Combine all these data frames into a single data frame based on the DATE field
-
-#df = combine_df_on_index(df_PERMIT,df_HOUST,"DATE")
-#df = combine_df_on_index(df_COMPUTSA,df,"DATE")
-
-# Get Original Sheet and store it in a dataframe
-#df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
-
-#df_updated = combine_df_on_index(df_original, df, 'DATE')
-
-# Write the updated df back to the excel sheet
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+# Write the updated df to the excel sheet, and overwrite what was there before
+#write_dataframe_to_excel(excel_file_path, sheet_name, df_earnings_calendar, False, 0, True)
 
 print("Done!")
