@@ -101,13 +101,14 @@ def scrape_table_marketscreener_economic_calendar():
     return df
 
 def scrape_table_earningswhispers_earnings_calendar():
-    #TODO: Get earnings for the next fortnight
+    df = pd.DataFrame()
+
+    # Get earnings calendar for the next fortnight
     for x in range(1, 10):
         earnings_whispers_day_df = scrape_earningswhispers_day(x)
-        print(earnings_whispers_day_df)
+        df = df.append(earnings_whispers_day_df, ignore_index=True)
 
-    import pdb; pdb.set_trace()
-    return None
+    return df
 
 def scrape_earningswhispers_day(day):
     url = "https://www.earningswhispers.com/calendar?sb=c&d=%s&t=all" % (day,)
@@ -122,18 +123,15 @@ def scrape_earningswhispers_day(day):
 
     table_rows = eps_cal_table.find_all('li')
 
-    #table_header = table_rows[0]
-
-    #th_td = table_header.find_all('div')
-    #index = 0
     df = pd.DataFrame()
     
-    #TODO: Add Date, Time, CompanyName, Ticker headers to dataframe
+    # Add Date, Time, CompanyName, Ticker headers to dataframe
+    df.insert(0,"Date",[],True)
+    df.insert(1,"Time",[],True)
+    df.insert(2,"Ticker",[],True)
+    df.insert(3,"Company Name",[],True)
 
-    #for obs in th_td:        
-    #    text = str(obs.text).strip()
-    #    df.insert(index,str(obs.text).strip(),[],True)
-    #    index+=1
+    skip_first = True
 
     for tr in table_rows:        
         temp_row = []
@@ -143,14 +141,28 @@ def scrape_earningswhispers_day(day):
         #TODO: Just Extract Date, Time, CompanyName, Ticker
         for obs in td:  
             text = str(obs.text).strip()
-            temp_row.append(text)     
+            temp_row.append(text)    
 
-        if(len(temp_row) == len(df.columns)):
-            df.loc[len(df.index)] = temp_row
+        time_str = temp_row[4]
+        company_name_str = temp_row[2]
+        ticker_str = temp_row[3]
 
-    import pdb; pdb.set_trace()
+        if(time_str.find(' ET') != -1):
+            #TODO: Get market cap from US Stocks list
+            #TODO: Only if company exists on US stocks list, we add to df
 
-    return date_str
+            temp_row1 = []
+            temp_row1.append(date_str)
+            temp_row1.append(time_str)
+            temp_row1.append(ticker_str)
+            temp_row1.append(company_name_str)
+
+            if not skip_first:   
+                df.loc[len(df.index)] = temp_row1
+
+        skip_first = False
+
+    return df
 
 sheet_name = 'Spin Off'
 #df_spin_off = scrape_table_sec()
@@ -169,6 +181,6 @@ sheet_name = 'Earnings Calendar'
 df_earnings_calendar = scrape_table_earningswhispers_earnings_calendar()
 
 # Write the updated df to the excel sheet, and overwrite what was there before
-#write_dataframe_to_excel(excel_file_path, sheet_name, df_earnings_calendar, False, 0, True)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_earnings_calendar, False, 0, True)
 
 print("Done!")
