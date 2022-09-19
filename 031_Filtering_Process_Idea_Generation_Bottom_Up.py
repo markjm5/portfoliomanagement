@@ -103,8 +103,8 @@ def scrape_table_marketscreener_economic_calendar():
 def scrape_table_earningswhispers_earnings_calendar():
     #TODO: Get earnings for the next fortnight
     for x in range(1, 10):
-        earnings_whispers_day = scrape_earningswhispers_day(x)
-        print(earnings_whispers_day)
+        earnings_whispers_day_df = scrape_earningswhispers_day(x)
+        print(earnings_whispers_day_df)
 
     import pdb; pdb.set_trace()
     return None
@@ -118,10 +118,37 @@ def scrape_earningswhispers_day(day):
     date_str = soup.find('div', attrs={"id":"calbox"})
     date_str = date_str.text.strip().replace('for ','')
 
-    df = pd.DataFrame()
+    eps_cal_table = soup.find('ul', attrs={"id":"epscalendar"})
 
-    #TODO: Get the remaining data and put it all into a dataframe or row
-    #import pdb; pdb.set_trace()
+    table_rows = eps_cal_table.find_all('li')
+
+    #table_header = table_rows[0]
+
+    #th_td = table_header.find_all('div')
+    #index = 0
+    df = pd.DataFrame()
+    
+    #TODO: Add Date, Time, CompanyName, Ticker headers to dataframe
+
+    #for obs in th_td:        
+    #    text = str(obs.text).strip()
+    #    df.insert(index,str(obs.text).strip(),[],True)
+    #    index+=1
+
+    for tr in table_rows:        
+        temp_row = []
+
+        td = tr.find_all('div')
+
+        #TODO: Just Extract Date, Time, CompanyName, Ticker
+        for obs in td:  
+            text = str(obs.text).strip()
+            temp_row.append(text)     
+
+        if(len(temp_row) == len(df.columns)):
+            df.loc[len(df.index)] = temp_row
+
+    import pdb; pdb.set_trace()
 
     return date_str
 
