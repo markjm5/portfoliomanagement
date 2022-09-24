@@ -1251,6 +1251,14 @@ def scrape_ism_services_headline_index(ism_date, ism_month):
 
     return df_at_a_glance
 
+def get_zacks_us_companies():
+  temp_excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
+  temp_sheet_name = 'Database US Companies'
+
+  #Get company data from various sources
+  df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
+
+  return df_us_companies
 
 ####################
 # Output Functions #

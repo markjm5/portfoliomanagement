@@ -8,7 +8,7 @@ from common import convert_excelsheet_to_dataframe, get_stockrow_stock_data
 from common import get_page, get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares
 from common import get_zacks_peer_comparison, get_zacks_earnings_surprises, get_zacks_product_line_geography
 from common import write_value_to_cell_excel, check_sheet_exists, create_sheet
-from common import download_file, unzip_file, get_yf_key_stats,transpose_df
+from common import download_file, unzip_file, get_yf_key_stats,transpose_df, get_zacks_us_companies
 #Sources:
 #https://finance.yahoo.com/
 #https://www.reuters.com
@@ -76,7 +76,7 @@ temp_excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_
 temp_sheet_name = 'Database US Companies'
 
 #Get company data from various sources
-df_us_companies = convert_excelsheet_to_dataframe(temp_excel_file_path, temp_sheet_name, False)
+df_us_companies = get_zacks_us_companies()
 df_zacks_stock_data = df_us_companies.loc[df_us_companies['TICKER'] == ticker].reset_index(drop=True)
 df_zacks_balance_sheet_shares_annual, df_zacks_balance_sheet_shares_quarterly = get_zacks_balance_sheet_shares(ticker)
 
