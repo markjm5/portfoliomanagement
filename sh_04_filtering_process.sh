@@ -11,3 +11,9 @@ echo "********************************************"
 echo "* Started 030_Filtering_Process_US_Stocks *"
 echo "********************************************"
 python ~/Documents/PythonProjects/PortfolioManagement/030_Filtering_Process_US_Stocks.py
+
+echo $(date) 
+echo "***************************************************"
+echo "* Started 031_Filtering_Idea_Generation_Bottom_Up *"
+echo "***************************************************"
+python ~/Documents/PythonProjects/PortfolioManagement/031_Filtering_Process_Idea_Generation_Bottom_Up.py

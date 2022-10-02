@@ -64,7 +64,8 @@ def scrape_table_china_caixin_pmi():
   #table_rows_header = table.find_all('tr')[0].find_all('th')
 
   df_caixin_pmi = convert_html_table_to_df(table, False)
-  
+  df_caixin_pmi = df_caixin_pmi[df_caixin_pmi.Actual != ''] #Remove any blank rows
+
   #Date Transformations
   df_caixin_pmi['Month_Day'], df_caixin_pmi['Year_Temp'] = df_caixin_pmi['Release Date'].str.split(',', n=1, expand=False).str
   df_caixin_pmi['Year'],df_caixin_pmi['Prev_Month'] = df_caixin_pmi['Year_Temp'].str.split('(', n=1, expand=False).str

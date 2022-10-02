@@ -10,6 +10,7 @@ excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/031_Filtering_Proce
 
 todays_date = date.today()
 year_str = todays_date.year
+df_us_companies = get_zacks_us_companies()
 
 def scrape_table_sec():
     print("Getting data from SEC")
@@ -117,7 +118,7 @@ def scrape_table_earningswhispers_earnings_calendar():
 
 def scrape_earningswhispers_day(day):
     url = "https://www.earningswhispers.com/calendar?sb=c&d=%s&t=all" % (day,)
-    df_us_companies = get_zacks_us_companies()
+    #df_us_companies = get_zacks_us_companies()
 
     page = get_page(url)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -192,7 +193,6 @@ def scrape_earningswhispers_day(day):
 
         skip_first = False
 
-    #import pdb; pdb.set_trace()
     return df
 
 sheet_name = 'Spin Off'
@@ -208,7 +208,6 @@ df_economic_calendar = df_economic_calendar.drop_duplicates()
 # Write the updated df to the excel sheet, and overwrite what was there before
 write_dataframe_to_excel(excel_file_path, sheet_name, df_economic_calendar, False, 0, True)
 
-
 sheet_name = 'Earnings Calendar'
 df_earnings_calendar = scrape_table_earningswhispers_earnings_calendar()
 df_earnings_calendar = df_earnings_calendar.drop_duplicates('Ticker')
@@ -217,5 +216,13 @@ df_earnings_calendar = df_earnings_calendar.drop_duplicates('Ticker')
 write_dataframe_to_excel(excel_file_path, sheet_name, df_earnings_calendar, False, 0, True)
 
 #TODO: Filter different metrics from US Stocks data list, and write to excel
+#import pdb; pdb.set_trace()
+#df_retrieved_company_data = df_us_companies.loc[df_us_companies['TICKER'] == ticker_str].reset_index(drop=True)
+
+# FCF 2015	FCF 2016	FCF 2017	FCF 2018
+# EPS 2015	EPS 2016	EPS 2017	EPS 2018
+# Sales 2018	Sales 2019	Sales 2020
+# ROE
+# AAll
 
 print("Done!")
