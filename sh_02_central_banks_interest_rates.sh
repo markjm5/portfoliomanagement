@@ -6,11 +6,11 @@ echo "* Started 012_Central_Banks *"
 echo "*****************************"
 python ~/Documents/PythonProjects/PortfolioManagement/012_Central_Banks.py
 
-echo $(date) 
-echo "******************************"
-echo "* Started 013_Interest_Rates *"
-echo "******************************"
-python ~/Documents/PythonProjects/PortfolioManagement/013_Interest_Rates.py
+#echo $(date) 
+#echo "******************************"
+#echo "* Started 013_Interest_Rates *"
+#echo "******************************"
+#python ~/Documents/PythonProjects/PortfolioManagement/013_Interest_Rates.py
 
 echo $(date) 
 echo "***************************"

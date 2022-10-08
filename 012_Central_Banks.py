@@ -1,3 +1,4 @@
+import pandas as pd
 from datetime import date
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_yf_historical_stock_data
@@ -14,6 +15,7 @@ sheet_name = 'Database Rates'
 df_INTDSRUSM193N = get_stlouisfed_data('INTDSRUSM193N')
 df_FEDFUNDS = get_stlouisfed_data('FEDFUNDS')
 df_M2SL = get_stlouisfed_data('M2SL')
+df_DPCREDIT = get_stlouisfed_data('DPCREDIT')
 
 #Combine all these data frames into a single data frame based on the DATE field
 
@@ -22,9 +24,9 @@ df_M2SL = get_stlouisfed_data('M2SL')
 
 df = append_two_df(df_INTDSRUSM193N, df_FEDFUNDS)
 df = append_two_df(df,df_M2SL)
-
-#df = pd.merge(df_INTDSRUSM193N,df_FEDFUNDS,"left")
-#df = pd.merge(df,df_M2SL,"left")
+#import pdb; pdb.set_trace()
+#df = append_two_df(df,df_DPCREDIT)
+df = pd.merge(df,df_DPCREDIT,"left")
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
@@ -77,11 +79,15 @@ df_JPNNGDP = df_JPNNGDP.asfreq('MS', method='bfill').reset_index() #.to_period('
 
 # Combine df_JPNNGDP with df_JPNASSETS and df_NIKKEI
 df = combine_df_on_index(df_JPNASSETS,df_JPNNGDP,"DATE")
-df = combine_df_on_index(df_NIKKEI,df,"DATE")
+df = pd.merge(df,df_NIKKEI,"left")
+
+#df = combine_df_on_index(df_NIKKEI,df,"DATE")
 
 # Clean up columns
 df = df.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
 df = df.rename(columns={"Close": "N225"})
+
+#import pdb; pdb.set_trace()
 
 #Get Original Dataframe
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
