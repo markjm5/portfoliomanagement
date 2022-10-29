@@ -40,10 +40,16 @@ from common import download_file, unzip_file, get_yf_key_stats,transpose_df, get
 # TODO: Get Historical Quarterly Revenue Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsTrend
 # TODO: Get Historical Quarterly EPS Actual + Estimates: https://query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=earningsHistory
 
-debug = True
+debug = False
 
 #################
-ticker = "AAPL" # COMPANY TICKER - CHANGE HERE
+#ticker = "QDEL" # COMPANY TICKER - CHANGE HERE
+#ticker = "CRUS" # COMPANY TICKER - CHANGE HERE
+#ticker = "LNTH" # COMPANY TICKER - CHANGE HERE
+ticker = "CANO" # COMPANY TICKER - CHANGE HERE *****
+#ticker = "PGNY" # COMPANY TICKER - CHANGE HERE
+#ticker = "ASAI" # COMPANY TICKER - CHANGE HERE
+
 #################
 
 #Dates

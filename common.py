@@ -144,7 +144,7 @@ def get_oecd_data(dataset, dimensions, params):
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
   #file_path = '/Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/XML/%s' % params['filename'] 
   file_path = "%s/XML/%s" % (sys.path[0],params['filename'])
-
+  #import pdb;  pdb.set_trace()
   resp = requests.get(url=url)
 
   try:
@@ -611,7 +611,8 @@ def get_stockrow_stock_data(ticker, debug):
 
           df2.loc[len(df2.index)] = temp_row
           break
-
+    print(df2)
+    #df2.drop([" "], axis=1) #Hack: Drop any null columns. Better to just remove them upstream
     df = df.append(df2,ignore_index = True)    
   #import pdb; pdb.set_trace()
   print("df after merge")
@@ -778,7 +779,7 @@ def get_zacks_earnings_surprises(ticker):
 
   page = get_page(url)
   soup = BeautifulSoup(page.content, 'html.parser')
-
+  new_df_earnings = pd.DataFrame()
   #Get Earnings Release Date
   table_earnings_release_date = soup.find_all('table')[2]
   df_earnings_release_date = convert_html_table_to_df(table_earnings_release_date,True)
@@ -793,28 +794,31 @@ def get_zacks_earnings_surprises(ticker):
   matches = match_pattern.findall(match_string)
   match_string = matches[0]
 
-  json_object = json.loads(match_string)
+  try:
+    json_object = json.loads(match_string)
 
-  list_earnings_announcements_earnings = json_object['earnings_announcements_earnings_table']
-  list_earnings_announcements_sales = json_object['earnings_announcements_sales_table']
+    list_earnings_announcements_earnings = json_object['earnings_announcements_earnings_table']
+    list_earnings_announcements_sales = json_object['earnings_announcements_sales_table']
 
-  df_earnings_surprises = convert_list_to_df(list_earnings_announcements_earnings)
-  df_earnings_surprises = df_earnings_surprises.drop(df_earnings_surprises.iloc[:, 4:7],axis = 1)
-  df_earnings_surprises.rename(columns={ df_earnings_surprises.columns[0]: "DATE",df_earnings_surprises.columns[1]: "PERIOD",df_earnings_surprises.columns[2]: "EPS_ESTIMATE",df_earnings_surprises.columns[3]: "EPS_REPORTED" }, inplace = True)
-  df_earnings_surprises['DATE'] = pd.to_datetime(df_earnings_surprises['DATE'],format='%m/%d/%y')
-  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'EPS_ESTIMATE')
-  df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'EPS_REPORTED')
+    df_earnings_surprises = convert_list_to_df(list_earnings_announcements_earnings)
+    df_earnings_surprises = df_earnings_surprises.drop(df_earnings_surprises.iloc[:, 4:7],axis = 1)
+    df_earnings_surprises.rename(columns={ df_earnings_surprises.columns[0]: "DATE",df_earnings_surprises.columns[1]: "PERIOD",df_earnings_surprises.columns[2]: "EPS_ESTIMATE",df_earnings_surprises.columns[3]: "EPS_REPORTED" }, inplace = True)
+    df_earnings_surprises['DATE'] = pd.to_datetime(df_earnings_surprises['DATE'],format='%m/%d/%y')
+    df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'EPS_ESTIMATE')
+    df_earnings_surprises = dataframe_convert_to_numeric(df_earnings_surprises,'EPS_REPORTED')
 
-  df_sales_surprises = convert_list_to_df(list_earnings_announcements_sales)
-  df_sales_surprises = df_sales_surprises.drop(df_sales_surprises.iloc[:, 4:7],axis = 1)
-  df_sales_surprises.rename(columns={ df_sales_surprises.columns[0]: "DATE",df_sales_surprises.columns[1]: "PERIOD",df_sales_surprises.columns[2]: "SALES_ESTIMATE",df_sales_surprises.columns[3]: "SALES_REPORTED" }, inplace = True)
-  df_sales_surprises['DATE'] = pd.to_datetime(df_sales_surprises['DATE'],format='%m/%d/%y')
-  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'SALES_ESTIMATE')
-  df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'SALES_REPORTED')
+    df_sales_surprises = convert_list_to_df(list_earnings_announcements_sales)
+    df_sales_surprises = df_sales_surprises.drop(df_sales_surprises.iloc[:, 4:7],axis = 1)
+    df_sales_surprises.rename(columns={ df_sales_surprises.columns[0]: "DATE",df_sales_surprises.columns[1]: "PERIOD",df_sales_surprises.columns[2]: "SALES_ESTIMATE",df_sales_surprises.columns[3]: "SALES_REPORTED" }, inplace = True)
+    df_sales_surprises['DATE'] = pd.to_datetime(df_sales_surprises['DATE'],format='%m/%d/%y')
+    df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'SALES_ESTIMATE')
+    df_sales_surprises = dataframe_convert_to_numeric(df_sales_surprises,'SALES_REPORTED')
 
-  new_df_earnings = pd.merge(df_earnings_surprises, df_sales_surprises,  how='left', left_on=['DATE','PERIOD'], right_on = ['DATE','PERIOD'])
+    new_df_earnings = pd.merge(df_earnings_surprises, df_sales_surprises,  how='left', left_on=['DATE','PERIOD'], right_on = ['DATE','PERIOD'])
 
-  new_df_earnings = new_df_earnings.iloc[:4,:]
+    new_df_earnings = new_df_earnings.iloc[:4,:]
+  except json.decoder.JSONDecodeError as e:
+    pass
 
   return df_earnings_release_date, new_df_earnings
 
@@ -862,22 +866,29 @@ def get_zacks_product_line_geography(ticker):
 
       if(len(temp_row) == len(df.columns)):
         df.loc[len(df.index)] = temp_row
+  #import pdb; pdb.set_trace()
+  if(file_dict):
+    try:
+      df_product_line = file_dict['Revenue - Line of Business Segments']
+      # Clean up dataframes
+      df_product_line = df_product_line.drop(columns='YR Estimate', axis=1)
+      df_product_line = df_product_line.iloc[:, 0:2]
+      colname = df_product_line.columns[1]
+      df_product_line = dataframe_convert_to_numeric(df_product_line,colname)
+      df_product_line = df_product_line.iloc[:4,:]
+    except KeyError as e:
+      pass
 
-  df_product_line = file_dict['Revenue - Line of Business Segments']
-  df_geography = file_dict['Revenue - Geographic Segments']
 
-  # Clean up dataframes
-  df_product_line = df_product_line.drop(columns='YR Estimate', axis=1)
-  df_product_line = df_product_line.iloc[:, 0:2]
-  colname = df_product_line.columns[1]
-  df_product_line = dataframe_convert_to_numeric(df_product_line,colname)
-  df_product_line = df_product_line.iloc[:4,:]
-
-  df_geography = df_geography.drop(columns='YR Estimate', axis=1)
-  df_geography = df_geography.iloc[:, 0:2]
-  colname = df_geography.columns[1]
-  df_geography = dataframe_convert_to_numeric(df_geography,colname)
-  df_geography = df_geography.iloc[:4,:]
+    try:
+      df_geography = file_dict['Revenue - Geographic Segments']
+      df_geography = df_geography.drop(columns='YR Estimate', axis=1)
+      df_geography = df_geography.iloc[:, 0:2]
+      colname = df_geography.columns[1]
+      df_geography = dataframe_convert_to_numeric(df_geography,colname)
+      df_geography = df_geography.iloc[:4,:]
+    except KeyError as e:
+      pass
 
   return df_product_line, df_geography
 

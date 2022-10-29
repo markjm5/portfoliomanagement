@@ -7,7 +7,7 @@ from datetime import datetime as dt
 from datetime import date
 from bs4 import BeautifulSoup
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel, combine_df_on_index, scrape_world_gdp_table
-from common import convert_html_table_to_df, get_page
+from common import convert_html_table_to_df, get_page, get_page_selenium
 
 excel_file_path = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/010_Lagging_Indicator_World_Industrial_Production.xlsm'
 
@@ -53,15 +53,19 @@ def scrape_table_world_production(url):
 
 def scrape_table_china_caixin_pmi():
   #currentYear = dt.now().strftime('%Y')
+
   url_caixin_pmi = 'https://www.investing.com/economic-calendar/chinese-caixin-manufacturing-pmi-753'
 
-  page = get_page(url_caixin_pmi)
+  #page = get_page(url_caixin_pmi)
+  #soup = BeautifulSoup(page.content, 'html.parser')
 
-  soup = BeautifulSoup(page.content, 'html.parser')
+  page = get_page_selenium(url_caixin_pmi)
+  soup = BeautifulSoup(page, 'html.parser')
 
   table = soup.find('table') 
   #table_rows = table.find_all('tr', recursive=True)
   #table_rows_header = table.find_all('tr')[0].find_all('th')
+  #import pdb; pdb.set_trace()
 
   df_caixin_pmi = convert_html_table_to_df(table, False)
   df_caixin_pmi = df_caixin_pmi[df_caixin_pmi.Actual != ''] #Remove any blank rows
@@ -84,13 +88,13 @@ def scrape_table_china_caixin_pmi():
       day = calendar.monthrange(year,row['Prev_Month'].month)[1]
       new_date = dt.strptime("%s-%s-%s" % (year,row['Prev_Month'].month,day), "%Y-%m-%d") 
       df_caixin_pmi.at[index,'Date'] = new_date
-
+  #import pdb; pdb.set_trace()
   #Drop unnecessary columns
   df_caixin_pmi = df_caixin_pmi.drop(columns='Release Date', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Month_Day', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Year_Temp', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Year', axis=1)
-  df_caixin_pmi = df_caixin_pmi.drop(columns='Time', axis=1)
+  #df_caixin_pmi = df_caixin_pmi.drop(columns='Time', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Forecast', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Previous', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='', axis=1)

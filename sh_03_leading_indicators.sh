@@ -40,4 +40,4 @@ echo $(date)
 echo "**********************************************"
 echo "* Started 022_Global_Macro_Data_Summary_Page *"
 echo "**********************************************"
-python ~/Documents/PythonProjects/PortfolioManagement/022_Global_Macro_Data_Summary_Page.py
+#python ~/Documents/PythonProjects/PortfolioManagement/022_Global_Macro_Data_Summary_Page.py
