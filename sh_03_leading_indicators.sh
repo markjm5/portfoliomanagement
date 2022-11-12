@@ -36,8 +36,8 @@ echo "* Started 020_Leading_Indicator_US_Housing_Market *"
 echo "***************************************************"
 python ~/Documents/PythonProjects/PortfolioManagement/020_Leading_Indicator_US_Housing_Market.py
 
-echo $(date) 
-echo "**********************************************"
-echo "* Started 022_Global_Macro_Data_Summary_Page *"
-echo "**********************************************"
+#echo $(date) 
+#echo "**********************************************"
+#echo "* Started 022_Global_Macro_Data_Summary_Page *"
+#echo "**********************************************"
 #python ~/Documents/PythonProjects/PortfolioManagement/022_Global_Macro_Data_Summary_Page.py
