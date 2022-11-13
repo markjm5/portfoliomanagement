@@ -110,7 +110,8 @@ def scrape_table_earningswhispers_earnings_calendar():
     df = pd.DataFrame()
 
     # Get earnings calendar for the next fortnight
-    for x in range(1, 10):
+    for x in range(1, 30):
+        print("Day %s" % x)
         earnings_whispers_day_df = scrape_earningswhispers_day(x)
         df = df.append(earnings_whispers_day_df, ignore_index=True)
 
