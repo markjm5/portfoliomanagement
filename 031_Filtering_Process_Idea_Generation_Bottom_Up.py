@@ -12,6 +12,27 @@ todays_date = date.today()
 year_str = todays_date.year
 df_us_companies = get_zacks_us_companies()
 
+# Swap function
+def swapPositions(list, pos1, pos2):
+     
+    list[pos1], list[pos2] = list[pos2], list[pos1]
+    return list
+
+# Function to clean the names
+def clean_dates(date_name):
+    pattern_regex = re.compile(r'^(?:MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)')
+    day_of_week = re.search(pattern_regex,date_name).group(0)
+
+    pattern_regex = re.compile(r'[0-9][0-9]')
+    day_of_month = re.search(pattern_regex,date_name).group(0)
+
+    pattern_regex = re.compile(r'(?:JANUARY|FEBRUARY|MARCH|APRIL|MAY|JUNE|JULY|AUGUST|SEPTEMBER|OCTOBER|NOVEMBER|DECEMBER)')
+    month_of_year = re.search(pattern_regex,date_name).group(0)
+
+    formatted_date_string = "%s %s %s" % (day_of_week, day_of_month, month_of_year)
+
+    return formatted_date_string
+
 def scrape_table_sec():
     print("Getting data from SEC")
     url = "https://www.sec.gov/cgi-bin/srch-edgar?text=form-type+%%3D+10-12b&first=%s&last=%s" % (year_str,year_str)
@@ -46,17 +67,20 @@ def scrape_table_marketscreener_economic_calendar():
 
     tables = soup.find_all('table', recursive=True)
 
-    table = tables[6]
+    table = tables[0]
 
     table_rows = table.find_all('tr')
 
     table_header = table_rows[0]
-    td = table_header.find_all('td')
+    td = table_header.find_all('th')
     index = 0
 
     for obs in td:        
         text = str(obs.text).strip()
-        df.insert(index,str(obs.text).strip(),[],True)
+
+        if(len(text)==0):
+            text = "Date"
+        df.insert(index,text,[],True)
         index+=1
 
     index = 0
@@ -65,42 +89,71 @@ def scrape_table_marketscreener_economic_calendar():
 
     for tr in table_rows:        
         temp_row = []
-                
+        #import pdb; pdb.set_trace()
         td = tr.find_all('td')
-        
-        if(len(td) == 5):
-            #if not skip_first:
-            session = str(td[0].text).strip()
+        #class="card--shadowed"
+        if not skip_first:
+            td = tr.find_all('td')
+            th = tr.find('th') #The time is stored as a th
+            if(th):
+                temp_row.append(th.text)        
+
+            if(len(td) == 4):
+                session = str(td[0].text).strip()
+
+            for obs in td:  
+
+                text = str(obs.text).strip()
+                text = text.replace('\n','').replace('  ','')
+
+                if(text == ''):
+                    flag_class = obs.i.attrs['class'][2]
+                    #Maybe this is the country field, which means that the country is represented by a flag image
+                    if(flag_class == 'flag__us'):
+                        text = "US"
+                    elif(flag_class == 'flag__uk'): 
+                        text = "UK"
+
+                    elif(flag_class == 'flag__eu'): 
+                        text = "European Union"
+
+                    elif(flag_class == 'flag__de'): 
+                        text = "Germany"
+
+                    elif(flag_class == 'flag__jp'): 
+                        text = "Japan"
+
+                    elif(flag_class == 'flag__cn'): 
+                        text = "China"
+                    else:
+                        text = "OTHER"
+    
+                temp_row.append(text)        
+
+
+            pos1, pos2  = 1, 2
+
+            if(len(temp_row) == len(df.columns)):
+                temp_row = swapPositions(temp_row, pos1-1, pos2-1)
+            else:
+                temp_row.insert(0,session)
+                #print(temp_row)
+                #import pdb; pdb.set_trace()
+
+            df.loc[len(df.index)] = temp_row
         else:
-            temp_row.append(session)        
-        
-        for obs in td:  
-            text = str(obs.text).strip()
-            if(text == ''):
-                #Maybe this is the country field, which means that the country is represented by a flag image
-                try:
-                    if(obs.attrs['class'][0] == 'pays'):
-                        if(obs.findChild('img')):
-                            text = obs.findChild('img').attrs['src']
-                            # Format text to remove image and convert into country
-                            pattern_regex = re.compile(r'([a-z]*(?=[.]png))')                            
-                            text = re.search(pattern_regex,text).group(0)
-                            text = text.upper()
+            skip_first = False
 
-                        else:
-                            text = str(obs.text).strip()
-                except KeyError as e:
-                    pass
+    #Remove Duplicates (Country, Events)
+    df = df.drop_duplicates(subset=['Country', 'Events'])
 
-            temp_row.append(text)        
+    #Remove OTHER Countries
+    df = df[df.Country != 'OTHER'].reset_index(drop=True)
 
-            if not skip_first:   
-                if(len(temp_row) == len(df.columns)):
-                    df.loc[len(df.index)] = temp_row
-               
-        skip_first = False
-    df['Session'] = df['Session'].str.replace('\n\n','|')
-    df['Session'] = df['Session'].str.replace('\n','|')
+    #Format Date into Date field '%A%d%B'
+    #df['Date'] = pd.to_datetime(df['Date'], format='%A%d%B')
+    # Updated the date columns
+    df['Date'] = df['Date'].apply(clean_dates)
 
     return df
 
@@ -204,7 +257,7 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0, Tru
 
 sheet_name = 'Economic Calendar'
 df_economic_calendar = scrape_table_marketscreener_economic_calendar()
-df_economic_calendar = df_economic_calendar.drop_duplicates()
+#df_economic_calendar = df_economic_calendar.drop_duplicates()
 
 # Write the updated df to the excel sheet, and overwrite what was there before
 write_dataframe_to_excel(excel_file_path, sheet_name, df_economic_calendar, False, 0, True)
