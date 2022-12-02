@@ -29,7 +29,7 @@ def main():
     file_name = "Trading_Excel_Files-%s-%s-%s-%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day, HOUR, MINUTE, SECONDS)
 
     # create a ZipFile object
-    with ZipFile('sampleDir.zip', 'w') as zipObj:
+    with ZipFile(file_name + '.zip', 'w') as zipObj:
        # Iterate over all the files in directory
        for folderName, subfolders, filenames in os.walk(dirName):
            for filename in filenames:
