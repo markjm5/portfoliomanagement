@@ -41,7 +41,9 @@ def main():
     SECONDS = datetime.now().second
 
     file_name = "Trading_Excel_Files-%s-%s-%s-%s-%s-%s.zip" % (todays_date.year, todays_date.month, todays_date.day, HOUR, MINUTE, SECONDS)
-    file_path = "%s/../../../Desktop/%s" % (sys.path[0],file_name)
+    file_dir = "%s/../../../Desktop/" % (sys.path[0])
+    file_path = "%s/%s" % (file_dir,file_name)
+
     # create a ZipFile object
     with ZipFile(file_path, 'w') as zipObj:
        # Iterate over all the files in directory
@@ -52,18 +54,30 @@ def main():
                # Add file to zip
                zipObj.write(filePath)
 
+    #os.chmod(file_path, 0o777)
+
     file_metadata = {
         "name": file_name,
         "parents": [google_drive_folder_id]
     }
+    #file_name = "Form.pdf"
 
-    media = MediaFileUpload(file_path,mimetype=mime_type)
-
-    service.files().create(
+    media = MediaFileUpload(file_dir + format(file_name),chunksize=5 * 1024 * 1024,mimetype=mime_type,resumable=True)
+    #import pdb; pdb.set_trace()
+    request = service.files().create(
         body=file_metadata,
         media_body=media,
         fields='id'
-    ).execute()
+    )
+
+    response = None
+    while response is None:
+        status, response = request.next_chunk()
+        if status:
+            print("Uploaded %d%%." % int(status.progress() * 100))
+
+    print("Upload of {} is complete.".format(file_name))
+
 
 if __name__ == '__main__':
    main()
