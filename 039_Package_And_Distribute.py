@@ -11,8 +11,6 @@ API_NAME = "drive"
 API_VERSION = "v3"
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
-service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)
-
 google_drive_folder_id = "1-hfhZ9phouewa36YVU67x2h8Q8lkXzB6"
 mime_type = "application/zip"
 
@@ -64,6 +62,7 @@ def main():
 
     media = MediaFileUpload(file_dir + format(file_name),chunksize=5 * 1024 * 1024,mimetype=mime_type,resumable=True)
     #import pdb; pdb.set_trace()
+    service = Create_Service(CLIENT_SECRET_FILE,API_NAME,API_VERSION,SCOPES)    
     request = service.files().create(
         body=file_metadata,
         media_body=media,
