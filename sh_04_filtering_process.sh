@@ -22,4 +22,4 @@ echo $(date)
 echo "**************************************"
 echo "* Started 039_Package_And_Distribute *"
 echo "**************************************"
-python ~/Documents/PythonProjects/PortfolioManagement/039_Package_And_Distribute.py
+#python ~/Documents/PythonProjects/PortfolioManagement/039_Package_And_Distribute.py
