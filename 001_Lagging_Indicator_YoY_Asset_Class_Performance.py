@@ -52,14 +52,14 @@ df_percentage_change = pd.DataFrame(data)
 for etf in etfs:
 
     #groupby year and determine the daily percent change by year, and add it as a column to df
-    df_etf_data['%s_pct_ch' % (etf,)] = df_etf_data.groupby(df_etf_data.DATE.dt.year)[etf].apply(pd.Series.pct_change)
+    df_etf_data['%s_pct_ch' % (etf,)] = df_etf_data.groupby(df_etf_data.DATE.dt.year, group_keys=False)[etf].apply(pd.Series.pct_change)
 
     #Drop unnecessary columns
     df_etf_data = df_etf_data.drop(columns=etf, axis=1)
 
     # groupby year and aggregate sum of pct_ch to get the yearly return
     #df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year)['%s_pct_ch' % (etf,)].sum().mul(100).reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
-    df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year)['%s_pct_ch' % (etf,)].sum().reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
+    df_yearly_pct_ch = df_etf_data.groupby(df_etf_data.DATE.dt.year, group_keys=False)['%s_pct_ch' % (etf,)].sum().reset_index().rename(columns={'%s_pct_ch' % (etf,): etf})
 
     df_percentage_change = combine_df_on_index(df_percentage_change, df_yearly_pct_ch, 'DATE')
 
