@@ -161,6 +161,7 @@ sheet_name = 'Data World GDP'
 #Get Capital Investment Data for the following countries
 country_list = ['USA','CHN','CEB','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
 #'EUN',
+import pdb; pdb.set_trace()
 df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, labels=True, mrv=1) # most recent 1 year
 
 df_capital_investment['Country'] = df_capital_investment['Country'].map({'Korea, Rep.': 'South Korea', 'Russian Federation': 'Russia'})

@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 from datetime import datetime as dt
 from datetime import date
@@ -5,6 +6,11 @@ from bs4 import BeautifulSoup
 from requests.models import parse_header_links
 from common import get_oecd_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_stlouisfed_data, get_page
+
+isWindows = False
+
+if(sys.platform == 'win32'):
+  isWindows = True
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/014_US_Global_Money_Supply.xlsm'
 
@@ -36,7 +42,13 @@ def scrape_money_supply_table(url):
       for obs in td:
         if(index == 3):
           dt_date = dt.strptime(str(obs.text),'%b/%y')
-          text = dt_date.strftime('%-d/%-m/%Y')
+          #import pdb; pdb.set_trace()
+
+          if(isWindows):
+            text = dt_date.strftime('%d/%m/%Y')
+
+          else:
+            text = dt_date.strftime('%-d/%-m/%Y')
         else:
           text = str(obs.text).strip()
         temp_row.append(text)        

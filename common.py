@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import sys
 import stat
 import requests
@@ -21,6 +24,11 @@ from datetime import date
 from datetime import datetime as dt
 from dateutil import relativedelta
 from bs4 import BeautifulSoup
+
+isWindows = False
+
+if(sys.platform == 'win32'):
+  isWindows = True
 
 ############################
 # Data Retrieval Functions #
@@ -143,8 +151,13 @@ def get_oecd_data(dataset, dimensions, params):
 
   url = "https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/%s/%s/all?startTime=%s&endTime=%s" % (dataset, dim_str,params['startTime'],params['endTime'])
   #file_path = '/Users/markmukherjee/Documents/PythonProjects/PortfolioManagement/XML/%s' % params['filename'] 
-  file_path = "%s/XML/%s" % (sys.path[0],params['filename'])
-  #import pdb;  pdb.set_trace()
+
+  if(isWindows):
+    file_path = "%s\\XML\\%s" % (sys.path[0],params['filename'])
+  
+  else:
+    file_path = "%s/XML/%s" % (sys.path[0],params['filename'])
+
   resp = requests.get(url=url)
 
   try:
@@ -166,6 +179,7 @@ def get_oecd_data(dataset, dimensions, params):
             raise Exception("Http Response (%s) Is Not 200: %s" % (url,str(resp.status_code)))
 
   resp_formatted = resp.text[resp.text.find('<'):len(resp.text)]
+
   # Write response to an XML File
   with open(file_path, 'w') as f:
     f.write(resp_formatted)
@@ -203,7 +217,12 @@ def get_oecd_data(dataset, dimensions, params):
     case 'QTR':
       #From year_start to year_end, calculate all the quarters. Populate date_range_list and date_list
       date_list = pd.date_range('%s-01-01' % (year_start),'%s-01-01' % (int(year_end)+1), freq='QS').strftime("1/%-m/%Y").tolist()
-      date_ranges = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
+  
+      if(isWindows):
+        date_ranges = pd.PeriodIndex(pd.to_datetime(date_list, format='%Y-%m-%d'),freq='Q').strftime('%Y-Q%q')
+
+      else:
+        date_ranges = pd.PeriodIndex(pd.to_datetime(date_list, format='%d/%m/%Y'),freq='Q').strftime('%Y-Q%q')
 
       date_range_list = date_ranges.tolist()
 
@@ -237,7 +256,11 @@ def get_oecd_data(dataset, dimensions, params):
           df.loc[obs_row, current_country] = round(float(obs_value),9)        
 
   #Set the date to the correct datatype, and ensure the format accounts for the correct positioning of day and month values
-  df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
+  if(isWindows):
+    df['DATE'] = pd.to_datetime(df['DATE'],format='%Y-%m-%d')
+
+  else:
+    df['DATE'] = pd.to_datetime(df['DATE'],format='%d/%m/%Y')
 
   print("Retrieved Data for Series %s" % (dataset,))
 
@@ -1277,8 +1300,13 @@ def get_zacks_us_companies():
 
 def convert_excelsheet_to_dataframe(excel_file_path,sheet_name,date_exists=False, index_col=None, date_format='%d/%m/%Y'):
 
-  filepath = os.path.realpath(__file__)
-  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+  if(isWindows):
+    filepath = os.getcwd()
+    excel_file_path = filepath + excel_file_path.replace("/","\\")
+
+  else:
+    filepath = os.path.realpath(__file__)
+    excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   if(index_col):
     df = pd.read_excel(excel_file_path, sheet_name=sheet_name, index_col=index_col, engine='openpyxl')
@@ -1298,8 +1326,13 @@ def write_to_directory(df,filename):
 
 def write_dataframe_to_excel(excel_file_path,sheet_name, df, include_index, date_position=None, format_header=False):
 
-  filepath = os.path.realpath(__file__)
-  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+  if(isWindows):
+    filepath = os.getcwd()
+    excel_file_path = filepath + excel_file_path.replace("/","\\")
+
+  else:
+    filepath = os.path.realpath(__file__)
+    excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
   sheet = book[sheet_name]
@@ -1355,8 +1388,14 @@ def unzip_file(zip_file_path, zip_file, chunk_size=128):
     print("The file has been deleted successfully")
 
 def write_value_to_cell_excel(excel_file_path,sheet_name, row, column, value):
-  filepath = os.path.realpath(__file__)
-  excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
+
+  if(isWindows):
+    filepath = os.getcwd()
+    excel_file_path = filepath + excel_file_path.replace("/","\\")
+
+  else:
+    filepath = os.path.realpath(__file__)
+    excel_file_path = filepath[:filepath.rfind('/')] + excel_file_path
 
   book = openpyxl.load_workbook(excel_file_path, read_only=False, keep_vba=True)
   sheet = book[sheet_name]
