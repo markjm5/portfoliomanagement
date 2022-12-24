@@ -1,8 +1,8 @@
 import pandas as pd
 from datetime import date
 from bs4 import BeautifulSoup
-from common import get_oecd_data, get_invest_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_yf_historical_stock_data, get_page
+from common import get_oecd_data, get_invest_data, get_invest_data_manual_scrape, convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import combine_df_on_index, get_yf_historical_stock_data, get_page, get_page_selenium, convert_html_table_to_df
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
@@ -97,11 +97,12 @@ df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_
 #df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%b %d, %Y')
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_10y, False, 0)
 
-country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','u.k.','russia','turkey','poland','hungary','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','indonesia','south korea','philippines','thailand','vietnam']
-#country_list = ['u.s.'] 
+country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','uk','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','new-zealand','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam']
+#removed_list = ['mexico']
 
-#country_missing = ['denmark','sweden']
-df_invest_10y = get_invest_data(country_list, '10', '28/12/2000')
+#df_invest_10y = get_invest_data(country_list, '10', '28/12/2000') #Needs to be replaced because it no longer works
+df_invest_10y = get_invest_data_manual_scrape(country_list,'10')
+df_invest_10y = df_invest_10y.rename(columns={"hong-kong": "hong kong", "south-korea": "south korea", "czech-republic": "czech republic", "south-africa": "south africa", "new-zealand": "new zealand", "uk":"u.k."})
 
 df_updated_invest_10y = combine_df_on_index(df_original_invest_10y, df_invest_10y, 'DATE')
 
@@ -155,11 +156,12 @@ df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_n
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_2y, False, 0)
 
 #TODO: match country list with what is in excel file, without the missing_country list.
-country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','norway','switzerland', 'u.k.','russia','turkey','poland','czech republic','south africa','japan','australia','new zealand','singapore','china','hong kong','india','south korea','philippines','thailand','vietnam']
-#country_missing = ['denmark','sweden', 'mexico', 'greece', 'hungary', 'indonesia']
+country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','norway','switzerland', 'uk','russia','turkey','poland','czech-republic','south-africa','japan','australia','new-zealand','singapore','china','hong-kong','india','south-korea','philippines','thailand','vietnam']
 
-df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
-#df_invest_2y = get_invest_data(country_missing, '2', '28/12/2000')
+#df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
+df_invest_2y = get_invest_data_manual_scrape(country_list,'2')
+df_invest_2y = df_invest_2y.rename(columns={"hong-kong": "hong kong", "south-korea": "south korea", 
+            "south-africa": "south africa", "new-zealand": "new zealand", "czech-republic": "czech republic", "uk":"u.k."})
 
 df_updated_invest_2y = combine_df_on_index(df_original_invest_2y, df_invest_2y, 'DATE')
 

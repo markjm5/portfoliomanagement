@@ -1023,6 +1023,36 @@ def get_invest_data(country_list, bond_year, from_date):
 
   return df
 
+def get_invest_data_manual_scrape(country_list, bond_year):
+
+  data = {'DATE': []}
+
+  # Convert the dictionary into DataFrame
+  df_invest_data = pd.DataFrame(data)
+
+  for country in country_list:
+    print("Getting %s-y data for: %s" % (bond_year,country))
+    url = "https://www.investing.com/rates-bonds/%s-%s-year-bond-yield-historical-data" % (country,bond_year)
+    page = get_page_selenium(url)
+
+    soup = BeautifulSoup(page, 'html.parser')
+    table = soup.find('table') 
+    df_country_rates = convert_html_table_to_df(table, False)
+
+    try:
+        df_country_rates = df_country_rates.drop(['Open', 'High', 'Low', 'Change %'], axis=1)
+        df_country_rates['Date'] = pd.to_datetime(df_country_rates['Date'],format='%b %d, %Y')
+        df_country_rates = df_country_rates.rename(columns={"Date": "DATE","Price": country})
+        df_country_rates[country] = pd.to_numeric(df_country_rates[country])
+        df_invest_data = combine_df_on_index(df_invest_data, df_country_rates, 'DATE')
+
+    except KeyError as e:
+        print("======================================%s DOES NOT EXIST=======================================" % country)
+        print("======================================%s DOES NOT EXIST=======================================" % country)
+        print("======================================%s DOES NOT EXIST=======================================" % country)
+
+  return df_invest_data.drop_duplicates()
+
 def scrape_world_gdp_table(url):
   #Scrape GDP Table from Trading Economics
   #url = "https://tradingeconomics.com/matrix"
