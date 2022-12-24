@@ -2,6 +2,7 @@ import pandas as pd
 import wbgapi as wb
 import numpy as np
 import re
+import json
 import calendar
 from datetime import datetime as dt
 from datetime import date
@@ -159,22 +160,42 @@ sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
 #Get Capital Investment Data for the following countries
-country_list = ['USA','CHN','CEB','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
-#'EUN',
-import pdb; pdb.set_trace()
-df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, labels=True, mrv=1) # most recent 1 year
+#country_list = ['USA','CHN','CEB','JPN','DEU','GBR','FRA','IND','ITA','CAN','KOR','RUS','BRA','AUS','ESP','MEX','IDN','NLD']
+#country_list = ['USA']
 
-df_capital_investment['Country'] = df_capital_investment['Country'].map({'Korea, Rep.': 'South Korea', 'Russian Federation': 'Russia'})
-#df_capital_investment.loc[df_capital_investment["Country"] == "Korea, Rep."].Country = "South Korea"
-#df_capital_investment.loc[df_capital_investment["Country"] == "Russian Federation"].Country = "Russia"
+#'EUN',
+#df_capital_investment =  wb.data.DataFrame(['NE.GDI.TOTL.ZS'], country_list, labels=True, mrv=1) # most recent 1 year
+
+#WORKING
+#https://api.worldbank.org/v2/country/USA;CHN;CEB;JPN;DEU;GBR;FRA;IND;ITA;CAN;KOR;RUS;BRA;AUS;ESP;MEX;IDN;NLD/indicator/NE.GDI.TOTL.ZS?format=json&per_page=1000
+
+page = get_page('https://api.worldbank.org/v2/country/USA;CHN;CEB;JPN;DEU;GBR;FRA;IND;ITA;CAN;KOR;RUS;BRA;AUS;ESP;MEX;IDN;NLD/indicator/NE.GDI.TOTL.ZS?format=json&per_page=1000&mrv=1')
+
+list_capital_investment = json.loads(page.text)[1]
+
+#TODO: Loop through data and construct dataframe consisting of: CODE, COUNTRY, INVESTMENT_PERCENTAGE
+
+data = {'CODE': [],
+        'COUNTRY':[],
+        'INVESTMENT_PERCENTAGE':[]
+        }
+
+df_capital_investment = pd.DataFrame(data)
+
+for country in list_capital_investment:
+  
+  country_name = country['country']['value']
+  country_code = country['countryiso3code']
+
+  if(country_code == 'KOR'):
+    country_name = 'South Korea'
+  if(country_code == 'RUS'):
+    country_name = 'Russia'
+
+  country_investment_percentage = country['value']
+  df_capital_investment.loc[len(df_capital_investment.index)] = [country_code, country_name, country_investment_percentage]
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
-
-# Add new index
-df_capital_investment.reset_index(level=0, inplace=True)
-
-# Rename columns in df_capital_investment
-df_capital_investment = df_capital_investment.rename(columns={'economy': 'CODE','Country': 'COUNTRY','NE.GDI.TOTL.ZS': 'INVESTMENT_PERCENTAGE'})
 
 # Combine df_original with df_capital_investment
 #df_updated = df_original.merge(df_capital_investment, on='CODE')
