@@ -3,15 +3,14 @@ from datetime import datetime
 
 
 def run_script(file_name):
-    now = datetime.now()
-    current_time = now.strftime("%H:%M:%S")
-    print("current time = %s" % (current_time))
     print("=================================================================================")
     print("* Started %s *" % (file_name))
     print("=================================================================================")
 
-    run_script("%s" % (file_name))
+    os.system("python %s" % (file_name))
 
+now_start = datetime.now()
+start_time = now_start.strftime("%H:%M:%S")
 
 run_script("001_Lagging_Indicator_YoY_Asset_Class_Performance.py")
 run_script("002_Lagging_Indicator_US_GDP.py")
@@ -35,3 +34,14 @@ run_script("020_Leading_Indicator_US_Housing_Market.py")
 run_script("024_Filtering_Process_ETF_Universe.py")
 run_script("030_Filtering_Process_US_Stocks.py")
 run_script("031_Filtering_Process_Idea_Generation_Bottom_Up.py")
+
+now_finish = datetime.now()
+finish_time = now_finish.strftime("%H:%M:%S")
+
+difference = now_finish - now_start
+
+seconds_in_day = 24 * 60 * 60
+
+print("Start Time = %s" % (start_time))
+print("End Time = %s" % (finish_time))
+print(divmod(difference.days * seconds_in_day + difference.seconds, 60))

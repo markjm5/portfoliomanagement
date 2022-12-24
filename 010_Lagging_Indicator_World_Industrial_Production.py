@@ -153,7 +153,7 @@ def scrape_table_china_industrial_production():
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-"""
+
 sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
@@ -256,7 +256,7 @@ cols.insert(4, cols.pop(cols.index('Unit')))
 df_updated = df_updated[cols]
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-"""
+
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
