@@ -153,7 +153,7 @@ def scrape_table_china_industrial_production():
 #####################################
 #   Get Capital Investment Data     #
 #####################################
-
+"""
 sheet_name = 'Data World GDP'
 
 # Use worldbank API to get capital investment data
@@ -256,7 +256,7 @@ cols.insert(4, cols.pop(cols.index('Unit')))
 df_updated = df_updated[cols]
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
-import pdb; pdb.set_trace()
+"""
 ##################################################
 #   Get China IP Data from Trading Economics     #
 ##################################################
@@ -272,12 +272,14 @@ df_ip_yoy = scrape_table_china_industrial_production()
 df_caixin_pmi['period_month'] = pd.DatetimeIndex(df_caixin_pmi['Date']).month
 df_ip_yoy['period_month'] = pd.DatetimeIndex(df_ip_yoy['Date']).month
 
-#Combine on temp field period_month
+#Drop the date column for df_ip_yoy, because it has the year as 1900
+df_ip_yoy = df_ip_yoy.drop(columns='Date', axis=1)
+
+#Combine on temp field period_month 
 df_china_pmi = combine_df_on_index(df_caixin_pmi, df_ip_yoy,'period_month')
 
 #Combine finished, so we dont need period_month anymore
 df_china_pmi = df_china_pmi.drop(columns='period_month', axis=1)
-#import pdb; pdb.set_trace()
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
