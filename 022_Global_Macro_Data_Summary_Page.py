@@ -16,8 +16,25 @@ def get_current_ffr_target():
     
     table = soup.find('table')
 
-    ffr_str = table.find('tbody').find('tr').find('td').text.strip()
+    table_rows = table.find_all('tr')
+    data = {'FFR_TARGET': [], 'THIS_WEEK':[],'MONTH_AGO':[],'YEAR_AGO':[]}
+    df = pd.DataFrame(data)
 
+    #Insert New Row. Format the data to show percentage as float
+    for tr in table_rows:
+        temp_row = []
+
+        td = tr.find_all('td')
+        for obs in td:
+            text = str(obs.text).strip()
+            temp_row.append(text)        
+    
+        if(len(temp_row)> 0):
+            df.loc[len(df.index)] = temp_row
+
+
+    ffr_str = df.iloc[0]['FFR_TARGET']
+        
     pattern_select = re.compile(r'([0-9\.\-]*(?=\)))')
 
     arr_rate = pattern_select.findall(ffr_str)
