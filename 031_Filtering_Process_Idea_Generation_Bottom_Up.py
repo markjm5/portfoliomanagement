@@ -44,15 +44,17 @@ def scrape_table_sec():
     table = tables[4]
 
     df_sec = convert_html_table_to_df(table, False)
+    if(len(df_sec) > 0):
+        #Drop unnecessary columns
+        df_sec = df_sec.drop(columns='No.', axis=1)
+        df_sec = df_sec.drop(columns='Format', axis=1)
+        df_sec = df_sec.drop(columns='Size', axis=1)
 
-    #Drop unnecessary columns
-    df_sec = df_sec.drop(columns='No.', axis=1)
-    df_sec = df_sec.drop(columns='Format', axis=1)
-    df_sec = df_sec.drop(columns='Size', axis=1)
+        #df_sec = df_sec.rename(columns={"Company": "COMPANY","Form Type":"FORM_TYPE", "Filing Date": "FILING_DATE"})
 
-    #df_sec = df_sec.rename(columns={"Company": "COMPANY","Form Type":"FORM_TYPE", "Filing Date": "FILING_DATE"})
-
-    df_sec['Filing Date'] = pd.to_datetime(df_sec['Filing Date'],format='%m/%d/%Y')
+        df_sec['Filing Date'] = pd.to_datetime(df_sec['Filing Date'],format='%m/%d/%Y')
+    else:
+        print("No data in Sec.gov")
 
     return df_sec
 
