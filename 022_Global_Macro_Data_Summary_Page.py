@@ -157,7 +157,10 @@ def get_df_row(df, date, col_name):
     # match on year and month only and don't worry about the day
     df = df.loc[(df['DATE'].dt.to_period('M') == date.to_period('M'))].T    
     df = df.iloc[1: , :]    
-    df.rename(columns={ df.columns[0]: col_name }, inplace = True)
+    #df.rename(columns={ df.columns[0]: col_name }, inplace = True)
+    #Get the last column because it has the latest data
+    df.rename(columns={ df.columns[len(df.columns)-1]: col_name }, inplace = True)
+
     df.reset_index(inplace=True)
     df = df.rename(columns = {'index':'COL0'})
     #in calse df has extra columns, make sure only to return COL0 and col_name fields each time
@@ -264,7 +267,7 @@ sheet_name_013 = 'Database'
 df_data_013 = convert_excelsheet_to_dataframe(excel_file_path_013, sheet_name_013, True)
 
 df_us_treasury_yields = get_data(df_data_013)
-
+import pdb;  pdb.set_trace()
 # Get DXY for Last, 6m, 12m
 excel_file_path_001 = '/Trading_Excel_Files/01_Lagging_Coincident_Indicators/001_Lagging_Indicator_YoY_Asset_Class_Performance.xlsm'
 sheet_name_001 = 'Database'
