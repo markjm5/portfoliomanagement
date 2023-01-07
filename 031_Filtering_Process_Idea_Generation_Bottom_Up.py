@@ -3,7 +3,7 @@ import pandas as pd
 import re
 from datetime import date
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_page,convert_html_table_to_df, get_zacks_us_companies
+from common import combine_df_on_index, get_page, get_page_selenium, convert_html_table_to_df, get_zacks_us_companies
 from bs4 import BeautifulSoup
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/031_Filtering_Process_Idea_Generation_Bottom_Up.xlsm'
@@ -175,9 +175,11 @@ def scrape_table_earningswhispers_earnings_calendar():
 def scrape_earningswhispers_day(day):
     url = "https://www.earningswhispers.com/calendar?sb=c&d=%s&t=all" % (day,)
     #df_us_companies = get_zacks_us_companies()
+    page = get_page_selenium(url)
+    #import pdb;  pdb.set_trace()
 
-    page = get_page(url)
-    soup = BeautifulSoup(page.content, 'html.parser')
+    #soup = BeautifulSoup(page.content, 'html.parser')
+    soup = BeautifulSoup(page, 'html.parser')
 
     date_str = soup.find('div', attrs={"id":"calbox"})
     date_str = date_str.text.strip().replace('for ','')

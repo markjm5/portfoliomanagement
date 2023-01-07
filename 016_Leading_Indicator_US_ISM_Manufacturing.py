@@ -18,7 +18,7 @@ def scrape_manufacturing_new_orders_production():
     para_manufacturing = "" 
     para_new_orders = ""
     para_production = ""
-    pattern_manufacturing = re.compile(r'(manufacturing industries report(ed|ing) growth in (January|February|...|December))')
+    pattern_manufacturing = re.compile(r'(manufacturing industries (that\s)?report(ed|ing) growth in (January|February|...|December))')
     pattern_new_orders = re.compile(r'(growth in new orders [A-Za-z,&;\s]* (January|February|...|December))')
     pattern_production = re.compile(r'(growth in production [A-Za-z,&;\s]* (January|February|...|December))')
 
