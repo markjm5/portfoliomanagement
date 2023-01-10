@@ -113,3 +113,20 @@ df_updated = combine_df_on_index(df_original, df_ECBASSETSW,"DATE")
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
 
 print("Done!")
+
+###########################################
+#   Get St Louis US Balance of Payments   #
+###########################################
+
+sheet_name = 'Database BOP'
+
+df_BOPGSTB = get_stlouisfed_data('BOPGSTB')
+
+df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
+
+df_updated = combine_df_on_index(df_original, df_BOPGSTB,"DATE")
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, 0)
+
+print("Done!")
