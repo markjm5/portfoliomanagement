@@ -142,9 +142,11 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 # Get Global Money Supply Data from OECD #
 ##########################################
 
-#TODO: Get data from correct OECD time series
-#TODO: Update excel sheet to remove unnecessary columns
-# https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI_FIN/MABM.AUS+CAN+CHL+COL+CZE+DNK+HUN+ISL+ISR+JPN+KOR+MEX+NZL+NOR+POL+SWE+CHE+TUR+GBR+USA+EA19+OECD+NMEC+BRA+CHN+IND+IDN+RUS+ZAF.M/all?startTime=2018&endTime=2021
+# Get data from correct OECD time series
+# Update excel sheet to remove unnecessary columns
+# https://stats.oecd.org/restsdmx/sdmx.ashx/GetData/MEI_FIN/MABM.AUS+CAN+CHL+COL+CZE+DNK+HUN+ISL+ISR+JPN+KOR+MEX+NZL+NOR+POL+SWE+CHE+TUR+GBR+USA+EA19+OECD+NMEC+BRA+CHN+IND+IDN+RUS+ZAF.M/all?startTime=2018&endTime=2023
+
+#TODO: Why are a lot of countries time series stopping at 12-2018. Is there another dataset I need to use?
 
 country = ['AUS','BRA','CAN','CHE','CHL','CHN','COL','CRI','CZE','DNK','EA19','GBR','HUN','IDN','IND','ISL','ISR','JPN','KOR','MEX','NOR','OECD','OECDE','POL','RUS','SWE','TUR','USA','ZAF','NZL']
 subject = ['MABM']
