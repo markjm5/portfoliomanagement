@@ -98,7 +98,6 @@ df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_10y, False, 0)
 
 country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','uk','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','new-zealand','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam']
-missing = ['mexico'] #TODO: Fix urls for these countries
 
 #df_invest_10y = get_invest_data(country_list, '10', '28/12/2000') #Needs to be replaced because it no longer works
 df_invest_10y = get_invest_data_manual_scrape(country_list,'10')
@@ -157,7 +156,7 @@ df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_n
 
 #TODO: match country list with what is in excel file, without the missing_country list.
 country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','norway','switzerland', 'uk','russia','turkey','poland','czech-republic','south-africa','japan','australia','new-zealand','singapore','china','hong-kong','india','south-korea','philippines','thailand','vietnam']
-missing = ['new zealand', 'south africa', 'south korea'] #TODO: Fix urls for these countries
+missing = ['mexico', 'greece', 'hungary', 'indonesia'] #TODO: Fix urls for these countries because they are have 3 months
 
 #df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
 df_invest_2y = get_invest_data_manual_scrape(country_list,'2')
@@ -179,6 +178,37 @@ df_updated_invest_2y = df_updated_invest_2y[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
+
+###########################################
+# Get 3y database Data from Investing.com #
+###########################################
+
+# TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
+# mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
+#country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','greece','denmark','sweden','norway','switzerland','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam','uk','new-zealand', 'mexico']
+
+sheet_name = 'DB 3y' #TODO: Make sure excel file 013 has updated sheet name
+
+df_original_invest_3y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+
+#TODO: match country list with what is in excel file, without the missing_country list.
+country_list = ['mexico', 'greece', 'hungary', 'indonesia']
+
+df_invest_3y = get_invest_data_manual_scrape(country_list,'3')
+
+df_updated_invest_3y = combine_df_on_index(df_original_invest_3y, df_invest_3y, 'DATE')
+
+# get a list of columns
+cols = list(df_updated_invest_3y)
+# move the column to head of list using index, pop and insert
+cols.insert(0, cols.pop(cols.index('DATE')))
+
+# reorder
+df_updated_invest_3y = df_updated_invest_3y[cols]
+
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_3y, False, 0)
+
 
 #################################################
 # Get Credit Rating Data from Trading Economics #
