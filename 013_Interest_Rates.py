@@ -116,6 +116,9 @@ df_updated_invest_10y = df_updated_invest_10y[cols]
 # format date
 #df_updated_invest_10y['DATE'] = pd.to_datetime(df_updated_invest_10y['DATE'],format='%b %d, %Y')
 
+#TODO: Fill NA values by propegating values before? Need to test
+df_updated_invest_10y = df_updated_invest_10y.fillna(method='ffill')
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_10y, False, 0)
 
@@ -176,6 +179,9 @@ df_updated_invest_2y = df_updated_invest_2y[cols]
 # format date
 #df_updated_invest_2y['DATE'] = pd.to_datetime(df_updated_invest_2y['DATE'],format='%b %d, %Y')
 
+#TODO: Fill NA values by propegating values before? Need to test
+df_updated_invest_2y = df_updated_invest_2y.fillna(method='ffill')
+
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
 
@@ -183,14 +189,14 @@ write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, Fals
 # Get 3y and 5y database Data from Investing.com #
 ##################################################
 
-# TODO: use below country list to get data and create df. Be mindful of order of countries, because it is used in 'Big Picture' sheet to load data
+# use below country list to get data and create df. Used in 'Big Picture' sheet to load data
 # mexico = https://www.investing.com/rates-bonds/mexico-10-year-historical-data
 
-sheet_name = 'DB 3y5y' #TODO: Make sure excel file 013 has updated sheet name
+sheet_name = 'DB 3y5y' 
 
 df_original_invest_3y5y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
 
-#TODO: match country list with what is in excel file, without the missing_country list.
+# match country list with what is in excel file, without the missing_country list.
 country_list_3y = ['mexico', 'hungary', 'indonesia', 'norway']
 country_list_5y = ['greece']
 
@@ -207,6 +213,9 @@ cols.insert(0, cols.pop(cols.index('DATE')))
 
 # reorder
 df_updated_invest_3y5y = df_updated_invest_3y5y[cols]
+
+#TODO: Fill NA values by propegating values before? Need to test
+df_updated_invest_3y5y = df_updated_invest_3y5y.fillna(method='ffill')
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_3y5y, False, 0)
