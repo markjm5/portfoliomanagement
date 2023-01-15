@@ -3,48 +3,51 @@ import csv
 import pandas as pd
 from datetime import date
 from bs4 import BeautifulSoup
-from common import get_oecd_data, get_invest_data,convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import get_oecd_data, get_invest_data, write_dataframe_to_excel, get_invest_data_manual_scrape, convert_excelsheet_to_dataframe
 from common import combine_df_on_index, get_yf_historical_stock_data, get_page, get_page_selenium, convert_html_table_to_df
+
+def convert_excelsheet_to_dataframe_temp(excel_file_path,sheet_name,date_exists=False, index_col=None, date_format='%d/%m/%Y'):
+
+  filepath = os.getcwd()
+  excel_file_path = filepath + excel_file_path.replace("/","\\")
+
+  df = pd.read_excel(excel_file_path, sheet_name=sheet_name, engine='openpyxl')
+
+  # format date
+  df['DATE'] = pd.to_datetime(df['DATE'],format='%b %d, %Y')
+
+  df[sheet_name] = pd.to_numeric(df[sheet_name])
+
+  return df
+
 
 excel_file_path = '/Trading_Excel_Files/02_Interest_Rates_FX/013_Interest_Rates.xlsm'
 
-def read_csv(excel_file_path):
+sheet_names = ['mexico','norway','hungary','greece','indonesia']
 
-    filepath = os.getcwd()
-    excel_file_path = filepath + excel_file_path.replace("/","\\")
+data = {'DATE': []}
 
-    df = pd.read_csv(excel_file_path)
+# Convert the dictionary into DataFrame
+df_invest_data = pd.DataFrame(data)
 
-    return df
+for sheet_name in sheet_names:
 
+  country_df = convert_excelsheet_to_dataframe_temp(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+  df_invest_data = combine_df_on_index(df_invest_data, country_df, 'DATE')
 
-def get_invest_data_manual_scrape(country_list, bond_year):
+#TODO: Combine with master country DF
+#TODO: Get Sheet 3y5y, and combine master country DF with the sheet
+#TODO: Write to excel
 
-  data = {'DATE': []}
+sheet_name = 'DB 3y5y' #TODO: Make sure excel file 013 has updated sheet name
 
-  # Convert the dictionary into DataFrame
-  df_invest_data = pd.DataFrame(data)
+df_original_invest_3y5y = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+df_updated_invest_3y5y = combine_df_on_index(df_original_invest_3y5y, df_invest_data, 'DATE')
 
-  for country in country_list:
-    print("Getting %s-y data for: %s" % (bond_year,country))
-    file_path = '/trading_excel_files/reference/%sy/%s-%s-Year.csv' % (bond_year,country,bond_year)
-    
-    df_country_rates = read_csv(file_path)
+# Write the updated df back to the excel sheet
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_3y5y, False, 0)
 
-    try:
-        df_country_rates = df_country_rates.drop(['Open', 'High', 'Low', 'Change %'], axis=1)
-        df_country_rates['Date'] = pd.to_datetime(df_country_rates['Date'],format='%b %d, %Y')
-        df_country_rates = df_country_rates.rename(columns={"Date": "DATE","Price": country})
-        df_country_rates[country] = pd.to_numeric(df_country_rates[country])
-        df_invest_data = combine_df_on_index(df_invest_data, df_country_rates, 'DATE')
-
-    except KeyError as e:
-        print("======================================%s DOES NOT EXIST=======================================" % country)
-        print("======================================%s DOES NOT EXIST=======================================" % country)
-        print("======================================%s DOES NOT EXIST=======================================" % country)
-
-  return df_invest_data.drop_duplicates()
-
+"""
 
 ############################################
 # Get 10y database Data from Investing.com #
@@ -105,6 +108,6 @@ df_updated_invest_2y = df_updated_invest_2y[cols]
 
 # Write the updated df back to the excel sheet
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_invest_2y, False, 0)
-
+"""
 
 print("Done!")
