@@ -214,7 +214,7 @@ cols.insert(0, cols.pop(cols.index('DATE')))
 # reorder
 df_updated_invest_3y5y = df_updated_invest_3y5y[cols]
 
-#TODO: Fill NA values by propegating values before? Need to test
+# Fill NA values by propegating values before
 df_updated_invest_3y5y = df_updated_invest_3y5y.fillna(method='ffill')
 
 # Write the updated df back to the excel sheet
@@ -236,5 +236,59 @@ df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
 df_updated = combine_df_on_index(df_original, df_country_credit_rating, 'Country')
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
+
+
+######################################
+# Get Country Index Data from YF.com #
+######################################
+
+sheet_name = 'Stock Market Levels Database'
+df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+
+#get date range
+todays_date = date.today()
+date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
+
+index_list = ['^DJI',
+'^GSPC',
+'^IXIC',
+'^NYA',
+'^GSPTSE',
+'^STOXX50E',
+'^FTSE',
+'^GDAXI',
+'^FCHI',
+'^IBEX',
+'^N225',
+'^HSI',
+'000300.SS',
+'^AXJO',
+'0P0001GY56.F' ]
+
+data = {'DATE': []}
+
+# Convert the dictionary into DataFrame
+df_index_data = pd.DataFrame(data)
+
+for index in index_list:
+    print("Getting: %s" % index)
+   
+    # Get index data
+    df_index = get_yf_historical_stock_data(index, "1d", "2000-12-28", date_str)
+
+    #Remove unnecessary columns from df_EUR_USD and rename columns
+    df_index = df_index.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+
+    #df_index = df_index.rename(columns={"Close": index.replace('^','')})
+    df_index = df_index.rename(columns={"Close": index})
+
+    df_index_data = combine_df_on_index(df_index_data, df_index, 'DATE')
+
+df_updated_indexes = combine_df_on_index(df_original_indexes, df_index_data, 'DATE')
+
+# Fill NA values by propegating values before
+df_updated_indexes = df_updated_indexes.fillna(method='ffill')
+
+write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_indexes, False, 0)
 
 print("Done!")
