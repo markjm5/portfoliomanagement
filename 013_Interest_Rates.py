@@ -250,20 +250,20 @@ todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
 index_list = ['^DJI',
-'^GSPC',
-'^IXIC',
-'^NYA',
-'^GSPTSE',
-'^STOXX50E',
-'^FTSE',
-'^GDAXI',
-'^FCHI',
-'^IBEX',
-'^N225',
-'^HSI',
-'000300.SS',
-'^AXJO',
-'0P0001GY56.F' ]
+    '^GSPC',
+    '^IXIC',
+    '^NYA',
+    '^GSPTSE',
+    '^STOXX50E',
+    '^FTSE',
+    '^GDAXI',
+    '^FCHI',
+    '^IBEX',
+    '^N225',
+    '^HSI',
+    '000300.SS',
+    '^AXJO',
+    '0P0001GY56.F' ]
 
 data = {'DATE': []}
 
