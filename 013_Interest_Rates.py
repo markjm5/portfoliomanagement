@@ -237,7 +237,6 @@ df_updated = combine_df_on_index(df_original, df_country_credit_rating, 'Country
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_updated, False, -1)
 
-
 ######################################
 # Get Country Index Data from YF.com #
 ######################################
@@ -263,7 +262,10 @@ index_list = ['^DJI',
     '^HSI',
     '000300.SS',
     '^AXJO',
-    '0P0001GY56.F' ]
+    '0P0001GY56.F',
+    '^NSEI', 
+    '^BSESN'
+    ]
 
 data = {'DATE': []}
 
