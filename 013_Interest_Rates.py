@@ -264,7 +264,8 @@ index_list = ['^DJI',
     '^AXJO',
     '0P0001GY56.F',
     '^NSEI', 
-    '^BSESN'
+    '^BSESN',
+    '^MXX'
     ]
 
 data = {'DATE': []}
