@@ -31,64 +31,84 @@ def return_atr(df_data):
 
     return df_sorted
 
+def write_to_file(index, number):
+
+    #################
+    # Get Daily ATR #
+    #################
+
+    df_data = get_yf_historical_stock_data(index, "1d", "2000-12-28", date_str)
+
+    df_sorted_daily = return_atr(df_data)
+
+    #sheet_name = 'Daily ATR %s' % (number)
+    #df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+
+    #df_updated_indexes = combine_df_on_index(df_original_indexes, df_sorted_daily, 'DATE')
+
+    #write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_indexes, False, 0)
+
+    ###################
+    # Get Monthly ATR #
+    ###################
+
+    df_data = get_yf_historical_stock_data(index, "1mo", "2000-12-28", date_str)
+
+    df_sorted_monthly = return_atr(df_data)
+
+    sheet_name = 'Monthly ATR %s' % (number)
+    #df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+
+    #df_updated_indexes = combine_df_on_index(df_original_indexes, df_sorted_monthly, 'DATE')
+
+    write_dataframe_to_excel(excel_file_path, sheet_name, df_sorted_monthly, False, 0)
+
+    #####################
+    # Get Quarterly ATR #
+    #####################
+
+    df_data = get_yf_historical_stock_data(index, "3mo", "2000-12-28", date_str)
+
+    df_sorted_quarterly = return_atr(df_data)
+
+    sheet_name = 'Quarterly ATR %s'  % (number)
+    #df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+
+    #df_updated_indexes = combine_df_on_index(df_original_indexes, df_sorted_quarterly, 'DATE')
+
+    write_dataframe_to_excel(excel_file_path, sheet_name, df_sorted_quarterly, False, 0)
+
+    df_sorted_daily = df_sorted_daily.drop(['H-L', 'H-C', 'L-C', 'TR', 'ATR'], axis=1)
+
+    df_sorted_daily = df_sorted_daily.rename(columns={"Close": index})
+
+    return df_sorted_daily
+
 ###############################
 # Get Ticker Data from YF.com #
 ###############################
 
-sheet_name = 'Ticker'
+sheet_name = 'Tickers'
 df_ticker = convert_excelsheet_to_dataframe(excel_file_path, sheet_name)
-
-index = df_ticker['Ticker'].values[0]
 
 #get date range
 todays_date = date.today()
 date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 
-print("Getting: %s" % index)
+index1 = df_ticker['Ticker'].values[0]
+print("Getting: %s" % index1)
+df_index1 = write_to_file(index1, 1)
 
-#################
-# Get Daily ATR #
-#################
+index2 = df_ticker['Ticker'].values[1]
+print("Getting: %s" % index2)
+df_index2 = write_to_file(index2, 2)
 
-df_data = get_yf_historical_stock_data(index, "1d", "2000-12-28", date_str)
+df_updated_indexes = combine_df_on_index(df_index1, df_index2, 'DATE')
 
-df_sorted_daily = return_atr(df_data)
+sheet_name = 'Database'
 
-sheet_name = 'Daily ATR'
-df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
+df_sorted = df_updated_indexes.sort_values(by='DATE', ascending = False)
 
-df_updated_indexes = combine_df_on_index(df_original_indexes, df_sorted_daily, 'DATE')
-
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_indexes, False, 0)
-
-###################
-# Get Monthly ATR #
-###################
-
-df_data = get_yf_historical_stock_data(index, "1mo", "2000-12-28", date_str)
-
-df_sorted_monthly = return_atr(df_data)
-
-sheet_name = 'Monthly ATR'
-df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
-
-df_updated_indexes = combine_df_on_index(df_original_indexes, df_sorted_monthly, 'DATE')
-
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_indexes, False, 0)
-
-#####################
-# Get Quarterly ATR #
-#####################
-
-df_data = get_yf_historical_stock_data(index, "3mo", "2000-12-28", date_str)
-
-df_sorted_quarterly = return_atr(df_data)
-
-sheet_name = 'Quarterly ATR'
-df_original_indexes = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True, None,'%d/%m/%Y')
-
-df_updated_indexes = combine_df_on_index(df_original_indexes, df_sorted_quarterly, 'DATE')
-
-write_dataframe_to_excel(excel_file_path, sheet_name, df_updated_indexes, False, 0)
+write_dataframe_to_excel(excel_file_path, sheet_name, df_sorted, False, 0)
 
 print("Done!")
