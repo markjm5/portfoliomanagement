@@ -33,6 +33,9 @@ for etf in etfs:
 
     df_etf_data = combine_df_on_index(df_etf_data, df_etf, 'DATE')
 
+# Fill NA values by propegating values before
+df_etf_data = df_etf_data.fillna(method='ffill')
+
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 df_updated = combine_df_on_index(df_original, df_etf_data, 'DATE')
