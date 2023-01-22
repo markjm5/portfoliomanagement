@@ -20,10 +20,13 @@ def return_atr(df_data):
     df_data['TR'] = df_data[['H-L', 'H-C', 'L-C']].max(axis=1)
 
     # Creates a new column in the netflix datafram called 'ATR' and calculates the ATR
-    df_data['ATR'] = df_data['TR'].rolling(14).mean()/100
+    df_data['ATR'] = df_data['TR'].rolling(14).mean()
+
+    df_data['ATR %'] = abs(df_data['ATR']/df_data['Open'])
 
     #Remove unnecessary columns from df_EUR_USD and rename columns
-    df_data = df_data.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+    #df_data = df_data.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
+    df_data = df_data.drop(['Volume'], axis=1)
 
     # Creates a new dataframe called netflix_sorted_df using the netflix dataframe
     # Sorts the dates from newest to oldest, rather than oldest to newest which the Yahoo Finance default
@@ -98,10 +101,12 @@ date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
 index1 = df_ticker['Ticker'].values[0]
 print("Getting: %s" % index1)
 df_index1 = write_to_file(index1, 1)
+df_index1 = df_index1.drop(['Open', 'High', 'Low','ATR %'], axis=1)
 
 index2 = df_ticker['Ticker'].values[1]
 print("Getting: %s" % index2)
 df_index2 = write_to_file(index2, 2)
+df_index2 = df_index2.drop(['Open', 'High', 'Low','ATR %'], axis=1)
 
 df_updated_indexes = combine_df_on_index(df_index1, df_index2, 'DATE')
 
