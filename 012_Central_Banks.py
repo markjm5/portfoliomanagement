@@ -28,6 +28,8 @@ df = append_two_df(df,df_M2SL)
 #df = append_two_df(df,df_DPCREDIT)
 df = pd.merge(df,df_DPCREDIT,"left")
 
+df = df.fillna(method='ffill')
+
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
 # Check for difference between original and new lists

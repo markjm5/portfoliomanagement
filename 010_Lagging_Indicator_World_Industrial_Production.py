@@ -97,6 +97,14 @@ def scrape_table_china_caixin_pmi():
   df_caixin_pmi = df_caixin_pmi.drop(columns='Forecast', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Previous', axis=1)
   df_caixin_pmi = df_caixin_pmi.drop(columns='', axis=1)
+
+  # Drop any rows that have a date that is in the future
+  # Get current date
+  # Filter data to only return rows before today
+  todays_date = date.today()
+  date_str = "%s-%s-%s" % (todays_date.year, todays_date.month, todays_date.day)
+  df_caixin_pmi = df_caixin_pmi.loc[(df_caixin_pmi['Date'] <= date_str)]
+
   print(df_caixin_pmi)
   df_caixin_pmi = df_caixin_pmi.drop(columns='Prev_Month', axis=1)
 

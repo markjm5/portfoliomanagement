@@ -252,13 +252,13 @@ def scrape_earningswhispers_day(day):
         skip_first = False
 
     return df
-
+"""
 sheet_name = 'Spin Off'
 df_spin_off = scrape_table_sec()
 
 # Write the updated df to the excel sheet, and overwrite what was there before
 write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0, True)
-
+"""
 sheet_name = 'Economic Calendar'
 df_economic_calendar = scrape_table_marketscreener_economic_calendar()
 #df_economic_calendar = df_economic_calendar.drop_duplicates()
