@@ -13,6 +13,7 @@ df_GPDIC1 = get_stlouisfed_data('GPDIC1')
 df_IMPGSC1 = get_stlouisfed_data('IMPGSC1')
 df_JCXFE = get_stlouisfed_data('JCXFE')
 df_PCECC96 = get_stlouisfed_data('PCECC96')
+df_A072RC1Q156SBEA = get_stlouisfed_data('A072RC1Q156SBEA')
 
 """
 print(df_DPCCRV1Q225SBEA.tail())
@@ -36,7 +37,7 @@ df = combine_df_on_index(df_GPDIC1,df,"DATE")
 df = combine_df_on_index(df_IMPGSC1,df,"DATE")
 df = combine_df_on_index(df_JCXFE,df,"DATE")
 df = combine_df_on_index(df_PCECC96,df,"DATE")
-
+df = combine_df_on_index(df_A072RC1Q156SBEA,df, "DATE")
 #LEGACY: Write to a csv file in the correct directory
 #write_to_directory(df,'002_Lagging_Indicator_US_GDP.csv')
 
