@@ -26,7 +26,7 @@ def get_etf_data(etfs):
         #Remove unnecessary columns and rename columns
         df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
         df_etf = df_etf.rename(columns={"Close": etf})
-
+        df_etf[etf].fillna(method='ffill', inplace=True)
         df_etf_data = combine_df_on_index(df_etf_data, df_etf, 'DATE')
 
     return df_etf_data
