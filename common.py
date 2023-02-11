@@ -810,9 +810,10 @@ def get_zacks_earnings_surprises(ticker):
   df_earnings_release_date['Release Date'] = df_earnings_release_date['Report Date'].str[:10]
   df_earnings_release_date = df_earnings_release_date.drop(['Zacks Consensus Estimate', 'Earnings ESP','Report Date'], axis=1)
   df_earnings_release_date['Release Date'] = pd.to_datetime(df_earnings_release_date['Release Date'],format='%m/%d/%Y')
-
+  #import pdb; pdb.set_trace()
   #Need to extract Earnings and Sales Surprises data from json object in javascript on page
-  scripts = soup.find_all('script')[29]
+  #scripts = soup.find_all('script')[29]
+  scripts = soup.find_all('script')[25]
   match_pattern = re.compile(r'(?<=\= ).*\}')
   match_string = scripts.text.strip().replace('\n','')
   matches = match_pattern.findall(match_string)

@@ -286,6 +286,9 @@ df_ip_yoy = df_ip_yoy.drop(columns='Date', axis=1)
 #Combine on temp field period_month 
 df_china_pmi = combine_df_on_index(df_caixin_pmi, df_ip_yoy,'period_month')
 
+#In case above merge resulted in rows without any date, drop these rows
+df_china_pmi = df_china_pmi.dropna(subset='Date')
+
 #Combine finished, so we dont need period_month anymore
 df_china_pmi = df_china_pmi.drop(columns='period_month', axis=1)
 

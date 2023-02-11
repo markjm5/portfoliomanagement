@@ -26,7 +26,6 @@ def get_etf_data(etfs):
         #Remove unnecessary columns and rename columns
         df_etf = df_etf.drop(['Open', 'High', 'Low', 'Volume'], axis=1)
         df_etf = df_etf.rename(columns={"Close": etf})
-        df_etf[etf].fillna(method='ffill', inplace=True)
         df_etf_data = combine_df_on_index(df_etf_data, df_etf, 'DATE')
 
     return df_etf_data
@@ -76,6 +75,7 @@ etfs.extend(commodities_etf)
 etfs = list(dict.fromkeys(etfs))
 
 df_etf_data = get_etf_data(etfs)
+df_etf_data = df_etf_data.fillna(method='ffill')
 
 df_original = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, True)
 
