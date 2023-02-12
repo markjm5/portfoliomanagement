@@ -486,6 +486,7 @@ def get_yf_financials(ticker):
 def get_finwiz_stock_data(ticker):
   df_company_data = pd.DataFrame()
   url_finviz = "https://finviz.com/quote.ashx?t=%s" % (ticker)
+  #try:
   page = get_page(url_finviz)
 
   soup = BeautifulSoup(page.content, 'html.parser')
@@ -528,7 +529,7 @@ def get_finwiz_stock_data(ticker):
   df_company_data.loc[ticker, 'QUICK_RATIO'] = emptyDict['Quick Ratio']
   df_company_data.loc[ticker, 'GROSS_MARGIN'] = emptyDict['Gross Margin']
   df_company_data.loc[ticker, 'CURRENT_RATIO'] = emptyDict['Current Ratio']
-
+  
   return df_company_data
 
 def get_stockrow_stock_data(ticker, debug):
@@ -565,13 +566,13 @@ def get_stockrow_stock_data(ticker, debug):
     for header in table_rows_header:
       df.insert(index,header.text,[],True)
       index+=1
-    print("did we get any rows?")
-    print(table_rows)
+    #print("did we get any rows?")
+    #print(table_rows)
     #Get rows of data.
     for tr in table_rows:
 
       if(tr.find_all('td')):
-        print(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip())
+        #print(tr.find_all('td')[len(tr.find_all('td'))-1].text.strip())
         row_heading = tr.find_all('td')[len(tr.find_all('td'))-1].text.strip().replace("Created with Highcharts 8.2.2foo","")   
         if(row_heading in ['Revenue','EBT','Net Income','PE Ratio','Earnings/Sh','Total Debt','Cash Flow/Sh','Book Value/Sh']):
           tds = tr.find_all('td', recursive=True)
@@ -592,8 +593,8 @@ def get_stockrow_stock_data(ticker, debug):
 
     # reorder
     df = df.loc[:, cols]
-    print("df before df2 is populated. Does it contain data?")
-    print(df)
+    #print("df before df2 is populated. Does it contain data?")
+    #print(df)
     page = get_page_selenium("https://www.wsj.com/market-data/quotes/%s/financials/annual/income-statement" % (ticker))
 
     soup = BeautifulSoup(page, 'html.parser')
@@ -639,8 +640,8 @@ def get_stockrow_stock_data(ticker, debug):
     #df2.drop([" "], axis=1) #Hack: Drop any null columns. Better to just remove them upstream
     df = df.append(df2,ignore_index = True)    
   #import pdb; pdb.set_trace()
-  print("df after merge")
-  print(df)
+  #print("df after merge")
+  #print(df)
   #format the df
 
   df_transposed = transpose_df(df)
@@ -663,8 +664,8 @@ def get_stockrow_stock_data(ticker, debug):
     })  
 
   df_transposed['EBITDA'] = df_transposed['EBITDA'].fillna("–")
-  print("df_transposed before numeric conversion")
-  print(df_transposed)
+  #print("df_transposed before numeric conversion")
+  #print(df_transposed)
 
   #format numeric values in dataframe
   #df_transposed = df_transposed.squeeze()

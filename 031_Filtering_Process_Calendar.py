@@ -1,12 +1,12 @@
 from unittest import skip
 import pandas as pd
 import re
-from datetime import date
+from datetime import date, datetime
 from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
 from common import combine_df_on_index, get_page, get_page_selenium, convert_html_table_to_df, get_zacks_us_companies
 from bs4 import BeautifulSoup
 
-excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/031_Filtering_Process_Idea_Generation_Bottom_Up.xlsm'
+excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/031_Filtering_Process_Calendar.xlsm'
 
 todays_date = date.today()
 year_str = todays_date.year
@@ -259,6 +259,7 @@ df_spin_off = scrape_table_sec()
 # Write the updated df to the excel sheet, and overwrite what was there before
 write_dataframe_to_excel(excel_file_path, sheet_name, df_spin_off, False, 0, True)
 """
+
 sheet_name = 'Economic Calendar'
 df_economic_calendar = scrape_table_marketscreener_economic_calendar()
 #df_economic_calendar = df_economic_calendar.drop_duplicates()
@@ -272,15 +273,5 @@ df_earnings_calendar = df_earnings_calendar.drop_duplicates('Ticker')
 
 # Write the updated df to the excel sheet, and overwrite what was there before
 write_dataframe_to_excel(excel_file_path, sheet_name, df_earnings_calendar, False, 0, True)
-
-#TODO: Filter different metrics from US Stocks data list, and write to excel
-#import pdb; pdb.set_trace()
-#df_retrieved_company_data = df_us_companies.loc[df_us_companies['TICKER'] == ticker_str].reset_index(drop=True)
-
-# FCF 2015	FCF 2016	FCF 2017	FCF 2018
-# EPS 2015	EPS 2016	EPS 2017	EPS 2018
-# Sales 2018	Sales 2019	Sales 2020
-# ROE
-# AAll
 
 print("Done!")

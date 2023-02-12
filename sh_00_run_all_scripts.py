@@ -37,7 +37,8 @@ run_script("020_Leading_Indicator_US_Housing_Market.py")
 run_script("022_Global_Macro_Data_Summary_Page.py")
 run_script("024_Filtering_Process_ETF_Universe.py")
 run_script("030_Filtering_Process_US_Stocks.py")
-run_script("031_Filtering_Process_Idea_Generation_Bottom_Up.py")
+run_script("031_Filtering_Process_Calendar.py")
+run_script("032_Filtering_Process_Idea_Generation_Bottom_Up.py")
 
 now_finish = datetime.now()
 finish_time = now_finish.strftime("%H:%M:%S")
@@ -45,7 +46,8 @@ finish_time = now_finish.strftime("%H:%M:%S")
 difference = now_finish - now_start
 
 seconds_in_day = 24 * 60 * 60
-
+print("=================================================================================")
 print("Start Time = %s" % (start_time))
 print("End Time = %s" % (finish_time))
 print(divmod(difference.days * seconds_in_day + difference.seconds, 60))
+print("=================================================================================")
