@@ -27,7 +27,7 @@ df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, F
 df_us_companies_profile = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP'])
 
 #For Debug Purposes
-df_us_companies_profile = df_us_companies_profile.head(5)
+#df_us_companies_profile = df_us_companies_profile.head(5)
 
 now_start = datetime.now()  
 start_time = now_start.strftime("%H:%M:%S")
@@ -74,11 +74,16 @@ df_vol_data_all_companies = df_vol_data_all_companies.reset_index(drop=True)
 df_vol_data_all_companies['bool_million'] = np.where(df_vol_data_all_companies['AVG_VOL_10D'].str.contains("M"), True, False)
 df_vol_data_all_companies = transpose_df_string_numbers(df_vol_data_all_companies,'AVG_VOL_10D')
 
-#Create temp column to track millions and thousands
+#Updated temp column to track millions and thousands
 df_vol_data_all_companies['bool_million'] = np.where(df_vol_data_all_companies['AVG_VOL_3M'].str.contains("M"), True, False)
 df_vol_data_all_companies = transpose_df_string_numbers(df_vol_data_all_companies,'AVG_VOL_3M')
 
+#Drop temp column
 df_vol_data_all_companies = df_vol_data_all_companies.drop(['bool_million'], axis=1)
+
+#Create calculated metrics
+df_vol_data_all_companies['VS_10_DAYS'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['AVG_VOL_10D']
+df_vol_data_all_companies['VS_3_MONTHS'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['AVG_VOL_3M']
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/038_Filtering_Process_Volume.xlsm'
 sheet_name = 'Volume'
