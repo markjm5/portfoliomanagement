@@ -636,7 +636,7 @@ def get_stockrow_stock_data(ticker, debug):
 
           df2.loc[len(df2.index)] = temp_row
           break
-    print(df2)
+    #print(df2)
     #df2.drop([" "], axis=1) #Hack: Drop any null columns. Better to just remove them upstream
     df = df.append(df2,ignore_index = True)    
   #import pdb; pdb.set_trace()

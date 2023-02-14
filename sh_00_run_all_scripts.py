@@ -38,7 +38,7 @@ run_script("022_Global_Macro_Data_Summary_Page.py")
 run_script("024_Filtering_Process_ETF_Universe.py")
 run_script("030_Filtering_Process_US_Stocks.py")
 run_script("031_Filtering_Process_Calendar.py")
-run_script("032_Filtering_Process_Idea_Generation_Bottom_Up.py")
+#run_script("032_Filtering_Process_Idea_Generation_Bottom_Up.py")
 
 now_finish = datetime.now()
 finish_time = now_finish.strftime("%H:%M:%S")

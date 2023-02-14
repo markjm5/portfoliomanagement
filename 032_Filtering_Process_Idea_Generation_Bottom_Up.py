@@ -1,13 +1,12 @@
-from unittest import skip
 import pandas as pd
-import re
-from datetime import date, datetime
-from common import get_stlouisfed_data, convert_excelsheet_to_dataframe, write_dataframe_to_excel
-from common import combine_df_on_index, get_page, get_page_selenium, convert_html_table_to_df, get_zacks_us_companies
-from bs4 import BeautifulSoup
+from datetime import datetime
+from common import convert_excelsheet_to_dataframe, write_dataframe_to_excel
+from common import get_zacks_us_companies
+from common import get_stockrow_stock_data
 
-from common import get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares
-from common import get_zacks_peer_comparison, get_zacks_earnings_surprises, get_zacks_product_line_geography
+###############################################################
+#       BEWARE: THIS SCRIPT TAKES 14 HOURS TO COMPLETE        #
+###############################################################
 
 df_us_companies = get_zacks_us_companies()
 
@@ -15,29 +14,46 @@ excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Proce
 sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-df_us_companies_fcf = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP'])
+df_us_companies_profile = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP'])
 
-#from common import get_finwiz_stock_data, get_stockrow_stock_data, get_zacks_balance_sheet_shares
-#from common import get_zacks_peer_comparison, get_zacks_earnings_surprises, get_zacks_product_line_geography
+#For Debug Purposes
+df_us_companies_profile = df_us_companies_profile.head(2)
+
 now_start = datetime.now()
 start_time = now_start.strftime("%H:%M:%S")
 
-count = 0
-total = len(df_us_companies)
-for ticker in df_us_companies["TICKER"]:
-    count += 1
-    print("%s / %s - %s" % (count, total, ticker))
-    try:
-        stockrow_data = get_stockrow_stock_data(ticker, False)
-        
-        stockrow_data = stockrow_data.filter(['SALES','EARNINGS_PER_SHARE'])
+df_sales_data_all_companies = pd.DataFrame()
+df_eps_data_all_companies = pd.DataFrame()
+df_cashflow_data_all_companies = pd.DataFrame()
 
-        #TODO: Create 2 dfs for all these tickers - SALES and EARNINGS_PER_SHARE
-        #TODO: Write completed dfs into separate sheets
+count = 0
+total = len(df_us_companies_profile)
+for ticker in df_us_companies_profile["TICKER"]:
+    count += 1
+    print("%s/%s - %s" % (count, total, ticker))
+    try:
+        df_stockrow_data = get_stockrow_stock_data(ticker, False)
+        
+        df_sales_data = df_stockrow_data.filter(['SALES']).T
+        df_eps_data = df_stockrow_data.filter(['EARNINGS_PER_SHARE']).T
+        df_cashflow_data = df_stockrow_data.filter(['CASH_FLOW_PER_SHARE']).T
+
+        df_sales_data = df_sales_data.reset_index(drop=True)
+        df_eps_data = df_eps_data.reset_index(drop=True)
+        df_cashflow_data = df_cashflow_data.reset_index(drop=True)
+
+        df_company_profile = df_us_companies_profile.loc[df_us_companies_profile['TICKER'] == ticker].reset_index(drop=True)
+
+        df_sales_data = pd.concat([df_company_profile, df_sales_data], axis=1, join="inner")
+        df_eps_data = pd.concat([df_company_profile, df_eps_data], axis=1, join="inner")
+        df_cashflow_data = pd.concat([df_company_profile, df_cashflow_data], axis=1, join="inner")
+
+        df_sales_data_all_companies = df_sales_data_all_companies.append(df_sales_data)
+        df_eps_data_all_companies = df_eps_data_all_companies.append(df_eps_data)
+        df_cashflow_data_all_companies = df_cashflow_data_all_companies.append(df_cashflow_data)
+
     except:
         print("Did not load data")
-
-    import pdb; pdb.set_trace()
 
 now_finish = datetime.now()
 finish_time = now_finish.strftime("%H:%M:%S")
@@ -50,13 +66,15 @@ print("Start Time = %s" % (start_time))
 print("End Time = %s" % (finish_time))
 print(divmod(difference.days * seconds_in_day + difference.seconds, 60))
 
-# FCF 2015	FCF 2016	FCF 2017	FCF 2018
-# EPS 2015	EPS 2016	EPS 2017	EPS 2018
-# Sales 2018	Sales 2019	Sales 2020
-# ROE
-# AAll
+excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/032_Filtering_Process_Idea_Generation_Bottom_Up.xlsm'
+sheet_name = 'Sales'
+# Write the updated df to the excel sheet, and overwrite what was there before
+write_dataframe_to_excel(excel_file_path, sheet_name, df_sales_data_all_companies, False, 0, True)
 
-excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/031_Filtering_Process_Idea_Generation_Bottom_Up.xlsm'
-sheet_name = 'Database US Companies'
+sheet_name = 'Earnings'
+write_dataframe_to_excel(excel_file_path, sheet_name, df_eps_data_all_companies, False, 0, True)
+
+sheet_name = 'FCF'
+write_dataframe_to_excel(excel_file_path, sheet_name, df_cashflow_data_all_companies, False, 0, True)
 
 print("Done!")
