@@ -12,6 +12,7 @@ from common import get_yf_key_stats
 def transpose_df_string_numbers(df, column):
     df[column] = df[column].str.replace("M","")
     df[column] = df[column].str.replace("k","")
+    df[column] = df[column].str.replace("N/A","0.00")
     #Convert numbers to numeric
     df[column] = df[column].astype(float)
     #where bool_million=True, multiply by a million, otherwise, multiply by a thousand
@@ -24,10 +25,10 @@ excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Proce
 sheet_name = 'Database US Companies'
 df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, False)
 
-df_us_companies_profile = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP'])
+df_us_companies_profile = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP','SHARES_OUTSTANDING_MILLIONS'])
 
 #For Debug Purposes
-#df_us_companies_profile = df_us_companies_profile.head(5)
+#df_us_companies_profile = df_us_companies_profile.head(2)
 
 now_start = datetime.now()  
 start_time = now_start.strftime("%H:%M:%S")
@@ -41,6 +42,7 @@ for ticker in df_us_companies_profile["TICKER"]:
     print("%s/%s - %s" % (count, total, ticker))
     try:
         df_yf_key_statistics = get_yf_key_stats(ticker)
+
         df_yf_key_statistics = df_yf_key_statistics.filter(['AVG_VOL_10D','AVG_VOL_3M']).reset_index(drop=True)
         df_yf_stock_data_last = yf.download(tickers=ticker,period="1d",interval="1d",auto_adjust=True)
         df_daily_volume = df_yf_stock_data_last["Volume"]
@@ -84,6 +86,10 @@ df_vol_data_all_companies = df_vol_data_all_companies.drop(['bool_million'], axi
 #Create calculated metrics
 df_vol_data_all_companies['VS_10_DAYS'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['AVG_VOL_10D']
 df_vol_data_all_companies['VS_3_MONTHS'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['AVG_VOL_3M']
+
+df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS']*1000000
+df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'].astype(int)
+df_vol_data_all_companies['DAILY_SHARES_TRADED_PERCENTAGE'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS']
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/038_Filtering_Process_Volume.xlsm'
 sheet_name = 'Volume'

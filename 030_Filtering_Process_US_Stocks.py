@@ -67,7 +67,8 @@ df_us_companies = df_us_companies.rename(columns={"Company Name": "COMPANY_NAME"
     "Dividend ": "DIVIDEND",
     "Current Assets  ($mil)": "CURRENT_ASSETS(MILLION)",	
     "Current Liabilities ($mil)": "CURRENT_LIABILITIES(MILLION)",	
-    "Long Term Debt ($mil)": "LONG_TERM_DEBT(MILLION)"
+    "Long Term Debt ($mil)": "LONG_TERM_DEBT(MILLION)",
+    "Shares Outstanding (mil)": "SHARES_OUTSTANDING_MILLIONS"
 })
 
 # Write the updated df back to the excel sheet

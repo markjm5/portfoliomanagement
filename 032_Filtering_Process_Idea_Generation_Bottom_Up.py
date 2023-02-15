@@ -8,6 +8,25 @@ from common import get_stockrow_stock_data
 #       BEWARE: THIS SCRIPT TAKES 14 HOURS TO COMPLETE        #
 ###############################################################
 
+def calculate_growth(df):
+
+    count = 0
+    for (columnName, columnData) in df.iteritems():
+        count += 1
+        if(count == 1):
+            year_a_name = columnName
+            year_a_value = columnData[0]
+        else:
+            year_b_name = columnName
+            year_b_value = columnData[0]
+            col_name = "%s_%s_GROWTH" % (year_a_name, year_b_name)
+            df[col_name] = (year_b_value-year_a_value)/year_a_value
+
+            year_a_name = year_b_name
+            year_a_value = year_b_value
+
+    return df
+
 df_us_companies = get_zacks_us_companies()
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/030_Filtering_Process_Quantitative_Analysis_US_Stocks.xlsm'
@@ -35,8 +54,13 @@ for ticker in df_us_companies_profile["TICKER"]:
         df_stockrow_data = get_stockrow_stock_data(ticker, False)
         
         df_sales_data = df_stockrow_data.filter(['SALES']).T
+        df_sales_data = calculate_growth(df_sales_data)
+
         df_eps_data = df_stockrow_data.filter(['EARNINGS_PER_SHARE']).T
+        df_eps_data = calculate_growth(df_eps_data)
+
         df_cashflow_data = df_stockrow_data.filter(['CASH_FLOW_PER_SHARE']).T
+        df_cashflow_data = calculate_growth(df_cashflow_data)
 
         df_sales_data = df_sales_data.reset_index(drop=True)
         df_eps_data = df_eps_data.reset_index(drop=True)
@@ -51,7 +75,6 @@ for ticker in df_us_companies_profile["TICKER"]:
         df_sales_data_all_companies = df_sales_data_all_companies.append(df_sales_data)
         df_eps_data_all_companies = df_eps_data_all_companies.append(df_eps_data)
         df_cashflow_data_all_companies = df_cashflow_data_all_companies.append(df_cashflow_data)
-
     except:
         print("Did not load data")
 
