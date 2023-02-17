@@ -88,7 +88,7 @@ df_vol_data_all_companies['VS_10_DAYS'] = df_vol_data_all_companies['Volume']/df
 df_vol_data_all_companies['VS_3_MONTHS'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['AVG_VOL_3M']
 
 df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS']*1000000
-df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'].astype(int)
+#df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'].astype(int)
 df_vol_data_all_companies['DAILY_SHARES_TRADED_PERCENTAGE'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS']
 
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/038_Filtering_Process_Volume.xlsm'

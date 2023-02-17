@@ -36,7 +36,7 @@ df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, F
 df_us_companies_profile = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP'])
 
 #For Debug Purposes
-df_us_companies_profile = df_us_companies_profile.head(2)
+#df_us_companies_profile = df_us_companies_profile.head(2)
 
 now_start = datetime.now()
 start_time = now_start.strftime("%H:%M:%S")
