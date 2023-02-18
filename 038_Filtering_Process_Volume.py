@@ -28,7 +28,7 @@ df_us_companies = convert_excelsheet_to_dataframe(excel_file_path, sheet_name, F
 df_us_companies_profile = df_us_companies.filter(['COMPANY_NAME','TICKER','SECTOR','INDUSTRY','MARKET_CAP','SHARES_OUTSTANDING_MILLIONS'])
 
 #For Debug Purposes
-#df_us_companies_profile = df_us_companies_profile.head(2)
+#df_us_companies_profile = df_us_companies_profile.head(5)
 
 now_start = datetime.now()  
 start_time = now_start.strftime("%H:%M:%S")
@@ -90,10 +90,23 @@ df_vol_data_all_companies['VS_3_MONTHS'] = df_vol_data_all_companies['Volume']/d
 df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS']*1000000
 #df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'] = df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS'].astype(int)
 df_vol_data_all_companies['DAILY_SHARES_TRADED_PERCENTAGE'] = df_vol_data_all_companies['Volume']/df_vol_data_all_companies['SHARES_OUTSTANDING_MILLIONS']
+df_vol_data_all_companies = df_vol_data_all_companies.sort_values(by=['DAILY_SHARES_TRADED_PERCENTAGE','VS_10_DAYS'], ascending=False)
 
+df_vol_data_all_sectors = df_vol_data_all_companies.drop(['COMPANY_NAME','TICKER','INDUSTRY','MARKET_CAP','SHARES_OUTSTANDING_MILLIONS','AVG_VOL_10D','AVG_VOL_3M','VS_10_DAYS','VS_3_MONTHS','DAILY_SHARES_TRADED_PERCENTAGE'], axis=1)
+df_vol_data_all_sectors = df_vol_data_all_sectors.groupby(['SECTOR']).sum().sort_values(by=['Volume'], ascending=False).reset_index()
+
+df_vol_data_all_industries = df_vol_data_all_companies.drop(['COMPANY_NAME','TICKER','SECTOR','MARKET_CAP','SHARES_OUTSTANDING_MILLIONS','AVG_VOL_10D','AVG_VOL_3M','VS_10_DAYS','VS_3_MONTHS','DAILY_SHARES_TRADED_PERCENTAGE'], axis=1)
+df_vol_data_all_industries = df_vol_data_all_industries.groupby(['INDUSTRY']).sum().sort_values(by=['Volume'], ascending=False).reset_index()
+#import pdb; pdb.set_trace()
 excel_file_path = '/Trading_Excel_Files/04_Filtering_Process/038_Filtering_Process_Volume.xlsm'
 sheet_name = 'Volume'
 
 write_dataframe_to_excel(excel_file_path, sheet_name, df_vol_data_all_companies, False, 0, True)
+
+sheet_name = 'Volume Sector'
+write_dataframe_to_excel(excel_file_path, sheet_name, df_vol_data_all_sectors, False, 0, True)
+
+sheet_name = 'Volume Industry'
+write_dataframe_to_excel(excel_file_path, sheet_name, df_vol_data_all_industries, False, 0, True)
 
 print("Done!")
