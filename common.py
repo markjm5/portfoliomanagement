@@ -319,7 +319,7 @@ def get_yf_historical_stock_data(ticker, interval, start, end):
 
 def get_yf_analysis(ticker):
   company = yf.Ticker(ticker)
-  import pdb; pdb.set_trace()
+  #import pdb; pdb.set_trace()
   # get stock info
   company.info
 
@@ -1049,7 +1049,7 @@ def get_invest_data_manual_scrape(country_list, bond_year):
 
     try:
         df_country_rates = df_country_rates.drop(['Open', 'High', 'Low', 'Change %'], axis=1)
-        df_country_rates['Date'] = pd.to_datetime(df_country_rates['Date'],format='%b %d, %Y')
+        df_country_rates['Date'] = pd.to_datetime(df_country_rates['Date'],format='%m/%d/%Y')
         df_country_rates = df_country_rates.rename(columns={"Date": "DATE","Price": country})
         df_country_rates[country] = pd.to_numeric(df_country_rates[country])
         df_invest_data = combine_df_on_index(df_invest_data, df_country_rates, 'DATE')
@@ -1061,10 +1061,10 @@ def get_invest_data_manual_scrape(country_list, bond_year):
   return df_invest_data.drop_duplicates()
 
 def return_selenium_df(url):
-
+  #import pdb; pdb.set_trace() #Need to check that the URL is getting the data
   page = get_page_selenium(url)
   soup = BeautifulSoup(page, 'html.parser')
-  table = soup.find('table') 
+  table = soup.find_all('table')[1]
   df = convert_html_table_to_df(table, False)
 
   return df
@@ -1508,11 +1508,14 @@ def combine_df_on_index(df1, df2, index_col):
   return df2.combine_first(df1).reset_index()
 
 def convert_html_table_to_df(table, contains_th):
-  
-  table_rows = table.find_all('tr')
-  table_rows_header = table.find_all('tr')[0].find_all('th')
   df = pd.DataFrame()
 
+  try:
+    table_rows = table.find_all('tr')
+    table_rows_header = table.find_all('tr')[0].find_all('th')
+  except AttributeError as e:
+    return df
+  
   index = 0
 
   for header in table_rows_header:

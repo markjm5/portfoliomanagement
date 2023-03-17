@@ -98,6 +98,8 @@ df_original_invest_10y = convert_excelsheet_to_dataframe(excel_file_path, sheet_
 #write_dataframe_to_excel(excel_file_path, sheet_name, df_original_invest_10y, False, 0)
 
 country_list = ['u.s.','canada','brazil','mexico','germany','france','italy','spain','portugal','netherlands','austria','greece','norway','switzerland','uk','russia','turkey','poland','hungary','czech-republic','south-africa','japan','australia','new-zealand','singapore','china','hong-kong','india','indonesia','south-korea','philippines','thailand','vietnam']
+#TEST
+#country_list = ['u.s.','canada']
 
 #df_invest_10y = get_invest_data(country_list, '10', '28/12/2000') #Needs to be replaced because it no longer works
 df_invest_10y = get_invest_data_manual_scrape(country_list,'10')
@@ -159,6 +161,9 @@ df_original_invest_2y = convert_excelsheet_to_dataframe(excel_file_path, sheet_n
 
 #TODO: match country list with what is in excel file, without the missing_country list.
 country_list = ['u.s.','canada','brazil','germany','france','italy','spain','portugal','netherlands','austria','norway','switzerland', 'uk','russia','turkey','poland','czech-republic','south-africa','japan','australia','new-zealand','singapore','china','hong-kong','india','south-korea','philippines','thailand','vietnam']
+#TEST
+#country_list = ['u.s.','canada']
+
 missing = ['mexico', 'greece', 'hungary', 'indonesia'] #TODO: Fix urls for these countries because they are have 3 months
 
 #df_invest_2y = get_invest_data(country_list, '2', '28/12/2000')
