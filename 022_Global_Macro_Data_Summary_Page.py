@@ -56,6 +56,7 @@ def get_eurodollar_futures():
 
     url = "https://www.cmegroup.com/markets/interest-rates/stirs/eurodollar.quotes.html"
 
+    df_eurodollar_futures = None
     html = get_page_selenium(url)
 
     soup = BeautifulSoup(html, 'html.parser')
@@ -65,79 +66,80 @@ def get_eurodollar_futures():
     table_rows = table.find_all('tr')
     table_rows_header = table.find_all('tr')[0].find_all('th')
 
-    df = pd.DataFrame()
-    index = 0
+    if(table_rows_header):
+        df = pd.DataFrame()
+        index = 0
 
-    for header in table_rows_header:
-        df.insert(index,header.text,[],True)
-        index+=1
+        for header in table_rows_header:
+            df.insert(index,header.text,[],True)
+            index+=1
 
-    #Insert New Row. Format the data to show percentage as float
-    for tr in table_rows:
-        temp_row = []
+        #Insert New Row. Format the data to show percentage as float
+        for tr in table_rows:
+            temp_row = []
 
-        td = tr.find_all('td')
-        if(td):
-            for obs in td:
-                text = obs.text
-                temp_row.append(text)        
+            td = tr.find_all('td')
+            if(td):
+                for obs in td:
+                    text = obs.text
+                    temp_row.append(text)        
 
-            df.loc[len(df.index)] = temp_row
+                df.loc[len(df.index)] = temp_row
 
-    df = df.drop(columns=['Change','Options','Chart','Open', 'High', 'Low', 'Volume', 'Updated', 'PriorSettle'], axis=1)
-    pattern_select = re.compile(r'((?!=[0-9])GE[A-Z][0-9])')
+        df = df.drop(columns=['Change','Options','Chart','Open', 'High', 'Low', 'Volume', 'Updated', 'PriorSettle'], axis=1)
+        pattern_select = re.compile(r'((?!=[0-9])GE[A-Z][0-9])')
 
-    df['Month'] = df['Month'].str.replace(pattern_select,'')
+        df['Month'] = df['Month'].str.replace(pattern_select,'')
 
-    # format date
-    df['Month'] = pd.to_datetime(df['Month'],format='%b %Y')
+        # format date
+        df['Month'] = pd.to_datetime(df['Month'],format='%b %Y')
 
-    current_value = None
-    one_month_value = None
-    six_month_value = None
-    twelve_month_value = None
+        current_value = None
+        one_month_value = None
+        six_month_value = None
+        twelve_month_value = None
 
-    # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
-    for index, row in df.iterrows():
-        if(index==0):
-            try:
-                current_value = float(row['Last'])
-            except ValueError as e:
-                pass        
-            except TypeError as e:
-                pass
-        elif(index==2):
-            try:
-                one_month_value = (current_value - float(row['Last']))/100
-            except ValueError as e:
-                pass        
-            except TypeError as e:
-                pass
+        # Calculate Eurodollar Futures quotes for 1m, 6m, 12m
+        for index, row in df.iterrows():
+            if(index==0):
+                try:
+                    current_value = float(row['Last'])
+                except ValueError as e:
+                    pass        
+                except TypeError as e:
+                    pass
+            elif(index==2):
+                try:
+                    one_month_value = (current_value - float(row['Last']))/100
+                except ValueError as e:
+                    pass        
+                except TypeError as e:
+                    pass
 
-        elif(index==5):
-            try:
-                six_month_value = (current_value - float(row['Last']))/100
-            except ValueError as e:
-                pass        
-            except TypeError as e:
-                pass
+            elif(index==5):
+                try:
+                    six_month_value = (current_value - float(row['Last']))/100
+                except ValueError as e:
+                    pass        
+                except TypeError as e:
+                    pass
 
-        elif(index==11):
-            try:
-                twelve_month_value = (current_value - float(row['Last']))/100
+            elif(index==11):
+                try:
+                    twelve_month_value = (current_value - float(row['Last']))/100
 
-            except ValueError as e:
-                pass        
-            except TypeError as e:
-                pass
+                except ValueError as e:
+                    pass        
+                except TypeError as e:
+                    pass
 
-        print("%s-%s" % (row['Month'], row['Last']))
+            print("%s-%s" % (row['Month'], row['Last']))
 
-    # initialize list of lists
-    data = [['Euro Futures 1m', one_month_value], ['Euro Futures 6m', six_month_value], ['Euro Futures 12m', twelve_month_value]]
-    
-    # Create the pandas DataFrame
-    df_eurodollar_futures = pd.DataFrame(columns=['COL0', 'LAST'], data=data)
+        # initialize list of lists
+        data = [['Euro Futures 1m', one_month_value], ['Euro Futures 6m', six_month_value], ['Euro Futures 12m', twelve_month_value]]
+        
+        # Create the pandas DataFrame
+        df_eurodollar_futures = pd.DataFrame(columns=['COL0', 'LAST'], data=data)
 
     return df_eurodollar_futures    
 
@@ -282,8 +284,12 @@ df_dxy_001 = df_dxy_001.rename(columns={"DX-Y.NYB": "DXY"})
 df_dxy = get_data(df_dxy_001)
 
 # Temp df to combine all rows
-df_us_rates_currency = df_current_ffr_target.append(df_eurodollar_futures, ignore_index=True)
-df_us_rates_currency = df_us_rates_currency.append(df_us_treasury_yields, ignore_index=True)
+if(df_eurodollar_futures):
+    df_us_rates_currency = df_current_ffr_target.append(df_eurodollar_futures, ignore_index=True)
+    df_us_rates_currency = df_us_rates_currency.append(df_us_treasury_yields, ignore_index=True)
+else:
+    df_us_rates_currency = df_current_ffr_target.append(df_us_treasury_yields, ignore_index=True)
+
 df_us_rates_currency = df_us_rates_currency.append(df_dxy, ignore_index=True)
 
 # Get Original Sheet and store it in a dataframe
